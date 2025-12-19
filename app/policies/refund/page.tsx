@@ -6,7 +6,7 @@ export default function RefundPolicyPage() {
       <Header />
       
       {/* Main Content - Responsive fluid layout */}
-      <main className="bg-[#F5E6D3] min-h-screen pb-12">
+      <main className="bg-[#F6D8AB] min-h-screen pb-12">
         {/* Centered container with max-width */}
         <div className="w-full max-w-[1280px] mx-auto px-8 pt-16 flex flex-col gap-6">
           <h1 className="font-bold text-[32px] leading-[100%] tracking-[0px] text-gray-900" style={{ fontFamily: 'var(--font-manrope)' }}>Refund Policy</h1>
@@ -22,7 +22,7 @@ export default function RefundPolicyPage() {
           {/* Eligibility Criteria */}
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Eligibility Criteria:</h2>
-            <ul className="list-disc list-inside space-y-1 text-gray-800 ml-4">
+            <ul className="list-disc list-inside space-y-1 text-base leading-6 font-normal ml-4" style={{ fontFamily: 'var(--font-manrope)', letterSpacing: '-0.005em' }}>
               <li>Items must be unused, undamaged, and in resalable condition.</li>
               <li>Proof of purchase (order number or receipt) is required.</li>
               <li>Sale items, personalized/custom-made products, and items marked "final sale" are non-returnable.</li>
@@ -57,10 +57,10 @@ export default function RefundPolicyPage() {
           {/* Return Process */}
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">Return process:</h2>
-            <div className="bg-[#F4C89F] p-6 rounded-lg space-y-3">
+            <div className="bg-[#FFC26F] p-6 rounded-lg space-y-3">
               <p className="text-gray-900">
                 <span className="font-semibold">Contact Us:</span>{' '}
-                <a href="mailto:help@rawearthcrystals.com.au" className="hover:underline">
+                <a href="mailto:help@rawearthcrystals.com.au" className="font-bold hover:underline">
                   help@rawearthcrystals.com.au
                 </a>{' '}
                 with your order number and reason for return.

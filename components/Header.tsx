@@ -13,7 +13,7 @@ export default function Header() {
       </div>
 
       {/* Main Header - Responsive navigation: mobile 390x120, desktop 1440x120 */}
-      <header className="bg-[#5C3D2E] text-white w-full h-[120px]">
+      <header className="bg-[#280F0B] text-white w-full h-[120px]">
         <div className="w-full max-w-[1440px] mx-auto h-full relative">
           {/* Mobile & Desktop Layout */}
           <div className="h-full px-4 sm:px-6 lg:px-0 lg:block">

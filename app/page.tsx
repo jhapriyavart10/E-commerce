@@ -7,7 +7,7 @@ export default function Home() {
       <Header />
       
       {/* Empty content area - to be filled later */}
-      <main className="flex-grow bg-[#F5E6D3]">
+      <main className="flex-grow bg-[#F6D8AB]">
         {/* Home page content will go here */}
       </main>
       
