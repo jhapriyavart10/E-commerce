@@ -76,7 +76,7 @@ export default function CartPage() {
         <Header />
 
         {/* Main Content */}
-        <div className="pt-[24px] px-6 pb-12 min-h-screen">
+        <div className="pt-[185px] px-6 pb-12 min-h-screen">
           {/* Page Title */}
           <div className="mb-6">
             <h1 className="font-['Lora',serif] font-normal text-[#280f0b] text-[40px] leading-[100%]">Cart</h1>
