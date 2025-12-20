@@ -55,6 +55,13 @@ export default function ProductPage() {
     }
   }
 
+  const scrollToReviews = () => {
+    const reviewsElement = document.getElementById('reviews-section')
+    if (reviewsElement) {
+      reviewsElement.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -67,10 +74,339 @@ export default function ProductPage() {
   }
 
   return (
-    <div style={{ fontFamily: 'var(--font-manrope)', backgroundColor: '#F6D8AB', minHeight: '100vh' }}>
+    <div className="font-sans bg-[#F6D8AB] min-h-screen">
       <Header />
-      
-      <style dangerouslySetInnerHTML={{__html: `
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            max-height: 500px;
+            transform: translateY(0);
+          }
+        }
+
+        .product-page-container {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 2rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+          .product-page-container {
+            padding: 2rem 2rem;
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .product-page-container {
+            padding: 2rem 4rem;
+          }
+        }
+
+        .product-layout {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+          .product-layout {
+            flex-direction: row;
+            gap: 3rem;
+          }
+        }
+
+        .product-gallery {
+          flex: 1;
+          min-width: 0;
+        }
+
+        @media (min-width: 1024px) {
+          .product-gallery {
+            max-width: 640px;
+          }
+        }
+
+        .product-details {
+          flex: 1;
+          min-width: 0;
+        }
+
+        @media (min-width: 1024px) {
+          .product-details {
+            padding-left: 91px;
+          }
+        }
+
+        .main-product-image {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 1;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 0.5rem;
+        }
+
+        .thumbnail-strip {
+          display: flex;
+          gap: 8px;
+          width: 100%;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        
+        .thumbnail-strip::-webkit-scrollbar {
+          display: none;
+        }
+
+        @media (max-width: 767px) {
+          .thumbnail-strip {
+            overflow-x: hidden;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+          }
+        }
+
+        .thumbnail-image {
+          width: calc((100% - 40px) / 6);
+          min-width: 50px;
+          max-width: 100px;
+          aspect-ratio: 1;
+          object-fit: cover;
+          border-radius: 4px;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+          .thumbnail-image {
+            width: 100px;
+            height: 100px;
+          }
+        }
+
+        .material-selection-box {
+          width: 100%;
+          background-color: #E8D5B7;
+          border: 1.25px solid #C5A572;
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          position: relative;
+        }
+
+        @media (min-width: 1024px) {
+          .material-selection-box {
+            max-width: 565px;
+          }
+        }
+
+        .material-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1.75rem;
+        }
+
+        @media (max-width: 767px) {
+          .material-buttons {
+            flex-direction: column;
+          }
+          
+          .material-buttons button {
+            width: 100% !important;
+            max-width: 100% !important;
+            justify-content: flex-start !important;
+          }
+        }
+
+        .cta-button {
+          width: 100%;
+          height: 51px;
+          padding: 15px 40px;
+          border: none;
+          color: #FFFFFF;
+          font-weight: 700;
+          font-size: 16px;
+          cursor: pointer;
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @media (min-width: 1024px) {
+          .cta-button {
+            max-width: 565px;
+          }
+        }
+
+        /* Desktop: 12px spacing between Add to Cart and Buy with Shop buttons */
+        @media (min-width: 768px) {
+          button[style*="565px"]:first-of-type {
+            margin-bottom: 12px !important;
+          }
+        }
+
+        .quantity-selector {
+          display: flex;
+          align-items: center;
+          border: 1px solid #280F0B;
+          padding: 6px 8px;
+          width: 116px;
+          height: 38px;
+          justify-content: space-between;
+          margin-bottom: 1.5rem;
+        }
+
+        .reviews-section {
+          width: 100%;
+          background: #F6D8AB;
+          padding: 3rem 0;
+        }
+
+        .reviews-layout {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+          .reviews-layout {
+            flex-direction: row;
+            gap: 144px;
+          }
+        }
+
+        .reviews-content {
+          flex: 1;
+        }
+
+        .review-box {
+          width: 100%;
+          max-width: 624px;
+          border: 1px dashed #280F0B;
+          border-radius: 8px;
+          padding: 2.5rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @media (max-width: 767px) {
+          .review-box {
+            padding: 1.5rem 1rem;
+          }
+        }
+
+        .filter-options {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 30px;
+          flex-wrap: wrap;
+        }
+
+        @media (max-width: 767px) {
+          .filter-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+          }
+          
+          .filter-options > * {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          
+          .filter-options input,
+          .filter-options select,
+          .filter-options button {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+        }
+
+        .review-card {
+          width: 100%;
+          background: #FFC26F;
+          padding: 1.5rem;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+        }
+
+        .embrace-section {
+          width: 100%;
+          min-height: 400px;
+          background: #4A221C;
+          position: relative;
+          margin-top: 100px;
+        }
+
+        @media (min-width: 768px) {
+          .embrace-section {
+            min-height: 611px;
+          }
+        }
+
+        .embrace-content {
+          display: flex;
+          flex-direction: column;
+          gap: 237px;
+          padding: 2rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+          .embrace-content {
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 128px 4rem 4rem;
+          }
+        }
+
+        .embrace-title {
+          max-width: 503px;
+          font-family: 'Lora', serif;
+          font-weight: 700;
+          font-style: italic;
+          font-size: 40px;
+          line-height: 100%;
+          letter-spacing: -1px;
+          color: #F6D8AB;
+          margin: 0;
+        }
+
+        @media (min-width: 768px) {
+          .embrace-title {
+            font-size: 96px;
+          }
+        }
+
+        .embrace-description {
+          width: 100%;
+          max-width: 343px;
+          font-family: var(--font-manrope);
+          font-weight: 500;
+          font-size: 14px;
+          line-height: 150%;
+          letter-spacing: -0.005em;
+          color: #F6D8AB;
+        }
+
+        @media (min-width: 768px) {
+          .embrace-description {
+            position: static;
+          }
+        }
+
         @media (max-width: 768px) {
           /* GLOBAL OVERRIDES - Force mobile layout */
           * {
@@ -128,16 +464,30 @@ export default function ProductPage() {
             object-fit: contain !important;
           }
           
-          /* THUMBNAIL STRIP - Horizontal scroll */
+          /* THUMBNAIL STRIP - No scroll, fit images properly */
           .thumbnail-strip {
             width: 100% !important;
             height: auto !important;
             overflow-x: auto !important;
             overflow-y: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
-            scrollbar-width: thin !important;
             display: flex !important;
             gap: 8px !important;
+            flex-wrap: nowrap !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+          }
+          
+          .thumbnail-strip::-webkit-scrollbar {
+            display: none !important;
+          }
+          
+          .thumbnail-strip img {
+            width: 100px !important;
+            height: 100px !important;
+            min-width: 100px !important;
+            max-width: 100px !important;
+            object-fit: cover !important;
+            flex-shrink: 0 !important;
           }
           
           /* MATERIAL SELECTION BOX */
@@ -161,25 +511,25 @@ export default function ProductPage() {
             justify-content: flex-start !important;
           }
           
-          /* BUTTONS - Full width, touch-friendly */
-          .add-to-cart-btn,
-          .buy-shop-btn {
+          /* BUTTONS - Full width, touch-friendly, equal widths with 12px gap */
+          button[style*="565px"] {
             width: 100% !important;
             max-width: 100% !important;
             height: 48px !important;
             min-height: 48px !important;
-            margin-bottom: 16px !important;
+            margin-bottom: 12px !important;
+            margin-top: 0 !important;
           }
           
           /* QUANTITY SELECTOR */
           .quantity-selector {
-            width: 50% !important;
+            width: auto !important;
             margin-bottom: 0 !important;
           }
           
           .quantity-selector > div:last-child {
-            width: 100% !important;
-            justify-content: center !important;
+            width: 116px !important;
+            justify-content: space-between !important;
           }
           
           /* DELIVERY INFO - Horizontal layout with icon and text side by side */
@@ -298,6 +648,11 @@ export default function ProductPage() {
             max-width: 100% !important;
           }
           
+          /* Center text in with media button */
+          .filter-options button {
+            justify-content: center !important;
+          }
+          
           /* RATING BREAKDOWN */
           .rating-breakdown {
             width: 100% !important;
@@ -347,18 +702,15 @@ export default function ProductPage() {
             padding-bottom: 16px !important;
           }
         }
-      `}} />
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8 product-container">
+      `}</style>
+
+      <div className="max-w-[1440px] mx-auto px-4 py-8 md:px-8 md:py-8 lg:px-16">
+        <div className="product-layout">
           {/* Left Column - Image Gallery */}
-          <div className="flex-shrink-0 product-left-column">
+          <div className="product-gallery">
             {/* Breadcrumb Navigation */}
             <div 
-              className="breadcrumb"
               style={{
-                width: '235px',
-                height: '18px',
                 fontFamily: 'var(--font-manrope)',
                 fontWeight: 600,
                 fontSize: '13px',
@@ -367,11 +719,11 @@ export default function ProductPage() {
                 marginBottom: '8px'
               }}
             >
-              <span style={{ fontWeight: 700 }}>Shop</span>
-              <span style={{ fontWeight: 600 }}> / </span>
-              <span style={{ fontWeight: 600 }}>Pendants</span>
-              <span style={{ fontWeight: 600 }}> / </span>
-              <span style={{ fontWeight: 600 }}>Tiger Eye Pendant</span>
+              <span style={{ fontWeight: 700, color: '#280F0B' }}>Shop</span>
+              <span style={{ fontWeight: 600, color: '#7F3E2FB2' }}> / </span>
+              <span style={{ fontWeight: 600, color: '#7F3E2FB2' }}>Pendants</span>
+              <span style={{ fontWeight: 600, color: '#7F3E2FB2' }}> / </span>
+              <span style={{ fontWeight: 600, color: '#7F3E2FB2' }}>Tiger Eye Pendant</span>
             </div>
             
             {/* Main Image */}
@@ -379,20 +731,19 @@ export default function ProductPage() {
               <img 
                 src={productImages[selectedImage]} 
                 alt="Product"
-                className="w-[640px] h-[640px] object-cover rounded-lg main-image"
+                className="w-full md:w-[640px] h-auto md:h-[640px] object-cover rounded-lg"
               />
             </div>
             
             {/* Thumbnail Strip */}
-            <div className="flex gap-[8px] w-[640px] h-[100px] thumbnail-strip">
+            <div className="flex gap-2 md:gap-[8px] w-full md:w-[640px] overflow-x-auto md:overflow-hidden overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
               {productImages.map((image, index) => (
                 <img
                   key={index}
                   src={image}
                   alt={`Thumbnail ${index + 1}`}
-                  className={`w-[100px] h-[100px] object-cover rounded cursor-pointer ${
-                    selectedImage === index ? 'ring-2 ring-[#6B5FE8]' : ''
-                  }`}
+                  className="w-[calc((100%-40px)/6)] min-w-[50px] md:w-[91px] h-[calc((100%-40px)/6)] min-h-[50px] md:h-[91px] object-cover rounded cursor-pointer flex-shrink-0 box-border"
+                  style={selectedImage === index ? { outline: '2px solid #3F3F3F', outlineOffset: '-2px' } : {}}
                   onClick={() => setSelectedImage(index)}
                 />
               ))}
@@ -400,7 +751,7 @@ export default function ProductPage() {
           </div>
 
           {/* Right Column - Product Details */}
-          <div className="flex-1 pl-[91px] product-right-column">
+          <div className="flex-1 min-w-0 lg:pl-[91px]">
             {/* Title */}
             <h1 style={{ 
               fontSize: '32px', 
@@ -420,7 +771,12 @@ export default function ProductPage() {
                   </svg>
                 ))}
               </div>
-              <span className="text-sm">(7 reviews)</span>
+              <span 
+                className="text-sm cursor-pointer hover:underline"
+                onClick={scrollToReviews}
+              >
+                (7 reviews)
+              </span>
             </div>
 
             {/* Description */}
@@ -431,7 +787,7 @@ export default function ProductPage() {
             {/* Learn More Link */}
             <button 
               onClick={scrollToDescription}
-              style={{ color: '#B8764A' }}
+              style={{ color: '#B8764A', fontSize: '12px' }}
               className="mb-6 font-semibold hover:underline"
             >
               LEARN MORE
@@ -439,7 +795,9 @@ export default function ProductPage() {
 
             {/* Price */}
             <div className="mb-6">
-              <p className="text-2xl font-bold">$35.00 AUD incl. tax</p>
+              <p style={{ fontSize: '24px', fontWeight: 700 }}>
+                $35.00 AUD <span style={{ fontSize: '14px', fontWeight: 400 }}>incl. tax</span>
+              </p>
             </div>
 
             {/* Material Selection */}
@@ -543,25 +901,20 @@ export default function ProductPage() {
             </div>
 
             {/* Quantity Selector */}
-            <div className="quantity-selector">
-              <h3 className="font-semibold mb-3">Quantity</h3>
-              <div className="flex items-center gap-4" style={{ border: '1px solid #280F0B', padding: '8px', borderRadius: '8px', display: 'inline-flex', width: '282px', justifyContent: 'center' }}>
-                <button
-                  onClick={() => handleQuantityChange(-1)}
-                  className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100"
-                  style={{ minHeight: '44px', minWidth: '44px' }}
-                >
-                  -
-                </button>
-                <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
-                <button
-                  onClick={() => handleQuantityChange(1)}
-                  className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100"
-                  style={{ minHeight: '44px', minWidth: '44px' }}
-                >
-                  +
-                </button>
-              </div>
+            <div style={{ border: '1px solid #280F0B', padding: '6px 8px', display: 'inline-flex', width: '116px', height: '38px', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0, marginTop: 0, boxSizing: 'border-box' }}>
+              <button
+                onClick={() => handleQuantityChange(-1)}
+                style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer', fontSize: '18px', lineHeight: '1', color: '#280F0B' }}
+              >
+                -
+              </button>
+              <span style={{ fontSize: '18px', fontWeight: 600, lineHeight: '1', color: '#280F0B' }}>{quantity}</span>
+              <button
+                onClick={() => handleQuantityChange(1)}
+                style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer', fontSize: '18px', lineHeight: '1', color: '#280F0B' }}
+              >
+                +
+              </button>
             </div>
 
             {/* Add to Cart Button */}
@@ -577,95 +930,28 @@ export default function ProductPage() {
                 // Optionally navigate to cart
                 // router.push('/cart');
               }}
-              className="add-to-cart-btn hover:opacity-90 transition-opacity"
-              style={{ 
-                width: '565px',
-                height: '51px',
-                backgroundColor: '#794936',
-                padding: '15px 40px',
-                gap: '12px',
-                borderRadius: '8px',
-                border: 'none',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: '16px',
-                cursor: 'pointer',
-                marginBottom: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className="w-full md:w-[565px] h-12 md:h-[51px] bg-[#794936] text-white font-bold text-base px-10 py-[15px] flex items-center justify-center gap-3 border-0 cursor-pointer hover:opacity-90 transition-opacity mb-3"
             >
               ADD TO CART
             </button>
 
             {/* Buy with Shop Button */}
             <button
-              className="buy-shop-btn hover:opacity-90 transition-opacity"
-              style={{ 
-                width: '565px',
-                height: '51px',
-                backgroundColor: '#3D1CEA',
-                padding: '15px 40px',
-                gap: '2px',
-                borderRadius: '8px',
-                border: 'none',
-                color: '#FFFFFF',
-                fontWeight: 400,
-                fontSize: '16px',
-                cursor: 'pointer',
-                marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className="w-full md:w-[565px] h-12 md:h-[51px] bg-[#3D1CEA] text-white font-normal text-base px-10 py-[15px] flex items-center justify-center gap-0.5 border-0 cursor-pointer hover:opacity-90 transition-opacity"
             >
-              Buy with <span style={{ fontWeight: 700, marginLeft: '4px' }}>shop</span>
+              Buy with <span className="font-bold ml-1">shop</span>
             </button>
 
             {/* Delivery Info */}
             <div className="flex items-center gap-3 mb-8 delivery-info" style={{ maxWidth: '100%' }}>
-              {/* Delivery Truck Icon - Layered Images */}
-              <div style={{ display: 'flex', flexDirection: 'column', width: '40px', height: '40px', flexShrink: 0, position: 'relative' }}>
-                {/* Top section: delivery-2 on left, delivery-4 and delivery-3 on right */}
-                <div style={{ display: 'flex', position: 'relative' }}>
-                  {/* Left: delivery-2 */}
-                  <Image
-                    src="/assets/images/delivery-2.png"
-                    alt="Delivery line 2"
-                    width={20}
-                    height={20}
-                  />
-                  
-                  {/* Right: delivery-4 (wheel) below delivery-3 (truck body) */}
-                  <div style={{ position: 'relative', width: '20px', height: '20px' }}>
-                    <Image
-                      src="/assets/images/delivery-3.png"
-                      alt="Truck body"
-                      width={20}
-                      height={20}
-                      style={{ position: 'absolute', top: 0, left: 0, zIndex: 2 }}
-                    />
-                    <Image
-                      src="/assets/images/delivery-4.png"
-                      alt="Truck wheel"
-                      width={20}
-                      height={20}
-                      style={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1 }}
-                    />
-                  </div>
-                </div>
-                
-                {/* Bottom section: delivery-1 */}
-                <div style={{ position: 'relative' }}>
-                  <Image
-                    src="/assets/images/delivery-1.png"
-                    alt="Delivery line 1"
-                    width={40}
-                    height={20}
-                  />
-                </div>
-              </div>
+              {/* Delivery Truck Icon */}
+              <Image
+                src="/assets/images/truck.jpeg"
+                alt="Delivery truck"
+                width={40}
+                height={40}
+                style={{ flexShrink: 0 }}
+              />
               
               <p 
                 style={{
@@ -693,7 +979,7 @@ export default function ProductPage() {
                   <span className="text-2xl">{expandedSections['description'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['description'] && (
-                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em' }}>
+                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em', animation: 'slideDown 0.3s ease-out' }}>
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
                     </p>
@@ -711,7 +997,7 @@ export default function ProductPage() {
                   <span className="text-2xl">{expandedSections['howto'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['howto'] && (
-                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em' }}>
+                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em', animation: 'slideDown 0.3s ease-out' }}>
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.
                     </p>
@@ -729,7 +1015,7 @@ export default function ProductPage() {
                   <span className="text-2xl">{expandedSections['details'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['details'] && (
-                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em' }}>
+                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em', animation: 'slideDown 0.3s ease-out' }}>
                     <p>
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo. Proin sodales pulvinar tempor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
                     </p>
@@ -747,7 +1033,7 @@ export default function ProductPage() {
                   <span className="text-2xl">{expandedSections['idealfor'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['idealfor'] && (
-                  <div className="mt-4 text-gray-700 leading-relaxed">
+                  <div className="mt-4 text-gray-700 leading-relaxed" style={{ animation: 'slideDown 0.3s ease-out' }}>
                     <ul className="list-disc pl-5 space-y-1">
                       <li>Divination and dowsing practices</li>
                       <li>Energy healing and chakra balancing</li>
@@ -784,19 +1070,15 @@ export default function ProductPage() {
         />
 
         {/* Content Container */}
-        <div
-          className="embrace-container"
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            paddingLeft: '70px',
-            paddingRight: '70px',
-            paddingTop: '128px',
-            maxWidth: '1440px',
-            margin: '0 auto'
-          }}
-        >
+        <div className="container mx-auto px-4" style={{ paddingTop: '128px' }}>
+          <div
+            className="embrace-container"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between'
+            }}
+          >
           {/* Left Side Text */}
           <h2 
             className="embrace-text"
@@ -836,14 +1118,15 @@ export default function ProductPage() {
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae ipsum in libero facilisis interdum. Integer sit amet sapien non nulla luctus elementum. Praesent vitae semper arcu, non tincidunt purus. Curabitur nec nunc a nisl convallis placerat. Suspendisse potenti. Nam iaculis, erat at.
             </p>
           </div>
+          </div>
         </div>
       </div>
 
       {/* Customer Reviews Section */}
-      <div style={{ width: '100%', background: '#F6D8AB', padding: '80px 0' }}>
-        <div className="reviews-outer-container" style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 70px' }}>
+      <div id="reviews-section" style={{ width: '100%', background: '#F6D8AB', padding: '80px 0' }}>
+        <div className="container mx-auto px-4">
           {/* Main Container with Reviews on Left and Box on Right */}
-          <div style={{ display: 'flex', gap: '40px', position: 'relative' }} className="reviews-container">
+          <div style={{ display: 'flex', gap: '144px', position: 'relative' }} className="reviews-container">
             {/* Left Side - Reviews */}
             <div style={{ flex: 1 }}>
               {/* Customer Reviews Title */}
@@ -1044,16 +1327,11 @@ export default function ProductPage() {
                       background: '#7F3E2F33',
                       fontFamily: 'var(--font-manrope)',
                       fontSize: '14px',
-                      color: '#280F0B',
-                      outline: 'none'
+                      color: '#280F0B !important',
+                      outline: 'none',
+                      WebkitTextFillColor: '#280F0B'
                     }}
-                    className="search-placeholder"
                   />
-                  <style jsx>{`
-                    .search-placeholder::placeholder {
-                      color: #280F0B;
-                    }
-                  `}</style>
                   <Image
                     src="/assets/images/search-icon.png"
                     alt="Search"
@@ -1073,9 +1351,9 @@ export default function ProductPage() {
                   minWidth: '150px',
                   height: '42px',
                   paddingTop: '8px',
-                  paddingRight: '24px',
+                  paddingRight: '40px',
                   paddingBottom: '8px',
-                  paddingLeft: '20px',
+                  paddingLeft: '22px',
                   borderRadius: '47px', 
                   border: 'none',
                   background: '#7F3E2F33',
@@ -1085,9 +1363,13 @@ export default function ProductPage() {
                   cursor: 'pointer',
                   outline: 'none',
                   textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  backgroundPosition: 'calc(100% - 8px) center'
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  backgroundImage: 'url(/assets/images/dropdown.svg)',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 14px center',
+                  backgroundSize: '16px 16px'
                 }}>
                   <option>Most relevant</option>
                 </select>
@@ -1097,9 +1379,9 @@ export default function ProductPage() {
                   minWidth: '130px',
                   height: '42px',
                   paddingTop: '8px',
-                  paddingRight: '24px',
+                  paddingRight: '40px',
                   paddingBottom: '8px',
-                  paddingLeft: '20px',
+                  paddingLeft: '22px',
                   borderRadius: '47px', 
                   border: 'none',
                   background: '#7F3E2F33',
@@ -1109,9 +1391,13 @@ export default function ProductPage() {
                   cursor: 'pointer',
                   outline: 'none',
                   textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  backgroundPosition: 'calc(100% - 8px) center'
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  backgroundImage: 'url(/assets/images/dropdown.svg)',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 14px center',
+                  backgroundSize: '16px 16px'
                 }}>
                   <option>All ratings</option>
                 </select>
@@ -1121,9 +1407,9 @@ export default function ProductPage() {
                   minWidth: '130px',
                   height: '42px',
                   paddingTop: '8px',
-                  paddingRight: '20px',
+                  paddingRight: '22px',
                   paddingBottom: '8px',
-                  paddingLeft: '20px',
+                  paddingLeft: '22px',
                   borderRadius: '47px', 
                   border: 'none',
                   background: '#7F3E2F33',

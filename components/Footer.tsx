@@ -68,6 +68,11 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-gray-300">
               <li>Email: help@rawearthcrystals.com</li>
               <li>Website: rawearthcrystals.com.au</li>
+              <li>
+                <Link href="/chatbot" className="text-gray-300 hover:text-white transition-colors">
+                  Customer Care
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

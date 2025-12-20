@@ -35,7 +35,6 @@ const svgPathsMobile = {
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart } = useCart();
-  const [isMobile, setIsMobile] = useState(false);
   const [couponExpanded, setCouponExpanded] = useState(false);
 
   // Use mock data if cart is empty (for display purposes)
@@ -56,168 +55,257 @@ export default function CartPage() {
   const shipping = 0; // FREE
   const total = 285.00;
 
-  // Check screen size
-  if (typeof window !== 'undefined') {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    if (!isMobile && window.innerWidth < 768) {
-      checkMobile();
-    } else if (isMobile && window.innerWidth >= 768) {
-      checkMobile();
-    }
-  }
-
-  if (isMobile) {
-    // Mobile Cart Layout
-    return (
-      <div className="bg-[#f6d8ab] min-h-screen w-full">
-        <Header />
-
-        {/* Main Content */}
-        <div className="pt-[190px] px-6 pb-12 min-h-screen">
-          {/* Page Title */}
-          <div className="mb-6">
-            <h1 className="font-['Lora',serif] font-normal text-[#280f0b] text-[40px] leading-[100%]">Cart</h1>
-            <p className="font-['Manrope:Regular',sans-serif] font-normal text-[#280f0b] text-[16px] leading-[100%] ml-1">(2 items)</p>
-          </div>
-
-          {/* Cart Items */}
-          <div className="mb-8">
-          {displayItems.map((item) => (
-            <div key={item.id} className="mb-6">
-              <div className="content-stretch flex gap-[16px] items-start w-full">
-                <div className="relative shrink-0 w-[95px] h-[95px]">
-                  <Image 
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                    src={item.image}
-                    width={95}
-                    height={95}
-                  />
-                </div>
-                <div className="content-stretch flex flex-col gap-[8px] items-start flex-1">
-                  <p className="font-['Manrope:Medium',sans-serif] font-medium leading-[normal] text-[#280f0b] text-[16px]">{item.name}</p>
-                  <p className="font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#7f3e2f] text-[14px]">{item.variant}</p>
-                  <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#280f0b] text-[13px]">${item.price.toFixed(2)} AUD</p>
-                  
-                  {/* Quantity Selector */}
-                  <div className="content-stretch flex gap-[24px] h-[31px] items-center px-[8px] py-[6px] relative rounded-[6px] shrink-0 border border-[#280f0b]">
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className={`font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#280f0b] text-[20px] ${item.quantity === 1 ? 'opacity-50' : ''}`}
-                    >
-                      -
-                    </button>
-                    <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[1.5] text-[#280f0b] text-[16px]">{item.quantity}</p>
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#280f0b] text-[20px]"
-                    >
-                      +
-                    </button>
-                  </div>
-                  
-                  {/* Delete Item */}
-                  <button 
-                    onClick={() => removeFromCart(item.id)}
-                    className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#474747] text-[13px] underline"
-                  >
-                    Delete item
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-          </div>
-
-          {/* Summary Card */}
-          <div className="w-full max-w-[342px] mx-auto mb-[80px]">
-            <div className="relative w-full h-[420px] bg-[#FFC26F] rounded-[20px] overflow-hidden">
-              <svg className="absolute inset-0 w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 342 420">
-                <path d={svgPathsMobile.p29054b00} fill="#FFC26F" />
-              </svg>
-            
-            {/* Summary Content */}
-            <div className="relative p-6 flex flex-col h-full">
-              {/* Subtotal Items */}
-              <div className="flex items-center justify-between text-[16px] text-black mb-4">
-                <p className="font-['Manrope:Regular',sans-serif] font-normal leading-[24px] tracking-[-0.08px]">Subtotal</p>
-                <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[1.5] text-right tracking-[0.16px]">${subtotal.toFixed(2)}</p>
-              </div>
-              
-              <div className="flex items-center justify-between text-[16px] text-black mb-4">
-                <p className="font-['Manrope:Regular',sans-serif] font-normal leading-[24px] tracking-[-0.08px]">Tax</p>
-                <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[1.5] text-right tracking-[0.16px]">${tax.toFixed(2)}</p>
-              </div>
-              
-              <div className="flex items-center justify-between text-[16px] text-black">
-                <p className="font-['Manrope:Regular',sans-serif] font-normal leading-[24px] tracking-[-0.08px]">Shipping</p>
-                <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[1.5] text-right tracking-[0.16px]">FREE</p>
-              </div>
-              
-              {/* Divider */}
-              <div className="border-t border-dashed border-black opacity-50 mt-[80px] mb-6 -mx-6" />
-              
-              {/* Coupon Section */}
-              <div className="relative -mx-6 px-6 mb-6">
-                {/* Left semicircle */}
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-[12px] h-[12px] bg-[#f6d8ab] rounded-full" />
-                {/* Right semicircle */}
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-[12px] h-[12px] bg-[#f6d8ab] rounded-full" />
-                
-                <button 
-                  onClick={() => setCouponExpanded(!couponExpanded)}
-                  className="flex gap-2 items-center w-full"
-                >
-                  <div className="relative shrink-0 size-[22px]">
-                    <Image src="/assets/images/coupon.png" alt="Coupon" width={22} height={22} />
-                  </div>
-                  <p className="font-['Manrope:Regular',sans-serif] font-normal leading-[24px] text-[#280f0b] text-[16px] text-nowrap tracking-[-0.08px]">Have a coupon code ?</p>
-                  <div className="ml-auto">
-                    <div className={`transition-transform ${couponExpanded ? '' : 'rotate-90'}`}>
-                      <svg className="block w-[12px] h-[24px]" fill="none" preserveAspectRatio="none" viewBox="0 0 12 24">
-                        <path clipRule="evenodd" d={svgPathsMobile.p21b9db80} fill="#280F0B" fillRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                </button>
-              </div>
-              
-              {/* Divider */}
-              <div className="border-t border-dashed border-black opacity-50 mb-6 -mx-6" />
-              
-              {/* Total */}
-              <div className="flex items-center justify-between mb-6">
-                <p className="font-['Manrope:Bold',sans-serif] font-bold leading-[normal] text-[#280f0b] text-[20px] text-nowrap">Total</p>
-                <p className="font-['Manrope:Bold',sans-serif] font-bold leading-[normal] text-[#280f0b] text-[20px] text-nowrap text-right">${total.toFixed(2)} AUD</p>
-              </div>
-              
-              {/* Checkout Button */}
-              <button className="mt-auto mb-6 bg-[#7f3e2f] flex gap-[12px] items-center justify-center px-[40px] py-[15px] w-full">
-                <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[1.5] text-[#fcf3e5] text-[14px] text-nowrap tracking-[1.12px] uppercase">Proceed to checkout</p>
-                <svg className="block w-[16px] h-[12px]" fill="none" preserveAspectRatio="none" viewBox="0 0 18 12">
-                  <path d={svgPathsMobile.pdaf5300} fill="#FCF3E5" />
-                </svg>
-              </button>
-            </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop Cart Layout
   return (
     <div className="bg-[#f6d8ab] min-h-screen w-full">
       <Header />
       
+      <style jsx>{`
+        .cart-container {
+          padding: 24px 1.5rem 3rem;
+          max-width: 1280px;
+          margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
+          .cart-container {
+            padding: 50px 2rem 3rem;
+          }
+        }
+
+        .progress-steps {
+          display: none;
+          margin-bottom: 3rem;
+        }
+
+        @media (min-width: 1024px) {
+          .progress-steps {
+            display: flex;
+          }
+        }
+
+        .cart-title {
+          font-family: 'Lora', serif;
+          font-weight: 400;
+          color: #280f0b;
+          font-size: 40px;
+          line-height: 100%;
+          margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 1024px) {
+          .cart-title {
+            font-size: 72px;
+          }
+        }
+
+        .cart-count {
+          font-family: 'Lora', serif;
+          font-weight: 400;
+          color: #280f0b;
+          font-size: 16px;
+          line-height: 100%;
+          margin-bottom: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+          .cart-count {
+            margin-left: 0.5rem;
+          }
+        }
+
+        .cart-layout {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+          .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 526px;
+            gap: 40px;
+          }
+        }
+
+        .cart-items-section {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .table-headers {
+          display: none;
+        }
+
+        @media (min-width: 1024px) {
+          .table-headers {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(40, 15, 11, 0.4);
+          }
+        }
+
+        .cart-item {
+          display: flex;
+          gap: 1rem;
+          align-items: flex-start;
+        }
+
+        @media (min-width: 1024px) {
+          .cart-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+            align-items: center;
+          }
+        }
+
+        .product-info {
+          display: flex;
+          gap: 1rem;
+          align-items: flex-start;
+          flex: 1;
+        }
+
+        @media (min-width: 1024px) {
+          .product-info {
+            flex: none;
+          }
+        }
+
+        .product-image {
+          width: 95px;
+          height: 95px;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 1024px) {
+          .product-image {
+            width: 110px;
+            height: 110px;
+          }
+        }
+
+        .product-details {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        @media (min-width: 1024px) {
+          .product-details {
+            flex: none;
+            width: 217px;
+          }
+        }
+
+        .quantity-container {
+          display: none;
+        }
+
+        @media (min-width: 1024px) {
+          .quantity-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+          }
+        }
+
+        .subtotal-container {
+          display: none;
+        }
+
+        @media (min-width: 1024px) {
+          .subtotal-container {
+            display: flex;
+            justify-content: flex-end;
+          }
+        }
+
+        .summary-card {
+          width: 100%;
+          max-width: 342px;
+          margin: 0 auto;
+          position: relative;
+          height: 430px;
+          background: #FFC26F;
+          border-radius: 20px;
+          overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+          .summary-card {
+            max-width: 526px;
+            margin: 0;
+          }
+        }
+
+        .summary-svg {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+        }
+
+        .summary-content {
+          position: relative;
+          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+
+        @media (min-width: 1024px) {
+          .summary-content {
+            padding: 2rem;
+          }
+        }
+
+        .coupon-semicircle-left {
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 12px;
+          height: 12px;
+          background: #f6d8ab;
+          border-radius: 50%;
+        }
+
+        @media (min-width: 1024px) {
+          .coupon-semicircle-left {
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        .coupon-semicircle-right {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translate(50%, -50%);
+          width: 12px;
+          height: 12px;
+          background: #f6d8ab;
+          border-radius: 50%;
+        }
+
+        @media (min-width: 1024px) {
+          .coupon-semicircle-right {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      `}</style>
+      
       {/* Main Content Container */}
-      <div className="w-full max-w-[1280px] mx-auto px-8 pb-12 pt-[50px]">
+      <div className="cart-container">
         {/* Progress Indicator */}
-        <div className="mb-12">
+        <div className="progress-steps">
           <div className="flex gap-4 items-center">
             {/* Step 1 - Active */}
             <div className="content-stretch flex gap-[12px] items-center relative shrink-0">
@@ -265,27 +353,27 @@ export default function CartPage() {
         
         {/* Page Title */}
         <div className="mb-8">
-          <h1 className="font-['Lora:Regular',sans-serif] font-normal text-[#280f0b] text-[72px] leading-[100%]">Cart</h1>
-          <p className="font-['Lora:Regular',sans-serif] font-normal text-[#280f0b] text-[16px] leading-[100%] ml-2">(2 items)</p>
+          <h1 className="cart-title">Cart</h1>
+          <p className="cart-count">(2 items)</p>
         </div>
         
         {/* Two Column Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_526px] gap-[40px]">
+        <div className="cart-layout">
           {/* Left Column - Cart Items */}
-          <div className="flex flex-col gap-6">
+          <div className="cart-items-section">
             {/* Table Headers */}
-            <div className="grid grid-cols-[2fr_1fr_1fr] gap-[16px] pb-[32px] border-b border-[#280f0b] border-opacity-40">
+            <div className="table-headers">
               <p className="font-['Manrope:Bold',sans-serif] font-bold text-[12px] text-black tracking-[1.2px] uppercase">product</p>
-              <p className="font-['Manrope:Bold',sans-serif] font-bold text-[12px] text-black tracking-[1.2px] uppercase text-center">Quantity</p>
+              <p className="font-['Manrope:Bold',sans-serif] font-bold text-[12px] text-black tracking-[1.2px] uppercase text-center" style={{ paddingLeft: '3px' }}>Quantity</p>
               <p className="font-['Manrope:Bold',sans-serif] font-bold text-[12px] text-black tracking-[1.2px] uppercase text-right">Subtotal</p>
             </div>
             
             {/* Cart Items */}
             {displayItems.map((item) => (
-              <div key={item.id} className="grid grid-cols-[2fr_1fr_1fr] gap-[16px] items-center">
+              <div key={item.id} className="cart-item">
                 {/* Product Info */}
-                <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                  <div className="relative shrink-0 size-[110px]">
+                <div className="product-info">
+                  <div className="product-image relative">
                     <Image 
                       alt={item.name}
                       className="w-full h-full object-cover"
@@ -294,21 +382,50 @@ export default function CartPage() {
                       height={110}
                     />
                   </div>
-                  <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-[217px]">
+                  <div className="product-details">
                     <p className="font-['Manrope:Medium',sans-serif] font-medium leading-[normal] text-[#280f0b] text-[16px]">{item.name}</p>
                     <p className="font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#7f3e2f] text-[14px]">{item.variant}</p>
                     <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#280f0b] text-[13px]">${item.price.toFixed(2)} AUD</p>
+                    
+                    {/* Delete button - Desktop only */}
                     <button 
                       onClick={() => removeFromCart(item.id)}
-                      className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#474747] text-[13px] underline"
+                      className="hidden lg:block font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#474747] text-[13px] underline text-left"
+                      style={{ padding: 0, margin: 0, border: 'none', background: 'none' }}
+                    >
+                      Delete item
+                    </button>
+                    
+                    {/* Quantity Selector - Mobile only */}
+                    <div className="flex items-center justify-between lg:hidden" style={{ width: '92px', height: '31px', border: '1px solid #280f0b', paddingTop: '6px', paddingRight: '8px', paddingBottom: '6px', paddingLeft: '8px', gap: '24px', borderRadius: '6px' }}>
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className={`font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#280f0b] text-[20px] ${item.quantity === 1 ? 'opacity-50' : ''}`}
+                      >
+                        -
+                      </button>
+                      <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[1.5] text-[#280f0b] text-[16px]">{item.quantity}</p>
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#280f0b] text-[20px]"
+                      >
+                        +
+                      </button>
+                    </div>
+                    
+                    {/* Delete button - Mobile only */}
+                    <button 
+                      onClick={() => removeFromCart(item.id)}
+                      className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#474747] text-[13px] underline lg:hidden text-left"
+                      style={{ padding: 0, margin: 0, border: 'none', background: 'none' }}
                     >
                       Delete item
                     </button>
                   </div>
                 </div>
                 
-                {/* Quantity */}
-                <div className="flex justify-center">
+                {/* Quantity - Desktop Only */}
+                <div className="quantity-container">
                   <div className="content-stretch flex gap-[24px] h-[31px] items-center px-[8px] py-[6px] relative rounded-[6px] shrink-0 border border-[#280f0b]">
                     <button 
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -326,8 +443,8 @@ export default function CartPage() {
                   </div>
                 </div>
                 
-                {/* Subtotal */}
-                <div className="flex justify-end">
+                {/* Subtotal - Desktop Only */}
+                <div className="subtotal-container">
                   <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[13px] text-black">${(item.price * item.quantity).toFixed(2)} AUD</p>
                 </div>
               </div>
@@ -335,15 +452,13 @@ export default function CartPage() {
           </div>
           
           {/* Right Column - Summary */}
-          <div className="relative h-[420px] mb-[200px] w-full max-w-[526px] mx-auto lg:mx-0">
-            <div className="absolute inset-0 bg-[#FFC26F] rounded-[20px] overflow-hidden">
-              <svg className="block w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 526 420">
-                <path d={svgPathsDesktop.p242d7e80} fill="#FFC26F" />
-              </svg>
-            </div>
+          <div className="summary-card">
+            <svg className="summary-svg" fill="none" preserveAspectRatio="none" viewBox="0 0 526 420">
+              <path d={svgPathsDesktop.p242d7e80} fill="#FFC26F" />
+            </svg>
             
             {/* Summary Content */}
-            <div className="relative p-8 flex flex-col h-full">
+            <div className="summary-content">
               {/* Subtotal Items */}
               <div className="flex items-center justify-between text-[16px] text-black mb-4">
                 <p className="font-['Manrope',sans-serif] font-normal leading-[24px] tracking-[-0.08px]">Subtotal</p>
@@ -361,14 +476,12 @@ export default function CartPage() {
               </div>
               
               {/* Divider */}
-              <div className="border-t border-dashed border-black opacity-50 mt-[80px] mb-6 -mx-8" />
+              <div className="border-t border-dashed border-black opacity-50 mt-[80px] mb-6" style={{ marginLeft: '-1.5rem', marginRight: '-1.5rem' }} />
               
               {/* Coupon Section */}
-              <div className="relative -mx-8 px-8 mb-6">
-                {/* Left semicircle */}
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-[16px] h-[16px] bg-[#f6d8ab] rounded-full" />
-                {/* Right semicircle */}
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-[16px] h-[16px] bg-[#f6d8ab] rounded-full" />
+              <div className="relative mb-6" style={{ marginLeft: '-1.5rem', marginRight: '-1.5rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
+                <div className="coupon-semicircle-left" />
+                <div className="coupon-semicircle-right" />
                 
                 <button 
                   onClick={() => setCouponExpanded(!couponExpanded)}
@@ -389,7 +502,7 @@ export default function CartPage() {
               </div>
               
               {/* Divider */}
-              <div className="border-t border-dashed border-black opacity-50 mb-6 -mx-8" />
+              <div className="border-t border-dashed border-black opacity-50 mb-6" style={{ marginLeft: '-1.5rem', marginRight: '-1.5rem' }} />
               
               {/* Total */}
               <div className="flex items-center justify-between mb-6">
