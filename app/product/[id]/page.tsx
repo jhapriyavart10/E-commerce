@@ -68,59 +68,261 @@ export default function ProductPage() {
       
       <style dangerouslySetInnerHTML={{__html: `
         @media (max-width: 768px) {
+          /* GLOBAL OVERRIDES - Force mobile layout */
+          * {
+            box-sizing: border-box !important;
+          }
+          
+          body, html {
+            overflow-x: hidden !important;
+            width: 100% !important;
+          }
+          
+          /* CONTAINER - Single column layout */
+          .container {
+            padding: 0 16px !important;
+            max-width: 100% !important;
+          }
+          
           .product-container {
             flex-direction: column !important;
-            gap: 24px !important;
+            gap: 0 !important;
+            padding: 0 !important;
           }
+          
+          /* LEFT COLUMN - Product Images */
           .product-left-column {
-            flex-shrink: 1 !important;
             width: 100% !important;
+            flex-shrink: 1 !important;
+            padding: 0 !important;
+            margin-bottom: 24px !important;
           }
+          
+          /* RIGHT COLUMN - Product Details */
           .product-right-column {
-            padding-left: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
+          
+          /* BREADCRUMB */
           .breadcrumb {
             width: 100% !important;
+            height: auto !important;
             font-size: 12px !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            margin-bottom: 16px !important;
           }
+          
+          /* PRODUCT IMAGE */
           .main-image {
             width: 100% !important;
             height: auto !important;
             max-width: 100% !important;
+            object-fit: contain !important;
           }
+          
+          /* THUMBNAIL STRIP - Horizontal scroll */
           .thumbnail-strip {
             width: 100% !important;
+            height: auto !important;
             overflow-x: auto !important;
+            overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: thin !important;
+            display: flex !important;
+            gap: 8px !important;
           }
+          
+          /* MATERIAL SELECTION BOX */
           .material-box {
             width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            padding: 16px !important;
+            margin-bottom: 24px !important;
           }
+          
+          /* Material buttons - one per line */
+          .material-box > div:last-child {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          
+          .material-box > div:last-child > button {
+            width: 100% !important;
+            max-width: 100% !important;
+            justify-content: flex-start !important;
+          }
+          
+          /* BUTTONS - Full width, touch-friendly */
           .add-to-cart-btn,
           .buy-shop-btn {
             width: 100% !important;
-          }
-          .embrace-text {
-            font-size: 48px !important;
             max-width: 100% !important;
+            height: 48px !important;
+            min-height: 48px !important;
+            margin-bottom: 16px !important;
           }
+          
+          /* QUANTITY SELECTOR */
+          .quantity-selector {
+            width: 100% !important;
+            margin-bottom: 24px !important;
+          }
+          
+          .quantity-selector > div {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          /* DELIVERY INFO - Vertical stack */
+          .delivery-info {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            margin-bottom: 24px !important;
+          }
+          
+          /* EMBRACE SPIRITUALITY SECTION */
+          .embrace-section {
+            padding: 24px 16px !important;
+            min-height: auto !important;
+            margin-top: 40px !important;
+          }
+          
+          .embrace-section > div:first-of-type {
+            padding: 0 !important;
+          }
+          
+          .embrace-section > div:last-of-type {
+            padding: 24px 16px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 237px !important;
+          }
+          
+          .embrace-text {
+            font-size: 40px !important;
+            max-width: 100% !important;
+            line-height: 1.1 !important;
+            margin-bottom: 0 !important;
+          }
+          
           .embrace-description {
             position: static !important;
             width: 100% !important;
-            margin-top: 24px !important;
+            max-width: 100% !important;
+            height: auto !important;
+            margin-top: 0 !important;
+            padding: 0 !important;
+            bottom: auto !important;
+            right: auto !important;
           }
+          
+          /* REVIEWS SECTION */
           .reviews-container {
             flex-direction: column !important;
-            gap: 32px !important;
+            gap: 24px !important;
+            padding: 0 !important;
           }
+          
           .review-box {
             width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            padding: 24px 16px !important;
+            margin-bottom: 24px !important;
+            box-sizing: border-box !important;
           }
+          
+          /* Fix Write a Review button width on mobile */
+          .review-box > button {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          
           .review-card {
             width: 100% !important;
+            max-width: 100% !important;
             height: auto !important;
+            min-height: auto !important;
           }
+          
+          /* FILTER OPTIONS - Two rows layout */
           .filter-options {
             flex-wrap: wrap !important;
+            gap: 12px !important;
+            overflow-x: visible !important;
+          }
+          
+          /* First row: Search and Most relevant */
+          .filter-options > *:nth-child(1),
+          .filter-options > *:nth-child(2) {
+            flex: 1 1 calc(50% - 6px) !important;
+            min-width: 0 !important;
+            max-width: calc(50% - 6px) !important;
+          }
+          
+          /* Second row: All ratings and With media */
+          .filter-options > *:nth-child(3),
+          .filter-options > *:nth-child(4) {
+            flex: 1 1 calc(50% - 6px) !important;
+            min-width: 0 !important;
+            max-width: calc(50% - 6px) !important;
+          }
+          
+          /* Ensure input and select fit within their containers */
+          .filter-options input,
+          .filter-options select,
+          .filter-options button {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          
+          /* RATING BREAKDOWN */
+          .rating-breakdown {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          
+          .rating-breakdown > div {
+            width: 100% !important;
+          }
+          
+          /* Progress bar container */
+          .rating-breakdown > div > div:nth-child(3) {
+            flex: 1 !important;
+            min-width: 0 !important;
+            max-width: none !important;
+          }
+          
+          /* Percentage text */
+          .rating-breakdown > div > span:last-child {
+            flex-shrink: 0 !important;
+            min-width: 45px !important;
+          }
+          
+          /* TYPOGRAPHY - Mobile optimized */
+          h1 {
+            font-size: 24px !important;
+            line-height: 32px !important;
+          }
+          
+          h2 {
+            font-size: 28px !important;
+            line-height: 1.2 !important;
+          }
+          
+          h3 {
+            font-size: 18px !important;
+          }
+          
+          /* SECTION PADDING */
+          .space-y-4 > * {
+            padding-bottom: 16px !important;
           }
         }
       `}} />
@@ -319,12 +521,13 @@ export default function ProductPage() {
             </div>
 
             {/* Quantity Selector */}
-            <div className="mb-1">
+            <div className="mb-1 quantity-selector">
               <h3 className="font-semibold mb-3">Quantity</h3>
-              <div className="flex items-center gap-4" style={{ border: '1px solid #280F0B', padding: '8px', borderRadius: '8px', display: 'inline-flex' }}>
+              <div className="flex items-center gap-4" style={{ border: '1px solid #280F0B', padding: '8px', borderRadius: '8px', display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
                 <button
                   onClick={() => handleQuantityChange(-1)}
                   className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100"
+                  style={{ minHeight: '44px', minWidth: '44px' }}
                 >
                   -
                 </button>
@@ -332,6 +535,7 @@ export default function ProductPage() {
                 <button
                   onClick={() => handleQuantityChange(1)}
                   className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100"
+                  style={{ minHeight: '44px', minWidth: '44px' }}
                 >
                   +
                 </button>
@@ -387,7 +591,7 @@ export default function ProductPage() {
             </button>
 
             {/* Delivery Info */}
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-8 delivery-info" style={{ maxWidth: '100%' }}>
               {/* Delivery Truck Icon - Layered Images */}
               <div style={{ display: 'flex', flexDirection: 'column', width: '40px', height: '40px', flexShrink: 0, position: 'relative' }}>
                 {/* Top section: delivery-2 on left, delivery-4 and delivery-3 on right */}
@@ -528,6 +732,7 @@ export default function ProductPage() {
 
       {/* Embrace Spirituality Section */}
       <div 
+        className="embrace-section"
         style={{
           width: '100%',
           minHeight: '611px',
@@ -649,12 +854,13 @@ export default function ProductPage() {
                   </div>
 
                   {/* Star Rating Breakdown */}
-                  <div style={{ 
+                  <div className="rating-breakdown" style={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
                     gap: '8px',
                     width: '528px',
-                    height: '137px',
+                    maxWidth: '100%',
+                    height: 'auto',
                     marginBottom: '32px'
                   }}>
                     {[
@@ -832,7 +1038,7 @@ export default function ProductPage() {
                   minWidth: '150px',
                   height: '42px',
                   paddingTop: '8px',
-                  paddingRight: '32px',
+                  paddingRight: '24px',
                   paddingBottom: '8px',
                   paddingLeft: '20px',
                   borderRadius: '47px', 
@@ -846,7 +1052,7 @@ export default function ProductPage() {
                   textAlign: 'center',
                   display: 'flex',
                   alignItems: 'center',
-                  backgroundPosition: 'calc(100% - 12px) center'
+                  backgroundPosition: 'calc(100% - 8px) center'
                 }}>
                   <option>Most relevant</option>
                 </select>
@@ -856,7 +1062,7 @@ export default function ProductPage() {
                   minWidth: '130px',
                   height: '42px',
                   paddingTop: '8px',
-                  paddingRight: '32px',
+                  paddingRight: '24px',
                   paddingBottom: '8px',
                   paddingLeft: '20px',
                   borderRadius: '47px', 
@@ -870,7 +1076,7 @@ export default function ProductPage() {
                   textAlign: 'center',
                   display: 'flex',
                   alignItems: 'center',
-                  backgroundPosition: 'calc(100% - 12px) center'
+                  backgroundPosition: 'calc(100% - 8px) center'
                 }}>
                   <option>All ratings</option>
                 </select>
