@@ -199,12 +199,12 @@ export default function ProductPage() {
           
           .embrace-section > div:first-of-type {
             width: 100vw !important;
-            margin-left: -16px !important;
+            margin-left: 0 !important;
             padding: 0 !important;
           }
           
-          .embrace-section > div:last-of-type {
-            padding: 24px 16px !important;
+          .embrace-container {
+            padding: 24px 8px !important;
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 237px !important;
@@ -229,6 +229,10 @@ export default function ProductPage() {
           }
           
           /* REVIEWS SECTION */
+          .reviews-outer-container {
+            padding: 0 8px !important;
+          }
+          
           .reviews-container {
             flex-direction: column !important;
             gap: 24px !important;
@@ -781,6 +785,7 @@ export default function ProductPage() {
 
         {/* Content Container */}
         <div
+          className="embrace-container"
           style={{
             display: 'flex',
             alignItems: 'flex-start',
@@ -836,7 +841,7 @@ export default function ProductPage() {
 
       {/* Customer Reviews Section */}
       <div style={{ width: '100%', background: '#F6D8AB', padding: '80px 0' }}>
-        <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 70px' }}>
+        <div className="reviews-outer-container" style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 70px' }}>
           {/* Main Container with Reviews on Left and Box on Right */}
           <div style={{ display: 'flex', gap: '40px', position: 'relative' }} className="reviews-container">
             {/* Left Side - Reviews */}

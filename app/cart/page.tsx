@@ -76,7 +76,7 @@ export default function CartPage() {
         {/* Mobile Navbar */}
         <div className="fixed top-0 left-0 bg-[#280f0b] w-full h-[120px] overflow-clip z-50">
           <div className="absolute h-[54px] left-[24px] top-1/2 -translate-y-1/2 w-[139.5px]">
-            <Image src="/assets/images/logo.svg" alt="Logo" width={139.5} height={54} className="w-full h-full object-contain" />
+            <Image src="/assets/images/logo.png" alt="Logo" width={139.5} height={54} className="w-full h-full object-contain" />
           </div>
           <div className="absolute content-stretch flex gap-[24px] items-center right-[24px] top-1/2 translate-y-[-50%]">
             <div className="overflow-clip relative shrink-0 size-[24px]">
