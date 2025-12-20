@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
+import Header from '@/components/Header';
 
 // SVG Path data for desktop
 const svgPathsDesktop = {
@@ -35,7 +36,6 @@ const svgPathsMobile = {
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart } = useCart();
   const [isMobile, setIsMobile] = useState(false);
-  const [showTopBanner, setShowTopBanner] = useState(true);
   const [couponExpanded, setCouponExpanded] = useState(false);
 
   // Use mock data if cart is empty (for display purposes)
@@ -73,38 +73,10 @@ export default function CartPage() {
     // Mobile Cart Layout
     return (
       <div className="bg-[#f6d8ab] min-h-screen w-full">
-        {/* Mobile Navbar */}
-        <div className="fixed top-0 left-0 bg-[#280f0b] w-full h-[120px] overflow-clip z-50">
-          <div className="absolute h-[54px] left-[24px] top-1/2 -translate-y-1/2 w-[139.5px]">
-            <Image src="/assets/images/logo.png" alt="Logo" width={139.5} height={54} className="w-full h-full object-contain" />
-          </div>
-          <div className="absolute content-stretch flex gap-[24px] items-center right-[24px] top-1/2 translate-y-[-50%]">
-            <div className="overflow-clip relative shrink-0 size-[24px]">
-              <div className="absolute inset-[14.48%_14.42%_10.31%_14.44%]">
-                <div className="absolute inset-[-5.54%_-5.86%]">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 21">
-                    <g>
-                      <path d={svgPathsMobile.p2a29c500} stroke="white" strokeWidth="2" />
-                      <path d={svgPathsMobile.p3659b180} fill="white" />
-                      <path d={svgPathsMobile.p27467800} fill="white" />
-                      <path d={svgPathsMobile.p12d72e00} stroke="white" strokeLinecap="round" strokeWidth="2" />
-                    </g>
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <div className="relative shrink-0 size-[24px]">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                <g>
-                  <path clipRule="evenodd" d={svgPathsMobile.p22d23bc0} fill="white" fillRule="evenodd" />
-                </g>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <Header />
 
         {/* Main Content */}
-        <div className="pt-[144px] px-6 pb-12 min-h-screen">
+        <div className="pt-[24px] px-6 pb-12 min-h-screen">
           {/* Page Title */}
           <div className="mb-6">
             <h1 className="font-['Lora',serif] font-normal text-[#280f0b] text-[40px] leading-[100%]">Cart</h1>
@@ -240,83 +212,10 @@ export default function CartPage() {
   // Desktop Cart Layout
   return (
     <div className="bg-[#f6d8ab] min-h-screen w-full">
-      {/* Fixed Navbar */}
-      <div className="fixed left-0 top-0 w-full z-50 flex flex-col">
-        {/* Top Banner */}
-        {showTopBanner && (
-          <div className="bg-[#7f3e2f] h-[45px] overflow-clip relative w-full">
-            <p className="absolute font-['Manrope:Regular',sans-serif] font-normal leading-[1.5] left-1/2 -translate-x-1/2 text-[14px] text-white top-1/2 -translate-y-1/2 tracking-[-0.07px]">
-              Free Standard Domestic Shipping above $135
-            </p>
-            <button 
-              onClick={() => setShowTopBanner(false)}
-              className="absolute right-8 size-[20px] top-1/2 -translate-y-1/2"
-            >
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                <path d={svgPathsDesktop.p23bcfd80} fill="white" />
-              </svg>
-            </button>
-          </div>
-        )}
-        
-        {/* Navbar */}
-        <div className="bg-[#280f0b] h-[120px] overflow-clip relative w-full">
-          <div className="absolute h-[72px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[186px]">
-            <Image src="/assets/images/logo.png" alt="Logo" width={186} height={72} className="w-full h-full object-contain" />
-          </div>
-          
-          {/* Nav Items */}
-          <div className="absolute left-8 top-1/2 -translate-y-1/2 flex font-['Manrope:Regular',sans-serif] font-normal gap-[50px] items-center leading-[1.5] text-[14px] text-white tracking-[-0.07px]">
-            <p className="relative shrink-0 cursor-pointer">Shop</p>
-            <p className="relative shrink-0 cursor-pointer">Plans</p>
-            <p className="relative shrink-0 cursor-pointer">Raw Earth Dojo</p>
-            <p className="relative shrink-0 cursor-pointer">About</p>
-          </div>
-          
-          {/* Icons */}
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 flex gap-6 items-center">
-            {/* Search Icon */}
-            <div className="relative shrink-0 size-[24px] cursor-pointer">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                <path d={svgPathsDesktop.pbe57a00} fill="white" />
-              </svg>
-            </div>
-            
-            {/* User Icon */}
-            <div className="overflow-clip relative shrink-0 size-[24px] cursor-pointer">
-              <div className="absolute inset-[12.5%_16.67%]">
-                <div className="absolute inset-[-5.56%_-6.25%]">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 20">
-                    <g>
-                      <path d={svgPathsDesktop.pc813b00} stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                      <path d={svgPathsDesktop.pd085366} stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                    </g>
-                  </svg>
-                </div>
-              </div>
-            </div>
-            
-            {/* Bag Icon */}
-            <div className="overflow-clip relative shrink-0 size-[24px] cursor-pointer">
-              <div className="absolute inset-[14.48%_14.42%_10.31%_14.44%]">
-                <div className="absolute inset-[-5.54%_-5.86%]">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 21">
-                    <g>
-                      <path d={svgPathsDesktop.p2a29c500} stroke="white" strokeWidth="2" />
-                      <path d={svgPathsDesktop.p3659b180} fill="white" />
-                      <path d={svgPathsDesktop.p27467800} fill="white" />
-                      <path d={svgPathsDesktop.p12d72e00} stroke="white" strokeLinecap="round" strokeWidth="2" />
-                    </g>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Header />
       
       {/* Main Content Container */}
-      <div className={`w-full max-w-[1280px] mx-auto px-8 pb-12 ${showTopBanner ? 'pt-[215px]' : 'pt-[170px]'}`}>
+      <div className="w-full max-w-[1280px] mx-auto px-8 pb-12 pt-[50px]">
         {/* Progress Indicator */}
         <div className="mb-12">
           <div className="flex gap-4 items-center">
