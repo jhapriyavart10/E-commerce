@@ -3,8 +3,12 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Header from '@/components/Header'
+import { useCart } from '@/app/context/CartContext'
+import { useRouter } from 'next/navigation'
 
 export default function ProductPage() {
+  const { addToCart } = useCart();
+  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedMaterial, setSelectedMaterial] = useState('Obsidian')
   const [quantity, setQuantity] = useState(1)
@@ -169,31 +173,33 @@ export default function ProductPage() {
           
           /* QUANTITY SELECTOR */
           .quantity-selector {
-            width: 100% !important;
-            margin-bottom: 24px !important;
+            width: 50% !important;
+            margin-bottom: 0 !important;
           }
           
-          .quantity-selector > div {
+          .quantity-selector > div:last-child {
             width: 100% !important;
             justify-content: center !important;
           }
           
-          /* DELIVERY INFO - Vertical stack */
+          /* DELIVERY INFO - Horizontal layout with icon and text side by side */
           .delivery-info {
-            flex-direction: column !important;
-            align-items: flex-start !important;
+            flex-direction: row !important;
+            align-items: center !important;
             gap: 12px !important;
             margin-bottom: 24px !important;
           }
           
           /* EMBRACE SPIRITUALITY SECTION */
           .embrace-section {
-            padding: 24px 16px !important;
+            padding: 0 !important;
             min-height: auto !important;
             margin-top: 40px !important;
           }
           
           .embrace-section > div:first-of-type {
+            width: 100vw !important;
+            margin-left: -16px !important;
             padding: 0 !important;
           }
           
@@ -226,7 +232,12 @@ export default function ProductPage() {
           .reviews-container {
             flex-direction: column !important;
             gap: 24px !important;
-            padding: 0 !important;
+          }
+          
+          /* Customer Reviews title - full width on mobile */
+          .reviews-container h2 {
+            width: 100% !important;
+            max-width: 100% !important;
           }
           
           .review-box {
@@ -251,27 +262,28 @@ export default function ProductPage() {
             min-height: auto !important;
           }
           
-          /* FILTER OPTIONS - Two rows layout */
+          /* FILTER OPTIONS - Two rows layout with 8px row gap */
           .filter-options {
             flex-wrap: wrap !important;
-            gap: 12px !important;
+            row-gap: 8px !important;
+            column-gap: 8px !important;
             overflow-x: visible !important;
           }
           
           /* First row: Search and Most relevant */
           .filter-options > *:nth-child(1),
           .filter-options > *:nth-child(2) {
-            flex: 1 1 calc(50% - 6px) !important;
+            flex: 1 1 calc(50% - 4px) !important;
             min-width: 0 !important;
-            max-width: calc(50% - 6px) !important;
+            max-width: calc(50% - 4px) !important;
           }
           
           /* Second row: All ratings and With media */
           .filter-options > *:nth-child(3),
           .filter-options > *:nth-child(4) {
-            flex: 1 1 calc(50% - 6px) !important;
+            flex: 1 1 calc(50% - 4px) !important;
             min-width: 0 !important;
-            max-width: calc(50% - 6px) !important;
+            max-width: calc(50% - 4px) !important;
           }
           
           /* Ensure input and select fit within their containers */
@@ -286,6 +298,7 @@ export default function ProductPage() {
           .rating-breakdown {
             width: 100% !important;
             max-width: 100% !important;
+            padding: 0 !important;
           }
           
           .rating-breakdown > div {
@@ -303,6 +316,11 @@ export default function ProductPage() {
           .rating-breakdown > div > span:last-child {
             flex-shrink: 0 !important;
             min-width: 45px !important;
+          }
+          
+          /* Reviews content padding - match product details */
+          .reviews-container {
+            padding: 0 16px !important;
           }
           
           /* TYPOGRAPHY - Mobile optimized */
@@ -521,9 +539,9 @@ export default function ProductPage() {
             </div>
 
             {/* Quantity Selector */}
-            <div className="mb-1 quantity-selector">
+            <div className="quantity-selector">
               <h3 className="font-semibold mb-3">Quantity</h3>
-              <div className="flex items-center gap-4" style={{ border: '1px solid #280F0B', padding: '8px', borderRadius: '8px', display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
+              <div className="flex items-center gap-4" style={{ border: '1px solid #280F0B', padding: '8px', borderRadius: '8px', display: 'inline-flex', width: '282px', justifyContent: 'center' }}>
                 <button
                   onClick={() => handleQuantityChange(-1)}
                   className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100"
@@ -544,6 +562,17 @@ export default function ProductPage() {
 
             {/* Add to Cart Button */}
             <button
+              onClick={() => {
+                addToCart({
+                  id: 'angel-wing-crystal-pendants',
+                  name: 'Angel Wing Crystal Pendants',
+                  variant: 'Rose Quartz Standard',
+                  price: 35.00,
+                  image: '/assets/images/necklace-img.png'
+                });
+                // Optionally navigate to cart
+                // router.push('/cart');
+              }}
               className="add-to-cart-btn hover:opacity-90 transition-opacity"
               style={{ 
                 width: '565px',
@@ -809,7 +838,7 @@ export default function ProductPage() {
       <div style={{ width: '100%', background: '#F6D8AB', padding: '80px 0' }}>
         <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 70px' }}>
           {/* Main Container with Reviews on Left and Box on Right */}
-          <div style={{ display: 'flex', gap: '144px', position: 'relative' }} className="reviews-container">
+          <div style={{ display: 'flex', gap: '40px', position: 'relative' }} className="reviews-container">
             {/* Left Side - Reviews */}
             <div style={{ flex: 1 }}>
               {/* Customer Reviews Title */}
@@ -985,7 +1014,8 @@ export default function ProductPage() {
                 fontSize: '24px', 
                 fontWeight: 600,
                 color: '#280F0B',
-                marginBottom: '20px'
+                marginBottom: '20px',
+                textDecoration: 'underline'
               }}>
                 Top reviews
               </h3>

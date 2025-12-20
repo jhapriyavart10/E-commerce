@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { useCart } from '@/app/context/CartContext'
 
 export default function Header() {
+  const { getTotalItems } = useCart();
+  const totalItems = getTotalItems();
+
   return (
     <>
       {/* Top Banner - 1440x45 */}
@@ -34,11 +40,16 @@ export default function Header() {
               
               {/* Mobile Icons - Right Side */}
               <div className="flex items-center gap-4">
-                <button className="hover:text-gray-300 transition-colors" aria-label="Cart">
+                <Link href="/cart" className="hover:text-gray-300 transition-colors relative" aria-label="Cart">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
-                </button>
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[#7F3E2F] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
                 <button className="hover:text-gray-300 transition-colors" aria-label="Menu">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -91,11 +102,16 @@ export default function Header() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </button>
-                <button className="hover:text-gray-300 transition-colors" aria-label="Cart">
+                <Link href="/cart" className="hover:text-gray-300 transition-colors relative" aria-label="Cart">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
-                </button>
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[#7F3E2F] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
               </div>
             </div>
           </div>
