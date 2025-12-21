@@ -15,12 +15,12 @@ export default function ProductPage() {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
 
   const productImages = [
-    '/assets/images/f1931560e8f947b5b51be3ba5535c1d4313d27f6.png',
-    '/assets/images/62b4f24e242d65d25cdb5d6bf7252a117eef90a7.png',
-    '/assets/images/70bc5bc1708629069ae799b4cb3dc173859c6998.png',
-    '/assets/images/7d485a0962c49cc6d71b620cc210d1bb377bb5ce.png',
-    '/assets/images/9de9340a9fbf42bbcdbcaf2e505f27a407b1de11.png',
-    '/assets/images/b05a93b56a86e1eb862f5abd622d101215f4368f.png',
+    '/assets/images/jewellery1.png',
+    '/assets/images/jewellery2.png',
+    '/assets/images/jewellery3.png',
+    '/assets/images/jewellery4.png',
+    '/assets/images/jewellery5.png',
+    '/assets/images/jewellery6.png',
   ]
 
   const materials = [
@@ -76,6 +76,7 @@ export default function ProductPage() {
   return (
     <div className="font-sans bg-[#F6D8AB] min-h-screen">
       <Header />
+
       <style suppressHydrationWarning>{`
         @keyframes slideDown {
           from {
@@ -90,321 +91,17 @@ export default function ProductPage() {
           }
         }
 
-        .product-page-container {
-          max-width: 1440px;
-          margin: 0 auto;
-          padding: 2rem 1rem;
+        /* Set Manrope as the default font for all except Embrace Spirituality */
+        body, .font-sans, .product-page-container, .product-layout, .product-gallery, .product-details, .main-product-image, .thumbnail-strip, .thumbnail-image, .material-selection-box, .material-buttons, .cta-button, .quantity-selector, .reviews-section, .reviews-layout, .reviews-content, .review-box, .filter-options, .review-card, .rating-breakdown, .delivery-info, .space-y-4, .material-box, .material-quantity-stack, .quantity-selector-box, h1, h2, h3, h4, h5, h6, p, span, button, input, select, label, div {
+          font-family: 'Manrope', var(--font-manrope), sans-serif !important;
         }
 
-        @media (min-width: 768px) {
-          .product-page-container {
-            padding: 2rem 2rem;
-          }
+        /* Embrace Spirituality heading keeps Lora */
+        .embrace-text {
+          font-family: 'Lora', serif !important;
         }
 
-        @media (min-width: 1024px) {
-          .product-page-container {
-            padding: 2rem 4rem;
-          }
-        }
-
-        .product-layout {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        @media (min-width: 1024px) {
-          .product-layout {
-            flex-direction: row;
-            gap: 3rem;
-          }
-        }
-
-        .product-gallery {
-          flex: 1;
-          min-width: 0;
-        }
-
-        @media (min-width: 1024px) {
-          .product-gallery {
-            max-width: 640px;
-          }
-        }
-
-        .product-details {
-          flex: 1;
-          min-width: 0;
-        }
-
-        @media (min-width: 1024px) {
-          .product-details {
-            padding-left: 91px;
-          }
-        }
-
-        .main-product-image {
-          width: 100%;
-          height: auto;
-          aspect-ratio: 1;
-          object-fit: cover;
-          border-radius: 8px;
-          margin-bottom: 0.5rem;
-        }
-
-        .thumbnail-strip {
-          display: flex;
-          gap: 8px;
-          width: 100%;
-          overflow-x: auto;
-          flex-wrap: nowrap;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        
-        .thumbnail-strip::-webkit-scrollbar {
-          display: none;
-        }
-
-        @media (max-width: 767px) {
-          .thumbnail-strip {
-            overflow-x: hidden;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-          }
-        }
-
-        .thumbnail-image {
-          width: calc((100% - 40px) / 6);
-          min-width: 50px;
-          max-width: 100px;
-          aspect-ratio: 1;
-          object-fit: cover;
-          border-radius: 4px;
-          cursor: pointer;
-          flex-shrink: 0;
-        }
-
-        @media (min-width: 768px) {
-          .thumbnail-image {
-            width: 100px;
-            height: 100px;
-          }
-        }
-
-        .material-selection-box {
-          width: 100%;
-          background-color: #E8D5B7;
-          border: 1.25px solid #C5A572;
-          padding: 1rem;
-          margin-bottom: 1.5rem;
-          position: relative;
-        }
-
-        @media (min-width: 1024px) {
-          .material-selection-box {
-            max-width: 565px;
-          }
-        }
-
-        .material-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-          margin-top: 1.75rem;
-        }
-
-        @media (max-width: 767px) {
-          .material-buttons {
-            flex-direction: column;
-          }
-          
-          .material-buttons button {
-            width: 100% !important;
-            max-width: 100% !important;
-            justify-content: flex-start !important;
-          }
-        }
-
-        .cta-button {
-          width: 100%;
-          height: 51px;
-          padding: 15px 40px;
-          border: none;
-          color: #FFFFFF;
-          font-weight: 700;
-          font-size: 16px;
-          cursor: pointer;
-          margin-bottom: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        @media (min-width: 1024px) {
-          .cta-button {
-            max-width: 565px;
-          }
-        }
-
-        /* Desktop: 12px spacing between Add to Cart and Buy with Shop buttons */
-        @media (min-width: 768px) {
-          button[style*="565px"]:first-of-type {
-            margin-bottom: 12px !important;
-          }
-        }
-
-        .quantity-selector {
-          display: flex;
-          align-items: center;
-          border: 1px solid #280F0B;
-          padding: 6px 8px;
-          width: 116px;
-          height: 38px;
-          justify-content: space-between;
-          margin-bottom: 1.5rem;
-        }
-
-        .reviews-section {
-          width: 100%;
-          background: #F6D8AB;
-          padding: 3rem 0;
-        }
-
-        .reviews-layout {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        @media (min-width: 1024px) {
-          .reviews-layout {
-            flex-direction: row;
-            gap: 144px;
-          }
-        }
-
-        .reviews-content {
-          flex: 1;
-        }
-
-        .review-box {
-          width: 100%;
-          max-width: 624px;
-          border: 1px dashed #280F0B;
-          border-radius: 8px;
-          padding: 2.5rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-        }
-
-        @media (max-width: 767px) {
-          .review-box {
-            padding: 1.5rem 1rem;
-          }
-        }
-
-        .filter-options {
-          display: flex;
-          gap: 12px;
-          margin-bottom: 30px;
-          flex-wrap: wrap;
-        }
-
-        @media (max-width: 767px) {
-          .filter-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-          }
-          
-          .filter-options > * {
-            width: 100% !important;
-            max-width: 100% !important;
-          }
-          
-          .filter-options input,
-          .filter-options select,
-          .filter-options button {
-            width: 100% !important;
-            max-width: 100% !important;
-          }
-        }
-
-        .review-card {
-          width: 100%;
-          background: #FFC26F;
-          padding: 1.5rem;
-          border-radius: 8px;
-          margin-bottom: 1rem;
-        }
-
-        .embrace-section {
-          width: 100%;
-          min-height: 400px;
-          background: #4A221C;
-          position: relative;
-          margin-top: 100px;
-        }
-
-        @media (min-width: 768px) {
-          .embrace-section {
-            min-height: 611px;
-          }
-        }
-
-        .embrace-content {
-          display: flex;
-          flex-direction: column;
-          gap: 237px;
-          padding: 2rem 1rem;
-        }
-
-        @media (min-width: 768px) {
-          .embrace-content {
-            flex-direction: row;
-            align-items: flex-start;
-            justify-content: space-between;
-            padding: 128px 4rem 4rem;
-          }
-        }
-
-        .embrace-title {
-          max-width: 503px;
-          font-family: 'Lora', serif;
-          font-weight: 700;
-          font-style: italic;
-          font-size: 40px;
-          line-height: 100%;
-          letter-spacing: -1px;
-          color: #F6D8AB;
-          margin: 0;
-        }
-
-        @media (min-width: 768px) {
-          .embrace-title {
-            font-size: 96px;
-          }
-        }
-
-        .embrace-description {
-          width: 100%;
-          max-width: 343px;
-          font-family: var(--font-manrope);
-          font-weight: 500;
-          font-size: 14px;
-          line-height: 150%;
-          letter-spacing: -0.005em;
-          color: #F6D8AB;
-        }
-
-        @media (min-width: 768px) {
-          .embrace-description {
-            position: static;
-          }
-        }
+        /* ...existing code... */
 
         @media (max-width: 768px) {
           /* GLOBAL OVERRIDES - Force mobile layout */
@@ -779,20 +476,6 @@ export default function ProductPage() {
           h2 {
             font-size: 28px !important;
             line-height: 1.2 !important;
-          }
-
-          /* Customer Reviews header mobile spacing */
-          @media (max-width: 767px) {
-            .reviews-container h2 {
-              margin-top: 32px !important;
-              margin-left: 24px !important;
-            }
-            .reviews-container {
-              gap: 0 !important;
-            }
-            .reviews-container > div:first-child {
-              margin-left: 0 !important;
-            }
           }
           
           h3 {
@@ -1231,7 +914,7 @@ export default function ProductPage() {
           {/* Main Container with Reviews on Left and Box on Right */}
           <div style={{ display: 'flex', gap: '144px', position: 'relative' }} className="reviews-container">
             {/* Left Side - Reviews */}
-            <div style={{ flex: 1, marginLeft: '72px' }} className="reviews-left-col">
+            <div style={{ flex: 1, marginLeft: '72px' }}>
               {/* Customer Reviews Title */}
               <h2 style={{ 
                     width: '100%',
@@ -1622,6 +1305,5 @@ export default function ProductPage() {
     </div>
   )
 }
-
 
 
