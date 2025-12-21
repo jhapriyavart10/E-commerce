@@ -76,7 +76,7 @@ export default function ProductPage() {
   return (
     <div className="font-sans bg-[#F6D8AB] min-h-screen">
       <Header />
-      <style>{`
+      <style suppressHydrationWarning>{`
         @keyframes slideDown {
           from {
             opacity: 0;
@@ -196,7 +196,6 @@ export default function ProductPage() {
           width: 100%;
           background-color: #E8D5B7;
           border: 1.25px solid #C5A572;
-          border-radius: 8px;
           padding: 1rem;
           margin-bottom: 1.5rem;
           position: relative;
@@ -418,10 +417,89 @@ export default function ProductPage() {
             width: 100% !important;
           }
           
-          /* CONTAINER - Single column layout */
+          /* UNIVERSAL 24PX PADDING FOR ALL SECTIONS */
+          .max-w-\[1440px\] {
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+          }
+          
+          /* CONTAINER - Single column layout with 24px horizontal padding */
           .container {
-            padding: 0 16px !important;
+            padding: 0 24px !important;
             max-width: 100% !important;
+          }
+          
+          /* PRODUCT PAGE - All sections get 24px horizontal padding */
+          .product-page-container {
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+          }
+          
+          /* Product layout children */
+          .product-layout > div {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+          
+          /* EMBRACE SECTION - Reset desktop margins, use padding */
+          .embrace-section {
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          .embrace-text {
+            margin-left: 0 !important;
+          }
+          
+          .embrace-description {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          /* REVIEWS SECTION - Reset all margins and use container padding */
+          #reviews-section {
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          #reviews-section * {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          /* Override container padding inside reviews section */
+          #reviews-section .container {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          #reviews-section .mx-auto {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          /* Override desktop 72px margins on review elements */
+          #reviews-section div[style*="marginLeft"] {
+            margin-left: 0 !important;
+          }
+          
+          #reviews-section div[style*="marginRight"] {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          /* Review box specific override */
+          .review-box {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
           }
           
           .product-container {
@@ -497,6 +575,7 @@ export default function ProductPage() {
             min-height: auto !important;
             padding: 16px !important;
             margin-bottom: 24px !important;
+            border-radius: 0 !important;
           }
           
           /* Material buttons - one per line */
@@ -598,15 +677,24 @@ export default function ProductPage() {
             width: 100% !important;
             max-width: 100% !important;
             height: auto !important;
-            padding: 24px 16px !important;
-            margin-bottom: 24px !important;
+            padding: 0 !important;
+            margin: 24px 0 !important;
+            border: none !important;
+            background: transparent !important;
             box-sizing: border-box !important;
           }
           
-          /* Fix Write a Review button width on mobile */
+          /* Hide heading and description text on mobile */
+          .review-box h3,
+          .review-box p {
+            display: none !important;
+          }
+          
+          /* Show only Write a Review button on mobile */
           .review-box > button {
             width: 100% !important;
             max-width: 100% !important;
+            margin: 0 !important;
           }
           
           .review-card {
@@ -679,7 +767,7 @@ export default function ProductPage() {
           
           /* Reviews content padding - match product details */
           .reviews-container {
-            padding: 0 16px !important;
+            padding: 0 24px !important;
           }
           
           /* TYPOGRAPHY - Mobile optimized */
@@ -704,7 +792,7 @@ export default function ProductPage() {
         }
       `}</style>
 
-      <div className="max-w-[1440px] mx-auto px-4 py-8 md:px-8 md:py-8 lg:px-16">
+      <div className="max-w-[1440px] mx-auto px-6 py-8 md:px-8 md:py-8 lg:px-16">
         <div className="product-layout">
           {/* Left Column - Image Gallery */}
           <div className="product-gallery">
@@ -804,11 +892,11 @@ export default function ProductPage() {
             <div 
               className="material-box"
               style={{
-                width: '565px',
+                width: '100%',
+                maxWidth: '565px',
                 minHeight: '146px',
                 backgroundColor: '#E8D5B7',
                 border: '1.25px solid #C5A572',
-                borderRadius: '8px',
                 padding: '16px',
                 marginBottom: '24px',
                 position: 'relative'
@@ -911,7 +999,7 @@ export default function ProductPage() {
               <span style={{ fontSize: '18px', fontWeight: 600, lineHeight: '1', color: '#280F0B' }}>{quantity}</span>
               <button
                 onClick={() => handleQuantityChange(1)}
-                style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer', fontSize: '18px', lineHeight: '1', color: '#280F0B' }}
+                style={{ background: 'none', border: 'none', padding: 0, margin: 0, cursor: 'pointer', fontSize: '18px', lineHeight: '1', color: '#280F0B', fontWeight: 700 }}
               >
                 +
               </button>
@@ -973,10 +1061,10 @@ export default function ProductPage() {
               <div className="pb-4" style={{ borderBottom: '1px solid #626262' }}>
                 <button
                   onClick={() => toggleSection('description')}
-                  className="w-full flex justify-between items-center font-semibold text-left"
+                  className="w-full flex justify-between items-center text-left"
                 >
-                  <span>Description</span>
-                  <span className="text-2xl">{expandedSections['description'] ? '−' : '+'}</span>
+                  <span style={{ fontFamily: 'var(--font-manrope)', fontWeight: 600, fontSize: '18px', lineHeight: '100%', letterSpacing: '0%' }}>Description</span>
+                  <span className="text-2xl font-bold">{expandedSections['description'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['description'] && (
                   <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em', animation: 'slideDown 0.3s ease-out' }}>
@@ -991,10 +1079,10 @@ export default function ProductPage() {
               <div className="pb-4" style={{ borderBottom: '1px solid #626262' }}>
                 <button
                   onClick={() => toggleSection('howto')}
-                  className="w-full flex justify-between items-center font-semibold text-left"
+                  className="w-full flex justify-between items-center text-left"
                 >
-                  <span>How to use</span>
-                  <span className="text-2xl">{expandedSections['howto'] ? '−' : '+'}</span>
+                  <span style={{ fontFamily: 'var(--font-manrope)', fontWeight: 600, fontSize: '18px', lineHeight: '100%', letterSpacing: '0%' }}>How to use</span>
+                  <span className="text-2xl font-bold">{expandedSections['howto'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['howto'] && (
                   <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em', animation: 'slideDown 0.3s ease-out' }}>
@@ -1009,10 +1097,10 @@ export default function ProductPage() {
               <div className="pb-4" style={{ borderBottom: '1px solid #626262' }}>
                 <button
                   onClick={() => toggleSection('details')}
-                  className="w-full flex justify-between items-center font-semibold text-left"
+                  className="w-full flex justify-between items-center text-left"
                 >
-                  <span>Product Details</span>
-                  <span className="text-2xl">{expandedSections['details'] ? '−' : '+'}</span>
+                  <span style={{ fontFamily: 'var(--font-manrope)', fontWeight: 600, fontSize: '18px', lineHeight: '100%', letterSpacing: '0%' }}>Product Details</span>
+                  <span className="text-2xl font-bold">{expandedSections['details'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['details'] && (
                   <div className="mt-4 text-gray-700 leading-relaxed" style={{ fontFamily: 'var(--font-manrope)', fontSize: '16px', lineHeight: '24px', letterSpacing: '-0.005em', animation: 'slideDown 0.3s ease-out' }}>
@@ -1027,10 +1115,10 @@ export default function ProductPage() {
               <div className="pb-4" style={{ borderBottom: '1px solid #626262' }}>
                 <button
                   onClick={() => toggleSection('idealfor')}
-                  className="w-full flex justify-between items-center font-semibold text-left"
+                  className="w-full flex justify-between items-center text-left"
                 >
-                  <span>Ideal for</span>
-                  <span className="text-2xl">{expandedSections['idealfor'] ? '−' : '+'}</span>
+                  <span style={{ fontFamily: 'var(--font-manrope)', fontWeight: 600, fontSize: '18px', lineHeight: '100%', letterSpacing: '0%' }}>Ideal for</span>
+                  <span className="text-2xl font-bold">{expandedSections['idealfor'] ? '−' : '+'}</span>
                 </button>
                 {expandedSections['idealfor'] && (
                   <div className="mt-4 text-gray-700 leading-relaxed" style={{ animation: 'slideDown 0.3s ease-out' }}>
@@ -1070,7 +1158,7 @@ export default function ProductPage() {
         />
 
         {/* Content Container */}
-        <div className="container mx-auto px-4" style={{ paddingTop: '128px' }}>
+        <div className="container mx-auto px-4" style={{ paddingTop: '93px' }}>
           <div
             className="embrace-container"
             style={{
@@ -1091,7 +1179,8 @@ export default function ProductPage() {
               lineHeight: '100%',
               letterSpacing: '-1px',
               color: '#F6D8AB',
-              margin: 0
+              margin: 0,
+              marginLeft: '70px'
             }}
           >
             Embrace Spirituality.
@@ -1128,17 +1217,19 @@ export default function ProductPage() {
           {/* Main Container with Reviews on Left and Box on Right */}
           <div style={{ display: 'flex', gap: '144px', position: 'relative' }} className="reviews-container">
             {/* Left Side - Reviews */}
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, marginLeft: '72px' }}>
               {/* Customer Reviews Title */}
               <h2 style={{ 
-                    width: '346px',
-                    height: '55px',
+                    width: '100%',
+                    maxWidth: '346px',
+                    minHeight: '55px',
                     fontFamily: 'var(--font-manrope)', 
                     fontSize: '40px', 
                     fontWeight: 700,
                     lineHeight: '100%',
                     letterSpacing: '-1px',
                     color: '#280F0B',
+                    marginTop: '60px',
                     marginBottom: '16px'
                   }}>
                     Customer Reviews
@@ -1148,8 +1239,9 @@ export default function ProductPage() {
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '24px', 
-                    width: '276px',
-                    height: '77px',
+                    width: '100%',
+                    maxWidth: '276px',
+                    minHeight: '77px',
                     marginBottom: '16px'
                   }}>
                     <span style={{ 
@@ -1166,7 +1258,7 @@ export default function ProductPage() {
                           <span key={star} style={{ color: '#FFC107', fontSize: '24px' }}>★</span>
                         ))}
                       </div>
-                      <p style={{ fontSize: '14px', color: '#280F0B', margin: 0 }}>Based on 2 reviews</p>
+                      <p style={{ fontSize: '14px', color: '#280F0B', margin: 0 }}>Based on 7 ratings</p>
                     </div>
                   </div>
 
@@ -1175,7 +1267,7 @@ export default function ProductPage() {
                     display: 'flex', 
                     flexDirection: 'column', 
                     gap: '8px',
-                    width: '528px',
+                    width: '100%',
                     maxWidth: '100%',
                     height: 'auto',
                     marginBottom: '32px'
@@ -1191,7 +1283,8 @@ export default function ProductPage() {
                         <span style={{ fontSize: '14px', color: '#280F0B', width: '20px' }}>{rating}</span>
                         <span style={{ color: '#FFC107', fontSize: '16px' }}>★</span>
                         <div style={{ 
-                          width: '396.5px', 
+                          width: '100%', 
+                          maxWidth: '396.5px', 
                           height: '8px', 
                           background: '#604A0A', 
                           borderRadius: '42px',
@@ -1228,7 +1321,9 @@ export default function ProductPage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '40px'
+              padding: '40px',
+              marginRight: '72px',
+              marginTop: '60px'
             }}>
               {/* Review this product */}
               <h3 style={{
@@ -1260,7 +1355,8 @@ export default function ProductPage() {
 
               {/* Write a Review Button */}
               <button style={{
-                width: '349px',
+                width: '100%',
+                maxWidth: '349px',
                 height: '51px',
                 paddingTop: '15px',
                 paddingRight: '40px',
@@ -1303,13 +1399,14 @@ export default function ProductPage() {
                 fontWeight: 600,
                 color: '#280F0B',
                 marginBottom: '20px',
+                marginLeft: '72px',
                 textDecoration: 'underline'
               }}>
                 Top reviews
               </h3>
 
               {/* Filter Options */}
-              <div style={{ display: 'flex', gap: '12px', marginBottom: '30px' }} className="filter-options">
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '30px', marginLeft: '72px' }} className="filter-options">
                 {/* Search Review */}
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                   <input
@@ -1427,11 +1524,12 @@ export default function ProductPage() {
               </div>
 
           {/* Review Cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginLeft: '72px', marginRight: '72px' }}>
             {/* Review 1 */}
             <div className="review-card" style={{ 
-              width: '1296px',
-              height: '150px',
+              width: '100%',
+              maxWidth: '1296px',
+              minHeight: '150px',
               background: '#FFC26F', 
               padding: '24px', 
               borderRadius: '8px'
@@ -1454,7 +1552,7 @@ export default function ProductPage() {
                   <span style={{ fontWeight: 500 }}>Verified Buyer</span>
                 </span>
               </div>
-              <p style={{ fontSize: '12px', color: '#666', marginBottom: '12px' }}>18 days ago</p>
+              <p style={{ fontSize: '12px', color: '#7F3E2F', marginBottom: '12px' }}>18 days ago</p>
               <p style={{ 
                 fontFamily: 'var(--font-manrope)',
                 fontSize: '14px',
@@ -1468,8 +1566,9 @@ export default function ProductPage() {
 
             {/* Review 2 */}
             <div className="review-card" style={{ 
-              width: '1296px',
-              height: '150px',
+              width: '100%',
+              maxWidth: '1296px',
+              minHeight: '150px',
               background: '#FFC26F', 
               padding: '24px', 
               borderRadius: '8px'
@@ -1492,7 +1591,7 @@ export default function ProductPage() {
                   <span style={{ fontWeight: 500 }}>Verified Buyer</span>
                 </span>
               </div>
-              <p style={{ fontSize: '12px', color: '#666', marginBottom: '12px' }}>18 days ago</p>
+              <p style={{ fontSize: '12px', color: '#7F3E2F', marginBottom: '12px' }}>18 days ago</p>
               <p style={{ 
                 fontFamily: 'var(--font-manrope)',
                 fontSize: '14px',

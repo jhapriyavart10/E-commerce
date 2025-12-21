@@ -61,14 +61,31 @@ export default function CartPage() {
       
       <style jsx>{`
         .cart-container {
-          padding: 24px 1.5rem 3rem;
-          max-width: 1280px;
+          padding: 24px 24px 3rem;
+          max-width: 1440px;
           margin: 0 auto;
         }
 
         @media (min-width: 1024px) {
           .cart-container {
-            padding: 50px 2rem 3rem;
+            padding: 50px 72px 3rem;
+            max-width: 1440px;
+          }
+        }
+        
+        /* Mobile margin consistency - 24px left/right */
+        @media (max-width: 768px) {
+          .cart-container {
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+          }
+          
+          .progress-steps,
+          .cart-layout,
+          .cart-items-section,
+          .summary-card {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
           }
         }
 
@@ -140,10 +157,18 @@ export default function CartPage() {
         @media (min-width: 1024px) {
           .table-headers {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 1rem;
+            grid-template-columns: auto auto auto;
+            column-gap: 0;
             padding-bottom: 2rem;
             border-bottom: 1px solid rgba(40, 15, 11, 0.4);
+          }
+          
+          .table-headers p:nth-child(1) {
+            margin-right: 394px;
+          }
+          
+          .table-headers p:nth-child(2) {
+            margin-right: 133px;
           }
         }
 
@@ -156,9 +181,17 @@ export default function CartPage() {
         @media (min-width: 1024px) {
           .cart-item {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 1rem;
+            grid-template-columns: auto auto auto;
+            column-gap: 104px;
             align-items: center;
+          }
+          
+          .cart-item > div:nth-child(1) {
+            margin-right: 0;
+          }
+          
+          .cart-item > div:nth-child(2) {
+            margin-right: 0;
           }
         }
 
@@ -239,7 +272,9 @@ export default function CartPage() {
 
         @media (min-width: 1024px) {
           .summary-card {
-            max-width: 526px;
+            width: 526px;
+            height: 440px;
+            max-width: none;
             margin: 0;
           }
         }
@@ -383,8 +418,8 @@ export default function CartPage() {
                     />
                   </div>
                   <div className="product-details">
-                    <p className="font-['Manrope:Medium',sans-serif] font-medium leading-[normal] text-[#280f0b] text-[16px]">{item.name}</p>
-                    <p className="font-['Manrope:Medium',sans-serif] font-medium leading-[1.5] text-[#7f3e2f] text-[14px]">{item.variant}</p>
+                    <p className="font-['Manrope',sans-serif] font-medium text-[#280f0b] text-[16px]" style={{ lineHeight: '100%', letterSpacing: '0%' }}>{item.name}</p>
+                    <p className="font-['Manrope',sans-serif] font-medium text-[#7f3e2f] text-[14px]" style={{ lineHeight: '100%', letterSpacing: '0%' }}>{item.variant}</p>
                     <p className="font-['Manrope:SemiBold',sans-serif] font-semibold leading-[normal] text-[#280f0b] text-[13px]">${item.price.toFixed(2)} AUD</p>
                     
                     {/* Delete button - Desktop only */}
