@@ -71,6 +71,7 @@ export default function MobileProductPage() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(6, 1fr)',
                 gap: 8,
+                width: '100%',
                 marginBottom: 24,
             }}
          >
@@ -80,14 +81,15 @@ export default function MobileProductPage() {
                 key={img}
                 onClick={() => setSelectedImage(img)}
                 style={{
-                  minWidth: 72,
-                  height: 72,
-                  border:
+                width: '100%',
+                aspectRatio: '1 / 1',
+                border:
                     selectedImage === img
-                      ? '2px solid #280F0B'
-                      : '1px solid rgba(40,15,11,0.3)',
-                  cursor: 'pointer',
+                    ? '2px solid #280F0B'
+                    : '1px solid rgba(40,15,11,0.3)',
+                cursor: 'pointer',
                 }}
+
               >
                 <Image
                   src={img}
