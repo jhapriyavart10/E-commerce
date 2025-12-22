@@ -466,11 +466,12 @@ export default function MobileProductPage() {
         <section
         id="reviews-section"
         style={{
-            padding: '48px 24px',
+            // padding: '48px 24px',
             backgroundColor: '#F6D8AB',
             color: '#280F0B',
         }}
         >
+        <div className="py-12 px-5 md:px-12 xl:px-24 2xl:px-32">
         {/* HEADER */}
         <h2
             style={{
@@ -616,25 +617,28 @@ export default function MobileProductPage() {
             {/* FILTER PILLS */}
             <div
             style={{
-                display: 'flex',
-                flexWrap: 'wrap',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
                 gap: 12,
                 marginBottom: 24,
             }}
             >
+            {/* Search */}
             <div
                 style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 8,
-                padding: '10px 16px',
+                padding: '10px 12px',
                 borderRadius: 999,
                 backgroundColor: '#E7C69A',
                 fontSize: 14,
+                width: '100%',
                 }}
             >
                 <img src="/assets/images/search-icon.png" alt="search" />
-                Search reviews
+                <span>Search reviews</span>
             </div>
 
             {['Most relevant', 'All ratings', 'With media'].map((label) => (
@@ -643,18 +647,22 @@ export default function MobileProductPage() {
                 style={{
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: 8,
-                    padding: '10px 16px',
+                    padding: '10px 12px',
                     borderRadius: 999,
                     backgroundColor: '#E7C69A',
                     fontSize: 14,
+                    width: '100%',
                 }}
                 >
-                {label}
+                <span>{label}</span>
                 <img src="/assets/images/dropdown.svg" alt="dropdown" />
                 </div>
             ))}
             </div>
+
+
 
             {/* REVIEW CARD */}
             <div
@@ -691,6 +699,7 @@ export default function MobileProductPage() {
                 She loves it!
             </p>
             </div>
+        </div>
         </div>
         </section>
 
