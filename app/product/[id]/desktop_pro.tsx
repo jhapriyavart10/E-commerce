@@ -47,7 +47,11 @@ export default function ProductPage() {
                 <span style={{ fontWeight: 700 }}>Shop</span> / Pendants / Tiger Eye Pendant
               </p>
               {/* Main Image */}
-              <div className="relative bg-[#F2EFEA] flex items-center justify-center aspect-square w-full max-w-[640px]">
+              <div className="relative bg-[#F2EFEA] flex items-center justify-center aspect-square w-full max-w-[420px]
+               sm:max-w-[520px]
+                lg:max-w-[640px]
+                xl:max-w-[720px]
+                2xl:max-w-[820px]">
                 <Image
                   src={selectedImage}
                   alt="Product"
@@ -94,7 +98,7 @@ export default function ProductPage() {
             {/* RIGHT COLUMN – DETAILS */}
             <div>
               {/* Title */}
-              <h1 className="text-3xl xl:text-4xl font-semibold mb-3">
+              <h1 className="text-3xl xl:text-4xl font-semibold mb-3 mt-8">
                 Sphere Crystal Pendulums
               </h1>
 
