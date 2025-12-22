@@ -15,7 +15,7 @@ const jewelleryImages = [
 const materialOptions = [
   { name: 'Obsidian', img: '/assets/images/obsidian.png' },
   { name: 'Tiger Eye', img: '/assets/images/tiger eye.png' },
-  { name: 'Lapis Lazuli', img: '/assets/images/lapis lazuli-1.png' },
+  { name: 'Lapis Lazuli', img: '/assets/images/Lapis Lazuli.svg' },
   { name: 'Rose Quartz', img: '/assets/images/rose quartz.png' },
   { name: 'Clear Quartz', img: '/assets/images/clear quartz.png' },
   { name: 'Green Aventurine', img: '/assets/images/green adventurine.png' },
@@ -38,8 +38,8 @@ export default function ProductPage() {
         style={{ fontFamily: 'Manrope, sans-serif' }}
       >
         {/* SECTION 1 */}
-        <section className="px-[72px] pt-12">
-          <div className="grid grid-cols-2 gap-16">
+        <section className="px-6 md:px-12 xl:px-24 2xl:px-32 pt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
             {/* LEFT COLUMN – IMAGES */}
             <div>
               {/* Breadcrumb */}
@@ -47,30 +47,24 @@ export default function ProductPage() {
                 <span style={{ fontWeight: 700 }}>Shop</span> / Pendants / Tiger Eye Pendant
               </p>
               {/* Main Image */}
-              <div
-                className="bg-[#F2EFEA] flex items-center justify-center"
-                style={{ width: 640, height: 640 }}
-              >
+              <div className="relative bg-[#F2EFEA] flex items-center justify-center aspect-square w-full max-w-[640px]">
                 <Image
                   src={selectedImage}
                   alt="Product"
-                  width={640}
-                  height={640}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  // width={640}
+                  // height={640}
+                  fill
+                  style={{objectFit: 'cover' }}
                   priority
                 />
               </div>
               {/* Thumbnails */}
               <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${jewelleryImages.length}, 1fr)`,
-                  gap: 5,
-                  width: 640, // EXACTLY same as main image
-                  marginTop: 16,
-                }}
-              >
-
+              className="grid gap-2 mt-4 w-full max-w-[640px]"
+              style={{
+                gridTemplateColumns: `repeat(${jewelleryImages.length}, minmax(0, 1fr))`,
+              }}
+            >
                 {jewelleryImages.map((img, idx) => (
                   <div
                     key={img}
@@ -100,7 +94,7 @@ export default function ProductPage() {
             {/* RIGHT COLUMN – DETAILS */}
             <div>
               {/* Title */}
-              <h1 className="text-4xl font-semibold mb-3 mt-10">
+              <h1 className="text-3xl xl:text-4xl font-semibold mb-3">
                 Sphere Crystal Pendulums
               </h1>
 
@@ -109,8 +103,6 @@ export default function ProductPage() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  width: 223,
-                  height: 24,
                   gap: 8,
                   opacity: 1,
                 }}
@@ -144,8 +136,8 @@ export default function ProductPage() {
                 style={{
                   fontFamily: 'Manrope, sans-serif',
                   fontWeight: 400,
-                  fontSize: 16,
-                  lineHeight: '24px',
+                  fontSize: 'clamp(15px, 1vw, 16px)',
+                  lineHeight: '1.6',
                   marginBottom: 16,
                   marginTop: 0,
                   opacity: 0.9,
@@ -161,7 +153,7 @@ export default function ProductPage() {
                   fontSize: 12,
                   color: '#7F3E2F',
                   fontFamily: 'Manrope, sans-serif',
-                  letterSpacing: '-0.5%',
+                  letterSpacing: '-0.005em',
                   marginTop: 2,
                 }}
                 onClick={() => {
@@ -187,8 +179,9 @@ export default function ProductPage() {
                 className="mb-6"
                 style={{
                   border: '1.25px solid #280F0B',
-                  width: 565,
-                  height: 146,
+                  width: '100%',
+                  height: 'auto',
+                  //maxWidth: 565,
                   opacity: 1,
                   position: 'relative',
                   padding: '12px 16px 12px 16px',
@@ -219,7 +212,7 @@ export default function ProductPage() {
                     gap: 16,
                     alignItems: 'center',
                     width: '100%',
-                    maxWidth: '100%',
+                    //maxWidth: '100%',
                   }}
                 >
                   {materialOptions.map((option) => (
@@ -232,7 +225,7 @@ export default function ProductPage() {
                         justifyContent: 'flex-start',
                         width: 'fit-content',
                         minWidth: 60,
-                        height: 38,
+                        minHeight: 38,
                         borderRadius: 27,
                         border: selectedMaterial === option.name ? '1px solid #6C6AE4' : '1px solid #280F0B66',
                         background: selectedMaterial === option.name ? '#6C6AE4' : '#F6D8AB',
@@ -257,8 +250,8 @@ export default function ProductPage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          width: 24.09,
-                          height: 21.82,
+                          width: '1.5rem',
+                          height: '1.375rem',
                           borderRadius: 4,
                           background: 'transparent',
                           marginRight: 8,
@@ -279,15 +272,15 @@ export default function ProductPage() {
                         style={{
                           fontFamily: 'Manrope, sans-serif',
                           fontWeight: 400,
-                          fontSize: 14,
-                          lineHeight: '21px',
-                          letterSpacing: '-0.5%',
+                          fontSize: 'clamp(13px, 0.9vw, 14px)',
+                          lineHeight: '1.5',
+                          letterSpacing: '-0.005em',
+                          maxWidth: '8rem',
                           opacity: 1,
                           marginLeft: 0,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          maxWidth: 120,
                         }}
                       >
                         {option.name}
@@ -302,8 +295,8 @@ export default function ProductPage() {
                 <div
                   className="flex items-center justify-start"
                   style={{
-                    width: 116,
-                    height: 38,
+                    width: 'fit-content',
+                    minHeight: 38,
                     border: '1px solid #280F0B66',
                     borderBottom: 'none',
                     borderRadius: 0,
@@ -313,61 +306,87 @@ export default function ProductPage() {
                   }}
                 >
                   <button
-                    className="px-4 py-2"
+                    className="px-4"
+                    style={{ height: '100%', display: 'flex', alignItems: 'center' }}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Decrease quantity"
-                    style={{ height: '100%' }}
                   >
                     -
                   </button>
-                  <span className="px-4" style={{ minWidth: 24, textAlign: 'center' }}>{quantity}</span>
+                  {/* <span className="px-4" style={{ minWidth: '1.75rem', textAlign: 'center' }}>{quantity}</span> */}
+                   {/* Input */}
+                  <input
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (!Number.isNaN(val) && val >= 1) {
+                        setQuantity(val);
+                      }
+                    }}
+                    style={{
+                      width: '3rem',
+                      textAlign: 'center',
+                      border: 'none',
+                      outline: 'none',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontSize: 14,
+                      appearance: 'textfield',
+                      background: 'transparent',
+                      padding: 0,
+                      margin: 0,
+                    }}
+                  />
                   <button
-                    className="px-4 py-2"
+                    className="px-4"
                     onClick={() => setQuantity((q) => q + 1)}
                     aria-label="Increase quantity"
-                    style={{ height: '100%' }}
+                    style={{ height: '100%', display: 'flex', alignItems: 'center' }}
                   >
                     +
                   </button>
                 </div>
-                <button className="w-full bg-[#7A3E2E] text-white py-4 uppercase tracking-wide mb-3" style={{ marginTop: 0 }}>
+                <button className="w-full bg-[#7A3E2E] text-white py-4 xl:py-5 uppercase tracking-wide mb-3">
                   Add to cart
                 </button>
               </div>
 
-              <button className="w-full bg-[#4A2CF0] text-white py-4">
+              <button className="w-full bg-[#4A2CF0] text-white py-4 xl:py-5 uppercase tracking-wide mb-3">
                 Buy with <span style={{ fontWeight: 700 }}>Shop</span>
               </button>
 
               {/* Info */}
-              <p className="text-sm mt-4 opacity-70 flex items-center gap-2">
+              <div
+                className="mt-4 opacity-70 max-w-[32rem] flex items-start gap-3"
+              >
                 <Image
                   src="/assets/images/truck.jpeg"
                   alt="Truck"
-                  width={40}
-                  height={40}
-                  style={{ display: 'inline-block' }}
+                  width={32}
+                  height={32}
+                  className="shrink-0"
                 />
-                <span
+
+                <p
                   style={{
                     fontFamily: 'Manrope, sans-serif',
                     fontWeight: 500,
-                    fontStyle: 'normal',
-                    fontSize: 14,
-                    lineHeight: '21px', // 150% of 14px
-                    letterSpacing: '-0.5%',
+                    fontSize: 'clamp(13px, 0.9vw, 14px)',
+                    lineHeight: '1.5',
+                    letterSpacing: '-0.005em',
                     color: '#280F0B',
-                    marginLeft: 8,
-                    display: 'inline-block',
+                    margin: 0,
                   }}
                 >
                   Orders are fulfilled within 24 hours. 3–5 business days delivery average.
-                </span>
-              </p>
+                </p>
+              </div>
+
 
               {/* DESCRIPTION / INFO ACCORDION */}
               {/* DESCRIPTION / INFO ACCORDION */}
-              <div style={{ marginTop: 32 }}>
+              <div style={{ marginTop: 32, width: '100%'}}>
                 {[
                   'Description',
                   'How to use',
@@ -381,9 +400,10 @@ export default function ProductPage() {
                       key={title}
                       {...refProp}
                       style={{
+                        width: '100%',
                         borderBottom: '1px solid rgba(40, 15, 11, 0.3)',
-                        paddingTop: 16,
-                        paddingBottom: 16,
+                        paddingTop: '1rem',
+                        paddingBottom: '1rem',
                       }}
                     >
                       <button
@@ -408,9 +428,9 @@ export default function ProductPage() {
                             fontFamily: 'Manrope, sans-serif',
                             fontWeight: 600,
                             fontStyle: 'normal',
-                            fontSize: 18,
-                            lineHeight: '18px', // 100% of 18px
-                            letterSpacing: '0%',
+                            fontSize: 'clamp(16px, 1.1vw, 18px)',
+                            lineHeight: '1.3rem', // 100% of 18px
+                            letterSpacing: '0em',
                           }}
                         >
                           {title}
@@ -420,8 +440,8 @@ export default function ProductPage() {
                         style={{
                           fontFamily: 'Manrope, sans-serif',
                           fontWeight: 700,
-                          fontSize: 20,
-                          lineHeight: '100%',
+                          fontSize: '1.25rem',
+                          lineHeight: '1',
                           letterSpacing: '0px',
                           transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
                           transition: 'transform 0.2s ease',
@@ -433,7 +453,7 @@ export default function ProductPage() {
 
                       <div
                         style={{
-                          maxHeight: isOpen ? 220 : 0,
+                          maxHeight: isOpen ? 1000 : 0,
                           opacity: isOpen ? 1 : 0,
                           overflow: 'hidden',
                           transition:
@@ -445,9 +465,9 @@ export default function ProductPage() {
                           style={{
                             fontFamily: 'Manrope, sans-serif',
                             fontWeight: 400,
-                            fontSize: 14,
-                            lineHeight: '100%',
-                            letterSpacing: '0%',
+                            fontSize: 'clamp(13px, 0.9vw, 14px)',
+                            lineHeight: '1.6rem',
+                            letterSpacing: '0em',
                             color: '#280F0B',
                             opacity: 0.8,
                           }}
@@ -467,80 +487,69 @@ export default function ProductPage() {
           </div>
         </section>
 
-        <div style={{ height: 100 }} />
+        <div className="h-16 xl:h-24" />
         {/* SECTION 2 – SEPRATOR BOX */}
         <div
           style={{
             width: '100%',
-            height: 35,
+            height: '2.25rem',
             backgroundColor: '#C38154',
           }}
         />
-        {/* SECTION 2 – EMBRACE SPIRITUALITY */}
-        <section
-          style={{
-            background: 'linear-gradient(180deg, #2A0F0A 0%, #1A0705 100%)',
-            width: '100%',
-            height: 560,
-            position: 'relative',
-          }}
-        >
-          {/* LEFT TITLE */}
-          <h2
-            style={{
-              position: 'absolute',
-              top: 128,
-              left: 70,
-              width: 503,
-              height: 192,
-              fontFamily: 'Lora, serif',
-              fontWeight: 700,
-              fontStyle: 'italic',
-              fontSize: 96,
-              lineHeight: '100%',
-              letterSpacing: '-1px',
-              color: '#F6D8AB',
-              margin: 0,
-            }}
-          >
-            Embrace
-            <br />
-            Spirituality.
-          </h2>
+        <section className="bg-gradient-to-b from-[#2A0F0A] to-[#1A0705]">
+        <div className="px-6 md:px-12 xl:px-24 2xl:px-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[560px]">
 
-          {/* RIGHT DESCRIPTION */}
-          <p
-            style={{
-              position: 'absolute',
-              top: 415,
-              left: 1024,
-              width: 343,
-              height: 126,
-              fontFamily: 'Manrope, sans-serif',
-              fontWeight: 500,
-              fontSize: 14,
-              lineHeight: '150%',
-              letterSpacing: '-0.5%',
-              color: '#F6D8AB',
-              margin: 0,
-              paddingBottom: 72
-            }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae
-            ipsum in libero facilisis interdum. Integer sit amet sapien non
-            nulla luctus elementum. Praesent vitae semper arcu, non tincidunt
-            purus. Curabitur nec nunc a nisi convallis placerat. Suspendisse
-            potenti. Nam lacinia, erat at
-          </p>
-        </section>
+            {/* LEFT TITLE — TOP ALIGNED */}
+            <h2
+              className="
+                font-[Lora] italic font-bold text-[#F6D8AB]
+                text-[clamp(48px,6vw,96px)]
+                leading-none tracking-[-1px]
+                max-w-[12ch]
+                self-start
+                pt-[clamp(48px,8vh,96px)]
+              "
+            >
+              Embrace
+              <br />
+              Spirituality.
+            </h2>
+
+            {/* RIGHT DESCRIPTION — BOTTOM ALIGNED */}
+            <p
+              className="
+                font-[Manrope] font-medium text-[#F6D8AB]
+                text-[clamp(13px,0.9vw,14px)]
+                leading-[1.6]
+                tracking-[-0.005em]
+                max-w-[22rem]
+                justify-self-end
+                self-end
+                pb-[clamp(48px,6vh,72px)]
+              "
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae
+              ipsum in libero facilisis interdum. Integer sit amet sapien non
+              nulla luctus elementum. Praesent vitae semper arcu, non tincidunt
+              purus. Curabitur nec nunc a nisi convallis placerat. Suspendisse
+              potenti. Nam lacinia, erat at
+            </p>
+
+          </div>
+        </div>
+      </section>
+
+
+
 
         {/* SECTION 3 – CUSTOMER REVIEWS */}
         <section
           id = "reviews-section"
-          className="px-[72px] py-20"
+          className="px-6 md:px-12 xl:px-24 py-16 xl:py-20"
           style={{ backgroundColor: '#F6D8AB', color: '#280F0B' }}
         >
-          <div className="grid grid-cols-2 gap-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
             {/* LEFT – RATINGS */}
             <div>
               {/* Customer Reviews Header */}
@@ -548,8 +557,8 @@ export default function ProductPage() {
                 style={{
                   fontFamily: 'Manrope, sans-serif',
                   fontWeight: 700,
-                  fontSize: 40,
-                  lineHeight: '100%',
+                  fontSize: 'clamp(28px, 3vw, 40px)',
+                  lineHeight: '1.1',
                   letterSpacing: '-1px',
                   marginBottom: 24,
                 }}
@@ -564,7 +573,7 @@ export default function ProductPage() {
                   style={{
                     fontFamily: 'Inter, sans-serif',
                     fontWeight: 700,
-                    fontSize: 64,
+                    fontSize: 'clamp(28px, 3vw, 40px)',
                     lineHeight: '100%',
                     letterSpacing: '-1px',
                   }}
@@ -576,15 +585,15 @@ export default function ProductPage() {
                   <div
                     style={{
                       color: '#F5B301',
-                      fontSize: 20,
-                      marginBottom: 4,
+                      fontSize: 'clamp(16px, 1.2vw, 20px)',
+                      marginBottom: '0.25rem',
                     }}
                   >
                     ★ ★ ★ ★ ★
                   </div>
                   <p
                     style={{
-                      fontSize: 14,
+                      fontSize: 'clamp(13px, 0.9vw, 14px)',
                       opacity: 0.7,
                     }}
                   >
@@ -594,7 +603,7 @@ export default function ProductPage() {
               </div>
 
               {/* Rating bars */}
-              <div style={{ marginTop: 32 }}>
+              <div style={{ marginTop: '2rem' }}>
                 {[
                   { star: 5, percent: 90 },
                   { star: 4, percent: 10 },
@@ -608,17 +617,17 @@ export default function ProductPage() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      marginBottom: 8, // exact spacing
+                      marginBottom: '0.5rem', // exact spacing
                     }}
                   >
                     {/* STAR + NUMBER */}
                     <span
                     style={{
-                      width: 36,
+                      minWidth: '2.25rem',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 4,
-                      fontSize: 14,
+                      fontSize: 'clamp(13px, 0.9vw, 14px)',
                       fontWeight: 400,
                       color: '#464646',
                     }}
@@ -631,9 +640,9 @@ export default function ProductPage() {
                     <div
                       style={{
                         flex: 1,
-                        height: 8,
+                        height: '0.5rem',
                         backgroundColor: '#5A4A1A',
-                        borderRadius: 4,
+                        borderRadius: '0.25rem',
                         overflow: 'hidden',
                       }}
                     >
@@ -647,7 +656,7 @@ export default function ProductPage() {
                     </div>
 
                     {/* PERCENT */}
-                    <span style={{ width: 40 }}>{item.percent}%</span>
+                    <span style={{ minWidth: '2.5rem', textAlign: 'right' }}>{item.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -656,32 +665,34 @@ export default function ProductPage() {
             {/* RIGHT – WRITE REVIEW */}
             <div
               style={{
-                width: 624,
-                height: 301,
+                width: '100%',
+                maxWidth: 624,
+                minHeight: 301,
                 border: '1px dashed #280F0B',
                 borderImage: '1px dashed #280F0B',
-                padding: 48,
+                padding: '3rem',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 textAlign: 'center',
+                marginLeft: 'auto',
               }}
             >
               <h3
                 style={{
-                  fontSize: 24,
+                  fontSize: 'clamp(16px, 1.2vw, 20px)',
                   fontWeight: 600,
-                  marginBottom: 8,
+                  marginBottom: '0.5rem',
                 }}
               >
                 Review this product
               </h3>
               <p
                 style={{
-                  fontSize: 14,
+                  fontSize: 'clamp(13px, 0.9vw, 14px)',
                   opacity: 0.8,
-                  marginBottom: 24,
+                  marginBottom: '1.5rem',
                 }}
               >
                 Share your feedback with other customers
@@ -689,8 +700,9 @@ export default function ProductPage() {
 
               <button
                 style={{
-                  width: 349,
-                  height: 51,
+                  width: '100%',
+                  maxWidth: 349,
+                  minHeight: 51,
                   backgroundColor: '#7A3E2E',
                   display: 'flex',
                   alignItems: 'center',
@@ -710,7 +722,7 @@ export default function ProductPage() {
                     fontWeight: 600,
                     fontSize: 14,
                     lineHeight: '150%',
-                    letterSpacing: '0.08em', // 8%
+                    letterSpacing: '0.06em', // 8%
                     textTransform: 'uppercase',
                     color: '#FFFFFF',
                   }}
@@ -809,11 +821,11 @@ export default function ProductPage() {
             ))}
           </div>
         </section>
+
       </main>
     </>
   );
 }
-
 
 
 

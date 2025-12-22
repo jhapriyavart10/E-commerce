@@ -16,7 +16,7 @@ const jewelleryImages = [
 const materialOptions = [
   { name: 'Obsidian', img: '/assets/images/obsidian.png' },
   { name: 'Tiger Eye', img: '/assets/images/tiger eye.png' },
-  { name: 'Lapis Lazuli', img: '/assets/images/lapis lazuli-1.png' },
+  { name: 'Lapis Lazuli', img: '/assets/images/Lapis Lazuli.svg' },
   { name: 'Rose Quartz', img: '/assets/images/rose quartz.png' },
   { name: 'Clear Quartz', img: '/assets/images/clear quartz.png' },
   { name: 'Green Aventurine', img: '/assets/images/green adventurine.png' },
@@ -257,7 +257,31 @@ export default function MobileProductPage() {
             >
               -
             </button>
-            <span style={{ flex: 1, textAlign: 'center' }}>{quantity}</span>
+            {/* <span style={{ flex: 1, textAlign: 'center' }}>{quantity}</span> */}
+             <input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={(e) => {
+                const val = Number(e.target.value);
+                if (!Number.isNaN(val) && val >= 1) {
+                    setQuantity(val);
+                }
+                }}
+                style={{
+                      width: '3rem',
+                      textAlign: 'center',
+                      border: 'none',
+                      outline: 'none',
+                      fontFamily: 'Manrope, sans-serif',
+                      fontSize: 14,
+                      appearance: 'textfield',
+                      background: 'transparent',
+                      padding: 0,
+                      margin: 0,
+                    }}
+            />
+            
             <button style={{ flex: 1 }} onClick={() => setQuantity((q) => q + 1)}>
               +
             </button>
