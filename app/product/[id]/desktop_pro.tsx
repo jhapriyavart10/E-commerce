@@ -1,4 +1,5 @@
-import { useCart } from '@/app/context/CartContext';
+'use client';
+
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import Header from '@/components/Header';
@@ -21,467 +22,123 @@ const materialOptions = [
   { name: 'Green Aventurine', img: '/assets/images/green adventurine.png' },
 ];
 
-export default function ProductPage() {
+export default function UnifiedProductPage() {
   const [selectedImage, setSelectedImage] = useState(jewelleryImages[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(materialOptions[0].name);
   const [quantity, setQuantity] = useState(1);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
-  // const { addToCart } = useCart(); // Uncomment if you want to use cart
+  // Review labels ordered specifically for the 2-column mobile grid
+  // Index 0 & 2 will be Col 1 (Search, All ratings)
+  // Index 1 & 3 will be Col 2 (Most relevant, With media)
+  const reviewFilters = [
+    { label: 'Search reviews', isSearch: true },
+    { label: 'Most relevant', isSearch: false },
+    { label: 'All ratings', isSearch: false },
+    { label: 'With media', isSearch: false },
+  ];
 
   return (
     <>
       <Header />
-      <main
-        className="min-h-screen bg-[#F6D8AB] text-[#280F0B]"
-        style={{ fontFamily: 'Manrope, sans-serif' }}
-      >
-        {/* SECTION 1 */}
-        <section className="px-6 md:px-12 xl:px-24 2xl:px-32 pt-12">
+      <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
+        
+        {/* SECTION 1 – PRODUCT INFO */}
+        <section className="px-6 pt-6 lg:pt-12 lg:px-12 xl:px-24 2xl:px-32 max-w-[1920px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
-            {/* LEFT COLUMN – IMAGES */}
-            <div>
-              {/* Breadcrumb */}
-              <p className="text-sm mb-4 opacity-70">
-                <span style={{ fontWeight: 700 }}>Shop</span> / Pendants / Tiger Eye Pendant
+            
+            {/* LEFT COLUMN: Image Gallery */}
+            <div className="w-full">
+              <p className="text-[12px] lg:text-sm mb-3 lg:mb-4 opacity-70">
+                <strong className="font-bold">Shop</strong> / Pendants / Tiger Eye Pendant
               </p>
-              {/* Main Image */}
-              <div className="relative bg-[#F2EFEA] flex items-center justify-center aspect-square w-full max-w-[420px]
-               sm:max-w-[520px]
-                lg:max-w-[640px]
-                xl:max-w-[720px]
-                2xl:max-w-[820px]">
-                <Image
-                  src={selectedImage}
-                  alt="Product"
-                  // width={640}
-                  // height={640}
-                  fill
-                  style={{objectFit: 'cover' }}
-                  priority
-                />
+              <div className="relative aspect-square w-full bg-[#F2EFEA] mb-3 lg:max-w-[820px]">
+                <Image src={selectedImage} alt="Product" fill className="object-cover" priority />
               </div>
-              {/* Thumbnails */}
-              <div
-              className="grid gap-2 mt-4 w-full max-w-[640px]"
-              style={{
-                gridTemplateColumns: `repeat(${jewelleryImages.length}, minmax(0, 1fr))`,
-              }}
-            >
-                {jewelleryImages.map((img, idx) => (
-                  <div
-                    key={img}
-                    style={{
-                    width: '100%',
-                    aspectRatio: '1 / 1',
-                    overflow: 'hidden',
-                    borderRadius: 0,
-                    border: selectedImage === img ? '2px solid #280F0B' : '1px solid #ccc',
-                    cursor: 'pointer',
-                  }}
-
-                    onClick={() => setSelectedImage(img)}
-                  >
-                    <Image
-                      src={img}
-                      alt={`Thumbnail ${idx + 1}`}
-                      width={100}
-                      height={100}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
+              <div className="grid grid-cols-6 gap-2 w-full lg:max-w-[640px]">
+                {jewelleryImages.map((img) => (
+                  <div key={img} onClick={() => setSelectedImage(img)} className={`aspect-square cursor-pointer transition-all ${selectedImage === img ? 'border-2 border-[#280F0B]' : 'border border-[#280F0B]/30'}`}>
+                    <Image src={img} alt="Thumb" width={100} height={100} className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* RIGHT COLUMN – DETAILS */}
-            <div>
-              {/* Title */}
-              <h1 className="text-3xl xl:text-4xl font-semibold mb-3 mt-8">
-                Sphere Crystal Pendulums
-              </h1>
-
-              {/* Rating */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  opacity: 1,
-                }}
-                className="mb-4"
-              >
-                <div className="flex gap-1 text-yellow-500" style={{ height: 24, alignItems: 'center', fontSize: 24 }}>
-                  ★ ★ ★ ★ ★
-                </div>
-                <button
-                onClick={() =>
-                    document
-                    .getElementById('reviews-section')
-                    ?.scrollIntoView({ behavior: 'smooth' })
-                }
-                style={{
-                    fontSize: 14,
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    color: '#280F0B',
-                }}
-                >
-                [7 reviews]
-                </button>
-            
+            {/* RIGHT COLUMN: Details */}
+            <div className="flex flex-col justify-start">
+              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-semibold mb-2 lg:mb-3 lg:mt-8">Sphere Crystal Pendulums</h1>
+              <div className="flex items-center gap-2 mb-3 lg:mb-4">
+                <span className="text-[#F5B301] text-lg lg:text-2xl">★ ★ ★ ★ ★</span>
+                <button onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })} className="text-[12px] lg:text-sm cursor-pointer bg-transparent border-none p-0">[7 reviews]</button>
               </div>
 
-              {/* Description */}
-              <p
-                style={{
-                  fontFamily: 'Manrope, sans-serif',
-                  fontWeight: 400,
-                  fontSize: 'clamp(15px, 1vw, 16px)',
-                  lineHeight: '1.6',
-                  marginBottom: 16,
-                  marginTop: 0,
-                  opacity: 0.9,
-                }}
-              >
-                Harness Universal Energy with a Sphere Crystal Pendulum. The sphere represents wholeness, unity, and the infinite flow of universal energy.
-              </p>
+              <p className="text-[14px] lg:text-[16px] leading-[1.6] opacity-90 mb-3">Harness Universal Energy with a Sphere Crystal Pendulum. The sphere represents wholeness, unity, and the infinite flow of universal energy.</p>
 
-              <button
-                className="uppercase underline mb-6"
-                style={{
-                  fontWeight: 700,
-                  fontSize: 12,
-                  color: '#7F3E2F',
-                  fontFamily: 'Manrope, sans-serif',
-                  letterSpacing: '-0.005em',
-                  marginTop: 2,
-                }}
-                onClick={() => {
-                  setOpenAccordion('Description');
-                  setTimeout(() => {
-                    descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }, 50);
-                }}
-              >
-                Learn more
-              </button>
+              <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase underline text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
 
-              {/* Price */}
-              <div className="text-2xl font-semibold mb-6">
-                $35.00 AUD{' '}
-                <span className="text-sm font-normal opacity-70">
-                  incl. tax
-                </span>
-              </div>
+              <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">$35.00 AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
-              {/* Jewellery Material */}
-              <div
-                className="mb-6"
-                style={{
-                  border: '1.25px solid #280F0B',
-                  width: '100%',
-                  height: 'auto',
-                  //maxWidth: 565,
-                  opacity: 1,
-                  position: 'relative',
-                  padding: '12px 16px 12px 16px',
-                  boxSizing: 'border-box',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  borderRadius: 0,
-                }}
-              >
-                <p
-                  style={{
-                    fontFamily: 'Manrope, sans-serif',
-                    fontWeight: 500,
-                    fontSize: 14,
-                    marginTop: 4,
-                    marginBottom: 8,
-                    opacity: 1,
-                    lineHeight: '18px',
-                  }}
-                >
-                  Jewellery Material
-                </p>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 16,
-                    alignItems: 'center',
-                    width: '100%',
-                    //maxWidth: '100%',
-                  }}
-                >
-                  {materialOptions.map((option) => (
-                    <button
-                      key={option.name}
-                      onClick={() => setSelectedMaterial(option.name)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        width: 'fit-content',
-                        minWidth: 60,
-                        minHeight: 38,
-                        borderRadius: 27,
-                        border: selectedMaterial === option.name ? '1px solid #6C6AE4' : '1px solid #280F0B66',
-                        background: selectedMaterial === option.name ? '#6C6AE4' : '#F6D8AB',
-                        color: selectedMaterial === option.name ? '#fff' : '#280F0B',
-                        fontFamily: 'Manrope, sans-serif',
-                        fontWeight: 400,
-                        fontSize: 14,
-                        lineHeight: '21px',
-                        letterSpacing: '-0.5%',
-                        opacity: 1,
-                        transition: 'all 0.15s',
-                        paddingTop: 8,
-                        paddingRight: 16,
-                        paddingBottom: 8,
-                        paddingLeft: 16,
-                        margin: 0,
-                        gap: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '1.5rem',
-                          height: '1.375rem',
-                          borderRadius: 4,
-                          background: 'transparent',
-                          marginRight: 8,
-                          flexShrink: 0,
-                          border: 'none',
-                          padding: 0,
-                        }}
+              {/* JEWELLERY MATERIAL: STACKED ON MOBILE/TAB, 3-PER-ROW WITH UNIFORM SPACING ON DESKTOP */}
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
+                <p className="text-sm font-medium mb-3">JEWELLERY MATERIAL</p>
+                
+                <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3">
+                  {materialOptions.map((option, index) => (
+                    <div key={option.name} className="flex contents">
+                      <button
+                        onClick={() => setSelectedMaterial(option.name)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
+                          selectedMaterial === option.name 
+                            ? 'bg-[#6C6AE4] text-white border-[#6C6AE4]' 
+                            : 'bg-transparent text-[#280F0B] border-[#280F0B]'
+                        }`}
                       >
-                        <Image
-                          src={option.img}
-                          alt={option.name}
-                          width={24.09}
-                          height={21.82}
-                          style={{ objectFit: 'contain' }}
+                        <Image 
+                          src={option.img} 
+                          alt={option.name} 
+                          width={20} 
+                          height={20} 
+                          className={`object-contain ${selectedMaterial === option.name ? 'brightness-0 invert' : ''}`}
                         />
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: 'Manrope, sans-serif',
-                          fontWeight: 400,
-                          fontSize: 'clamp(13px, 0.9vw, 14px)',
-                          lineHeight: '1.5',
-                          letterSpacing: '-0.005em',
-                          maxWidth: '8rem',
-                          opacity: 1,
-                          marginLeft: 0,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {option.name}
-                      </span>
-                    </button>
+                        <span className="whitespace-nowrap font-normal">{option.name}</span>
+                      </button>
+                      
+                      {/* Forces a new line after every 3rd item ONLY on desktop */}
+                      {(index + 1) % 3 === 0 && <div className="hidden lg:block w-full h-0" />}
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Quantity & CTA */}
-              <div style={{ width: '100%' }}>
-                <div
-                  className="flex items-center justify-start"
-                  style={{
-                    width: 'fit-content',
-                    minHeight: 38,
-                    border: '1px solid #280F0B66',
-                    borderBottom: 'none',
-                    borderRadius: 0,
-                    marginBottom: 0,
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 0 0 #F6D8AB', // visually remove any bottom border if present
-                  }}
-                >
-                  <button
-                    className="px-4"
-                    style={{ height: '100%', display: 'flex', alignItems: 'center' }}
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    aria-label="Decrease quantity"
-                  >
-                    -
-                  </button>
-                  {/* <span className="px-4" style={{ minWidth: '1.75rem', textAlign: 'center' }}>{quantity}</span> */}
-                   {/* Input */}
-                  <input
-                    type="number"
-                    min={1}
-                    value={quantity}
-                    onChange={(e) => {
-                      const val = Number(e.target.value);
-                      if (!Number.isNaN(val) && val >= 1) {
-                        setQuantity(val);
-                      }
-                    }}
-                    style={{
-                      width: '3rem',
-                      textAlign: 'center',
-                      border: 'none',
-                      outline: 'none',
-                      fontFamily: 'Manrope, sans-serif',
-                      fontSize: 14,
-                      appearance: 'textfield',
-                      background: 'transparent',
-                      padding: 0,
-                      margin: 0,
-                    }}
-                  />
-                  <button
-                    className="px-4"
-                    onClick={() => setQuantity((q) => q + 1)}
-                    aria-label="Increase quantity"
-                    style={{ height: '100%', display: 'flex', alignItems: 'center' }}
-                  >
-                    +
-                  </button>
+              {/* Quantity & Actions */}
+              <div className="w-full">
+                <div className="flex items-center w-fit border-t border-l border-r border-[#280F0B]/40">
+                  <button className="px-4 py-2" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                  <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-12 text-center bg-transparent border-none outline-none font-manrope text-sm" />
+                  <button className="px-4 py-2" onClick={() => setQuantity(q => q + 1)}>+</button>
                 </div>
-                <button className="w-full bg-[#7A3E2E] text-white py-4 xl:py-5 uppercase tracking-wide mb-3">
-                  Add to cart
-                </button>
+                <button className="w-full bg-[#7A3E2E] text-white py-4 uppercase font-semibold tracking-wide mb-3">Add to cart</button>
+                <button className="w-full bg-[#4A2CF0] text-white py-4 uppercase font-bold mb-3">Buy with Shop</button>
               </div>
 
-              <button className="w-full bg-[#4A2CF0] text-white py-4 xl:py-5 uppercase tracking-wide mb-3">
-                Buy with <span style={{ fontWeight: 700 }}>Shop</span>
-              </button>
-
-              {/* Info */}
-              <div
-                className="mt-4 opacity-70 max-w-[32rem] flex items-start gap-3"
-              >
-                <Image
-                  src="/assets/images/truck.jpeg"
-                  alt="Truck"
-                  width={32}
-                  height={32}
-                  className="shrink-0"
-                />
-
-                <p
-                  style={{
-                    fontFamily: 'Manrope, sans-serif',
-                    fontWeight: 500,
-                    fontSize: 'clamp(13px, 0.9vw, 14px)',
-                    lineHeight: '1.5',
-                    letterSpacing: '-0.005em',
-                    color: '#280F0B',
-                    margin: 0,
-                  }}
-                >
-                  Orders are fulfilled within 24 hours. 3–5 business days delivery average.
-                </p>
+              <div className="flex items-start gap-3 mt-4 opacity-80 max-w-md">
+                <Image src="/assets/images/truck.jpeg" alt="Truck" width={32} height={32} className="shrink-0" />
+                <p className="text-[13px] lg:text-[14px] leading-snug">Orders are fulfilled within 24 hours. 3–5 business days delivery average.</p>
               </div>
 
-
-              {/* DESCRIPTION / INFO ACCORDION */}
-              {/* DESCRIPTION / INFO ACCORDION */}
-              <div style={{ marginTop: 32, width: '100%'}}>
-                {[
-                  'Description',
-                  'How to use',
-                  'Product Details',
-                  'Ideal for',
-                ].map((title: string) => {
+              {/* Accordions */}
+              <div className="mt-8">
+                {['Description', 'How to use', 'Product Details', 'Ideal for'].map((title) => {
                   const isOpen = openAccordion === title;
-                  const refProp = title === 'Description' ? { ref: descriptionRef } : {};
                   return (
-                    <div
-                      key={title}
-                      {...refProp}
-                      style={{
-                        width: '100%',
-                        borderBottom: '1px solid rgba(40, 15, 11, 0.3)',
-                        paddingTop: '1rem',
-                        paddingBottom: '1rem',
-                      }}
-                    >
-                      <button
-                        onClick={() =>
-                          setOpenAccordion(isOpen ? null : title)
-                        }
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          background: 'none',
-                          border: 'none',
-                          padding: 0,
-                          cursor: 'pointer',
-                          fontFamily: 'Manrope, sans-serif',
-                          color: '#280F0B',
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: 'Manrope, sans-serif',
-                            fontWeight: 600,
-                            fontStyle: 'normal',
-                            fontSize: 'clamp(16px, 1.1vw, 18px)',
-                            lineHeight: '1.3rem', // 100% of 18px
-                            letterSpacing: '0em',
-                          }}
-                        >
-                          {title}
-                        </span>
-
-                        <span
-                        style={{
-                          fontFamily: 'Manrope, sans-serif',
-                          fontWeight: 700,
-                          fontSize: '1.25rem',
-                          lineHeight: '1',
-                          letterSpacing: '0px',
-                          transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-                          transition: 'transform 0.2s ease',
-                        }}
-                      >
-                        +
-                      </span>
+                    <div key={title} ref={title === 'Description' ? descriptionRef : null} className="border-b border-[#280F0B]/30 py-4">
+                      <button onClick={() => setOpenAccordion(isOpen ? null : title)} className="w-full flex justify-between items-center text-left font-semibold text-[16px] lg:text-[18px] bg-transparent border-none p-0">
+                        {title}
+                        <span className={`text-xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
                       </button>
-
-                      <div
-                        style={{
-                          maxHeight: isOpen ? 1000 : 0,
-                          opacity: isOpen ? 1 : 0,
-                          overflow: 'hidden',
-                          transition:
-                            'max-height 0.45s ease, opacity 0.35s ease',
-                          marginTop: isOpen ? 12 : 0,
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontFamily: 'Manrope, sans-serif',
-                            fontWeight: 400,
-                            fontSize: 'clamp(13px, 0.9vw, 14px)',
-                            lineHeight: '1.6rem',
-                            letterSpacing: '0em',
-                            color: '#280F0B',
-                            opacity: 0.8,
-                          }}
-                        >
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit. Sed do eiusmod tempor incididunt ut labore et
-                          dolore magna aliqua. Ut enim ad minim veniam, quis
-                          nostrud exercitation ullamco laboris nisi ut aliquip
-                          ex ea commodo consequat.
-                        </p>
+                      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <p className="text-[14px] opacity-80 leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                       </div>
                     </div>
                   );
@@ -491,346 +148,80 @@ export default function ProductPage() {
           </div>
         </section>
 
-        <div className="h-16 xl:h-24" />
-        {/* SECTION 2 – SEPRATOR BOX */}
-        <div
-          style={{
-            width: '100%',
-            height: '2.25rem',
-            backgroundColor: '#C38154',
-          }}
-        />
-        <section className="bg-gradient-to-b from-[#2A0F0A] to-[#1A0705]">
-        <div className="px-6 md:px-12 xl:px-24 2xl:px-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[560px]">
-
-            {/* LEFT TITLE — TOP ALIGNED */}
-            <h2
-              className="
-                font-[Lora] italic font-bold text-[#F6D8AB]
-                text-[clamp(48px,6vw,96px)]
-                leading-none tracking-[-1px]
-                max-w-[12ch]
-                self-start
-                pt-[clamp(48px,8vh,96px)]
-              "
-            >
-              Embrace
-              <br />
-              Spirituality.
-            </h2>
-
-            {/* RIGHT DESCRIPTION — BOTTOM ALIGNED */}
-            <p
-              className="
-                font-[Manrope] font-medium text-[#F6D8AB]
-                text-[clamp(13px,0.9vw,14px)]
-                leading-[1.6]
-                tracking-[-0.005em]
-                max-w-[22rem]
-                justify-self-end
-                self-end
-                pb-[clamp(48px,6vh,72px)]
-              "
-            >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae
-              ipsum in libero facilisis interdum. Integer sit amet sapien non
-              nulla luctus elementum. Praesent vitae semper arcu, non tincidunt
-              purus. Curabitur nec nunc a nisi convallis placerat. Suspendisse
-              potenti. Nam lacinia, erat at
-            </p>
-
+        {/* SECTION 2 – EMBRACE SPIRITUALITY */}
+        <section className="mt-16 bg-gradient-to-b from-[#2A0F0A] to-[#1A0705]">
+          <div className="w-full h-[35px] bg-[#C38154]" />
+          <div className="px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[1920px] mx-auto">
+            <div className="flex flex-col lg:grid lg:grid-cols-2 min-h-[400px] lg:min-h-[560px] py-12 lg:py-0">
+              <h2 className="font-lora italic font-bold text-[#F6D8AB] text-[48px] lg:text-[80px] xl:text-[96px] leading-none mb-[237px] lg:mb-0 lg:self-start lg:pt-24">Embrace<br />Spirituality.</h2>
+              <p className="font-manrope text-[#F6D8AB] text-[14px] opacity-90 lg:max-w-[22rem] lg:justify-self-end lg:self-end lg:pb-16">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae ipsum in libero facilisis interdum. Integer sit amet sapien non nulla luctus elementum.</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-
-
-
-        {/* SECTION 3 – CUSTOMER REVIEWS */}
-        <section
-          id = "reviews-section"
-          className="px-6 md:px-12 xl:px-24 py-16 xl:py-20"
-          style={{ backgroundColor: '#F6D8AB', color: '#280F0B' }}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
-            {/* LEFT – RATINGS */}
+        {/* SECTION 3 – REVIEWS */}
+        <section id="reviews-section" className="py-16 px-6 lg:px-12 xl:px-24 max-w-[1920px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
             <div>
-              {/* Customer Reviews Header */}
-              <h2
-                style={{
-                  fontFamily: 'Manrope, sans-serif',
-                  fontWeight: 700,
-                  fontSize: 'clamp(28px, 3vw, 40px)',
-                  lineHeight: '1.1',
-                  letterSpacing: '-1px',
-                  marginBottom: 24,
-                }}
-              >
-                Customer Reviews
-              </h2>
-
-              {/* Rating summary */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-                {/* 4.8 */}
-                <div
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 700,
-                    fontSize: 'clamp(28px, 3vw, 40px)',
-                    lineHeight: '100%',
-                    letterSpacing: '-1px',
-                  }}
-                >
-                  4.8
-                </div>
-
+              <h2 className="text-[28px] lg:text-[40px] font-bold mb-6">Customer Reviews</h2>
+              <div className="flex items-center gap-6 mb-8">
+                <span className="text-[48px] lg:text-[64px] font-bold">4.8</span>
                 <div>
-                  <div
-                    style={{
-                      color: '#F5B301',
-                      fontSize: 'clamp(16px, 1.2vw, 20px)',
-                      marginBottom: '0.25rem',
-                    }}
-                  >
-                    ★ ★ ★ ★ ★
-                  </div>
-                  <p
-                    style={{
-                      fontSize: 'clamp(13px, 0.9vw, 14px)',
-                      opacity: 0.7,
-                    }}
-                  >
-                    Based on 7 Ratings
-                  </p>
+                  <div className="text-[#F5B301] text-lg">★ ★ ★ ★ ★</div>
+                  <p className="text-sm opacity-70">Based on 7 Ratings</p>
                 </div>
               </div>
-
-              {/* Rating bars */}
-              <div style={{ marginTop: '2rem' }}>
-                {[
-                  { star: 5, percent: 90 },
-                  { star: 4, percent: 10 },
-                  { star: 3, percent: 0 },
-                  { star: 2, percent: 0 },
-                  { star: 1, percent: 0 },
-                ].map((item) => (
-                  <div
-                    key={item.star}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      marginBottom: '0.5rem', // exact spacing
-                    }}
-                  >
-                    {/* STAR + NUMBER */}
-                    <span
-                    style={{
-                      minWidth: '2.25rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontSize: 'clamp(13px, 0.9vw, 14px)',
-                      fontWeight: 400,
-                      color: '#464646',
-                    }}
-                  >
-                    <span style={{ color: '#F5B301' }}>★</span>
-                    {item.star}
-                  </span>
-
-                    {/* BAR */}
-                    <div
-                      style={{
-                        flex: 1,
-                        height: '0.5rem',
-                        backgroundColor: '#5A4A1A',
-                        borderRadius: '0.25rem',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: `${item.percent}%`,
-                          height: '100%',
-                          backgroundColor: '#F5B301',
-                        }}
-                      />
+              <div className="space-y-2 max-w-md">
+                {[5, 4, 3, 2, 1].map((star) => (
+                  <div key={star} className="flex items-center gap-3">
+                    <span className="text-sm min-w-[30px] flex items-center gap-1"><span className="text-[#F5B301]">★</span>{star}</span>
+                    <div className="flex-1 h-2 bg-[#5A4A1A] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#F5B301]" style={{ width: star === 5 ? '90%' : star === 4 ? '10%' : '0%' }} />
                     </div>
-
-                    {/* PERCENT */}
-                    <span style={{ minWidth: '2.5rem', textAlign: 'right' }}>{item.percent}%</span>
+                    <span className="text-xs w-8 text-right">{star === 5 ? '90%' : star === 4 ? '10%' : '0%'}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* RIGHT – WRITE REVIEW */}
-            <div
-              style={{
-                width: '100%',
-                maxWidth: 624,
-                minHeight: 301,
-                border: '1px dashed #280F0B',
-                borderImage: '1px dashed #280F0B',
-                padding: '3rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                marginLeft: 'auto',
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: 'clamp(16px, 1.2vw, 20px)',
-                  fontWeight: 600,
-                  marginBottom: '0.5rem',
-                }}
-              >
-                Review this product
-              </h3>
-              <p
-                style={{
-                  fontSize: 'clamp(13px, 0.9vw, 14px)',
-                  opacity: 0.8,
-                  marginBottom: '1.5rem',
-                }}
-              >
-                Share your feedback with other customers
-              </p>
-
-              <button
-                style={{
-                  width: '100%',
-                  maxWidth: 349,
-                  minHeight: 51,
-                  backgroundColor: '#7A3E2E',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 12,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <img
-                  src="/assets/images/write.svg"
-                  alt="write"
-                />
-                <span
-                  style={{
-                    fontFamily: 'Manrope, sans-serif',
-                    fontWeight: 600,
-                    fontSize: 14,
-                    lineHeight: '150%',
-                    letterSpacing: '0.06em', // 8%
-                    textTransform: 'uppercase',
-                    color: '#FFFFFF',
-                  }}
-                >
-                  Write a review
-                </span>
-
+            <div className="w-full lg:max-w-[624px] lg:border lg:border-dashed border-[#280F0B] p-0 lg:p-12 flex flex-col items-center justify-center text-center">
+              <h3 className="text-lg lg:text-xl font-semibold mb-2">Review this product</h3>
+              <p className="text-sm opacity-80 mb-6 hidden lg:block">Share your feedback with other customers</p>
+              <button className="w-full max-w-[349px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 border-none">
+                <img src="/assets/images/write.svg" alt="write" />
+                Write a review
               </button>
             </div>
           </div>
 
-          {/* TOP REVIEWS */}
-          <div style={{ marginTop: 64 }}>
-            <h3
-              style={{
-                fontSize: 20,
-                fontWeight: 600,
-                marginBottom: 16,
-                textDecoration: 'underline',
-                textUnderlineOffset: 6,
-              }}
-            >
-              Top reviews
-            </h3>
-
-            {/* Filters */}
-            <div
-              style={{
-                display: 'flex',
-                gap: 16,
-                marginBottom: 32,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '10px 16px',
-                  borderRadius: 999,
-                  backgroundColor: '#E7C69A',
-                }}
-              >
-                <img src="/assets/images/search-icon.png" alt="search" />
-                <span style={{ fontSize: 14 }}>Search reviews</span>
-              </div>
-
-              {['Most relevant', 'All ratings', 'With media'].map((label) => (
-                <div
-                  key={label}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '10px 16px',
-                    borderRadius: 999,
-                    backgroundColor: '#E7C69A',
-                    fontSize: 14,
-                  }}
-                >
-                  {label}
-                  <img src="/assets/images/dropdown.svg" alt="dropdown" />
+          <div className="mt-16">
+            <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
+            
+            {/* REVIEW FILTERS: 2 COLS ON MOBILE (Search/All Ratings in Col 1), ROW ON DESKTOP */}
+            <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-8">
+              {reviewFilters.map((f, idx) => (
+                <div key={idx} className="flex items-center justify-center gap-2 px-4 py-2 bg-[#E7C69A] rounded-full text-sm">
+                  {f.isSearch && <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4" />}
+                  <span>{f.label}</span>
+                  {!f.isSearch && <img src="/assets/images/dropdown.svg" alt="v" />}
                 </div>
               ))}
             </div>
 
-            {/* REVIEW CARDS */}
-            {[1, 2].map((i) => (
-              <div
-                key={i}
-                style={{
-                  backgroundColor: '#FDC77B',
-                  padding: 24,
-                  marginBottom: 24,
-                }}
-              >
-                <p style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-                Raman S.
-                <img
-                  src="/assets/images/verified.png"
-                  alt="Verified Buyer"
-                  style={{ width: 16, height: 16 }}
-                />
-                <span style={{ fontWeight: 400 }}>Verified Buyer</span>
-              </p>
-
-                <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 12 }}>
-                  18 days ago
-                </p>
-                <p style={{ fontSize: 14, lineHeight: '22px' }}>
-                  I bought the black Ball Crystal Pendulum for my wife and she says it
-                  has a steady, smooth swing and feels very responsive during her
-                  readings. It’s become one of her favourite tools... She loves it!
-                </p>
+            {[1, 2].map(i => (
+              <div key={i} className="bg-[#FDC77B] p-6 mb-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-bold">Raman S.</span>
+                  <img src="/assets/images/verified.png" alt="v" className="w-4 h-4" />
+                  <span className="text-sm font-normal">Verified Buyer</span>
+                </div>
+                <p className="text-[12px] opacity-60 mb-3">18 days ago</p>
+                <p className="text-sm leading-relaxed">I bought the black Ball Crystal Pendulum for my wife and she says it has a steady, smooth swing and feels very responsive...</p>
               </div>
             ))}
           </div>
         </section>
-
       </main>
     </>
   );
 }
-
-
-
-

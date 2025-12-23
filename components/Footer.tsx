@@ -32,6 +32,11 @@ export default function Footer() {
                   About
                 </Link>
               </li>
+              <li>
+                <Link href="/product-analogue" className="text-gray-300 hover:text-white transition-colors">
+                  Product Analogue
+                </Link>
+              </li>
             </ul>
           </div>
 
