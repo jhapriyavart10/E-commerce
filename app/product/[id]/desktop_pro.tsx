@@ -56,7 +56,7 @@ export default function UnifiedProductPage() {
               <div className="relative aspect-square w-full bg-[#F2EFEA] mb-3 lg:max-w-[820px]">
                 <Image src={selectedImage} alt="Product" fill className="object-cover" priority />
               </div>
-              <div className="grid grid-cols-6 gap-2 w-full lg:max-w-[640px]">
+              <div className="grid grid-cols-6 gap-2 w-full lg:max-w-[820px]">
                 {jewelleryImages.map((img) => (
                   <div key={img} onClick={() => setSelectedImage(img)} className={`aspect-square cursor-pointer transition-all ${selectedImage === img ? 'border-2 border-[#280F0B]' : 'border border-[#280F0B]/30'}`}>
                     <Image src={img} alt="Thumb" width={100} height={100} className="w-full h-full object-cover" />
@@ -83,12 +83,12 @@ export default function UnifiedProductPage() {
               <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
                 <p className="text-sm font-medium mb-3">JEWELLERY MATERIAL</p>
                 
-                <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3">
+                <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
                   {materialOptions.map((option, index) => (
                     <div key={option.name} className="flex contents">
                       <button
                         onClick={() => setSelectedMaterial(option.name)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
+                        className={`flex items-center gap-1 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
                           selectedMaterial === option.name 
                             ? 'bg-[#6C6AE4] text-white border-[#6C6AE4]' 
                             : 'bg-transparent text-[#280F0B] border-[#280F0B]'
@@ -113,18 +113,18 @@ export default function UnifiedProductPage() {
 
               {/* Quantity & Actions */}
               <div className="w-full">
-                <div className="flex items-center w-fit border-t border-l border-r border-[#280F0B]/40">
+                <div className="flex items-center w-fit border-t border-l border-r border-[#280F0B]">
                   <button className="px-4 py-2" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
                   <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-12 text-center bg-transparent border-none outline-none font-manrope text-sm" />
                   <button className="px-4 py-2" onClick={() => setQuantity(q => q + 1)}>+</button>
                 </div>
                 <button className="w-full bg-[#7A3E2E] text-white py-4 uppercase font-semibold tracking-wide mb-3">Add to cart</button>
-                <button className="w-full bg-[#4A2CF0] text-white py-4 uppercase font-bold mb-3">Buy with Shop</button>
+                <button className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3">Buy with SHOP</button>
               </div>
 
-              <div className="flex items-start gap-3 mt-4 opacity-80 max-w-md">
+              <div className="flex items-start gap-3 mt-4 opacity-80 ">
                 <Image src="/assets/images/truck.jpeg" alt="Truck" width={32} height={32} className="shrink-0" />
-                <p className="text-[13px] lg:text-[14px] leading-snug">Orders are fulfilled within 24 hours. 3–5 business days delivery average.</p>
+                <p className="text-[14px] lg:text-[15px] leading-snug">Orders are fulfilled within 24 hours. 3–5 business days delivery average.</p>
               </div>
 
               {/* Accordions */}
@@ -133,7 +133,7 @@ export default function UnifiedProductPage() {
                   const isOpen = openAccordion === title;
                   return (
                     <div key={title} ref={title === 'Description' ? descriptionRef : null} className="border-b border-[#280F0B]/30 py-4">
-                      <button onClick={() => setOpenAccordion(isOpen ? null : title)} className="w-full flex justify-between items-center text-left font-semibold text-[16px] lg:text-[18px] bg-transparent border-none p-0">
+                      <button onClick={() => setOpenAccordion(isOpen ? null : title)} className="w-full flex justify-between items-center text-left font-semibold text-[18px] lg:text-[18px] bg-transparent border-none p-0">
                         {title}
                         <span className={`text-xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
                       </button>
@@ -171,7 +171,7 @@ export default function UnifiedProductPage() {
                   <p className="text-sm opacity-70">Based on 7 Ratings</p>
                 </div>
               </div>
-              <div className="space-y-2 max-w-md">
+              <div className="space-y-2 max-w-[820px]">
                 {[5, 4, 3, 2, 1].map((star) => (
                   <div key={star} className="flex items-center gap-3">
                     <span className="text-sm min-w-[30px] flex items-center gap-1"><span className="text-[#F5B301]">★</span>{star}</span>
@@ -184,10 +184,10 @@ export default function UnifiedProductPage() {
               </div>
             </div>
 
-            <div className="w-full lg:max-w-[624px] lg:border lg:border-dashed border-[#280F0B] p-0 lg:p-12 flex flex-col items-center justify-center text-center">
-              <h3 className="text-lg lg:text-xl font-semibold mb-2">Review this product</h3>
+            <div className="w-full lg:max-w-[820px] lg:border lg:border-dashed border-[#280F0B] p-0 lg:p-12 flex flex-col items-center justify-center text-center">
+              <h3 className="text-lg lg:text-xl font-semibold mb-2 hidden lg:block">Review this product</h3>
               <p className="text-sm opacity-80 mb-6 hidden lg:block">Share your feedback with other customers</p>
-              <button className="w-full max-w-[349px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 border-none">
+              <button className="w-full max-w-[820px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 border-none">
                 <img src="/assets/images/write.svg" alt="write" />
                 Write a review
               </button>
@@ -200,7 +200,7 @@ export default function UnifiedProductPage() {
             {/* REVIEW FILTERS: 2 COLS ON MOBILE (Search/All Ratings in Col 1), ROW ON DESKTOP */}
             <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-8">
               {reviewFilters.map((f, idx) => (
-                <div key={idx} className="flex items-center justify-center gap-2 px-4 py-2 bg-[#E7C69A] rounded-full text-sm">
+                <div key={idx} className="flex items-center justify-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:w-[177px] lg:h-[42px]">
                   {f.isSearch && <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4" />}
                   <span>{f.label}</span>
                   {!f.isSearch && <img src="/assets/images/dropdown.svg" alt="v" />}
