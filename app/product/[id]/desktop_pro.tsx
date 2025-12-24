@@ -81,8 +81,22 @@ export default function UnifiedProductPage() {
 
               {/* JEWELLERY MATERIAL: STACKED ON MOBILE/TAB, 3-PER-ROW WITH UNIFORM SPACING ON DESKTOP */}
               <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
-                <p className="text-sm font-medium mb-3">JEWELLERY MATERIAL</p>
-                
+
+                <div className="flex justify-between items-center mb-4">
+                  <p className="text-sm font-semibold uppercase tracking-tight">Jewellery Material</p>
+                  
+                  {/* Book Icon - Hidden on mobile, visible on desktop */}
+                  <div className="hidden lg:block">
+                    <Image 
+                      src="/assets/images/book.svg" 
+                      alt="Material Guide" 
+                      width={22} 
+                      height={22} 
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </div>
+                   
                 <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
                   {materialOptions.map((option, index) => (
                     <div key={option.name} className="flex contents">

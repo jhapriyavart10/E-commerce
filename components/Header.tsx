@@ -2,31 +2,62 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { useCart } from '@/app/context/CartContext'
+
+const BANNER_MESSAGES = [
+  "Free Standard Domestic Shipping above $135",
+  "New Collection: Rose Quartz Bracelets Now Available",
+  "Join our community for 10% off your first order"
+];
 
 export default function Header() {
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
 
+  const [showBanner, setShowBanner] = useState(true);
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  // Banner Text Carousel Logic
+  useEffect(() => {
+    if (!showBanner) return;
+
+    const interval = setInterval(() => {
+      setFade(false); // Start fade out
+      setTimeout(() => {
+        setMessageIndex((prev) => (prev + 1) % BANNER_MESSAGES.length);
+        setFade(true); // Start fade in
+      }, 500);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [showBanner]);
+
   return (
     <>
-      {/* Top Banner - 1440x45 */}
-      <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative">
-        <span className="text-sm">Free Standard Domestic Shipping above $135</span>
-        <button className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">
-          ✕
-        </button>
-      </div>
+      {/* Top Banner */}
+      {showBanner && (
+        <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative">
+          <span className={`text-sm transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}>
+            {BANNER_MESSAGES[messageIndex]}
+          </span>
+          <button 
+            onClick={() => setShowBanner(false)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
-      {/* Main Header - Responsive navigation: mobile 390x120, desktop 1440x120 */}
+      {/* Main Header */}
       <header className="bg-[#280F0B] text-white w-full h-[120px]">
         <div className="w-full max-w-[1440px] mx-auto h-full relative">
-          {/* Mobile & Desktop Layout */}
           <div className="h-full px-4 sm:px-6 lg:px-0 lg:block">
             
-            {/* Mobile Layout - Single Row */}
+            {/* Mobile Layout - Kept Logo on Left */}
             <div className="flex items-center justify-between h-full lg:hidden">
-              {/* Mobile Logo - Left Side */}
               <Link href="/" className="flex items-center">
                 <Image 
                   src="/assets/images/Logo.png" 
@@ -38,7 +69,6 @@ export default function Header() {
                 />
               </Link>
               
-              {/* Mobile Icons - Right Side */}
               <div className="flex items-center gap-4">
                 <Link href="/cart" className="hover:text-gray-300 transition-colors relative" aria-label="Cart">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,25 +88,15 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Desktop Layout - Absolute Positioning */}
+            {/* Desktop Layout - Kept as provided */}
             <div className="hidden lg:block">
-              {/* Left Navigation - gap: 50px */}
               <nav className="absolute left-[72px] top-[50px] flex items-center gap-[50px]">
-                <Link href="/shop" className="hover:text-gray-300 transition-colors text-base">
-                  Shop
-                </Link>
-                <Link href="/plants" className="hover:text-gray-300 transition-colors text-base">
-                  Plants
-                </Link>
-                <Link href="/raw-earth-logo" className="hover:text-gray-300 transition-colors text-base">
-                  Raw Earth Logo
-                </Link>
-                <Link href="/about" className="hover:text-gray-300 transition-colors text-base">
-                  About
-                </Link>
+                <Link href="/shop" className="hover:text-gray-300 transition-colors text-base">Shop</Link>
+                <Link href="/plants" className="hover:text-gray-300 transition-colors text-base">Plants</Link>
+                <Link href="/raw-earth-logo" className="hover:text-gray-300 transition-colors text-base">Raw Earth Logo</Link>
+                <Link href="/about" className="hover:text-gray-300 transition-colors text-base">About</Link>
               </nav>
 
-              {/* Logo - 186x72 at top: 24px, left: 627px */}
               <div className="absolute left-[627px] top-[24px]">
                 <Link href="/" className="flex items-center">
                   <Image 
@@ -90,7 +110,6 @@ export default function Header() {
                 </Link>
               </div>
 
-              {/* Icons - gap: 24px at top: 48px */}
               <div className="absolute right-[48px] top-[48px] flex items-center gap-[24px]">
                 <button className="hover:text-gray-300 transition-colors" aria-label="Search">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,5 +137,5 @@ export default function Header() {
         </div>
       </header>
     </>
-  )
+  );
 }
