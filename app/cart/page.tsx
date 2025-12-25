@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
 import Header from '@/components/Header';
+import Link from 'next/link';
 
 const svgPathsDesktop = {
   p21b9db80: "M10.1569 12.7116L5.20694 17.6616C4.81647 18.0521 4.1834 18.0521 3.79294 17.6616C3.40247 17.2712 3.40247 16.6381 3.79294 16.2476L8.03594 12.0046L3.79294 7.76163C3.40247 7.37116 3.40247 6.73809 3.79294 6.34763C4.1834 5.95716 4.81647 5.95716 5.20694 6.34763L10.1569 11.2976C10.3444 11.4852 10.4497 11.7395 10.4497 12.0046C10.4497 12.2698 10.3444 12.5241 10.1569 12.7116Z",
@@ -186,17 +187,17 @@ export default function CartPage() {
                   <span className="text-2xl font-bold">${total.toFixed(2)} AUD</span>
                 </div>
 
-                <button className="mt-auto bg-[#7f3e2f] text-[#fcf3e5] py-4 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-[1.12px] font-semibold text-sm">
-                  Proceed to checkout
-                  <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
-                    <path d={svgPathsDesktop.pdaf5300} fill="#fcf3e5" />
-                  </svg>
-                </button>
+                <Link href="/checkout" className="w-full block">
+                  <button className="w-full mt-auto bg-[#7f3e2f] text-[#fcf3e5] py-4 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-[1.12px] font-semibold text-sm">
+                    Proceed to checkout
+                    <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
+                      <path d={svgPathsDesktop.pdaf5300} fill="#fcf3e5" />
+                    </svg>
+                  </button>
+                </Link>
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>

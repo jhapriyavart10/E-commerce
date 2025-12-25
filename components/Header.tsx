@@ -17,31 +17,46 @@ export default function Header() {
 
   const [showBanner, setShowBanner] = useState(true);
   const [messageIndex, setMessageIndex] = useState(0);
-  const [fade, setFade] = useState(true);
+  const [animate, setAnimate] = useState(false);
+  const [nextIndex, setNextIndex] = useState(1);
+  const [paused, setPaused] = useState(false);
 
   // Banner Text Carousel Logic
   useEffect(() => {
-    if (!showBanner) return;
+    if (!showBanner || paused) return;
 
     const interval = setInterval(() => {
-      setFade(false); // Start fade out
+      setAnimate(true); // Start fade out
       setTimeout(() => {
         setMessageIndex((prev) => (prev + 1) % BANNER_MESSAGES.length);
-        setFade(true); // Start fade in
+        setNextIndex((prev) => (prev + 2) % BANNER_MESSAGES.length);
+        setAnimate(false); // Start fade in
       }, 500);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [showBanner]);
+  }, [showBanner, paused]);
 
   return (
     <>
       {/* Top Banner */}
       {showBanner && (
-        <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative">
-          <span className={`text-sm transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative overflow-hidden"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          >  
+          <span className={`text-sm whitespace-nowrap leading-[45px] transition-transform duration-500 ease-in-out ${animate ? '-translate-y-[45px]' : 'translate-y-0'}`}>
             {BANNER_MESSAGES[messageIndex]}
           </span>
+
+          <span
+            className={`absolute text-sm whitespace-nowrap leading-[45px] transition-transform duration-500 ease-in-out ${
+              animate ? 'translate-y-0' : 'translate-y-[45px]'
+            }`}
+          >
+            {BANNER_MESSAGES[nextIndex]}
+          </span>
+
           <button 
             onClick={() => setShowBanner(false)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
@@ -49,6 +64,8 @@ export default function Header() {
             ✕
           </button>
         </div>
+
+        
       )}
 
       {/* Main Header */}
