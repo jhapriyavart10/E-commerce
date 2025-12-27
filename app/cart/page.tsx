@@ -13,23 +13,47 @@ const svgPathsDesktop = {
 };
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, removeFromCart } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, cartId, getTotalItems } = useCart();
   const [couponExpanded, setCouponExpanded] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const displayItems = cartItems.length > 0 ? cartItems : [
-    {
-      id: 'angel-wing-crystal-pendants',
-      name: 'Angel Wing Crystal Pendants',
-      variant: 'Rose Quartz, Standard',
-      price: 35.00,
-      quantity: 1,
-      image: '/assets/images/necklace-img.png'
+  // Dynamic calculations based on real Cart state
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const tax = subtotal * 0.1; // Example 10% tax calculation
+  const total = subtotal + tax;
+
+  const handleCheckout = async () => {
+    if (!cartId) return alert("Cart is empty");
+    
+    setIsRedirecting(true);
+    try {
+      const response = await fetch('/api/shopify/checkout', {
+        method: 'POST',
+        body: JSON.stringify({ cartId })
+      });
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url; // Redirect to Shopify
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (err) {
+      console.error("Checkout redirect failed", err);
+      setIsRedirecting(false);
     }
-  ];
+  };
 
-  const subtotal = 250.00;
-  const tax = 35.00;
-  const total = 285.00;
+  if (cartItems.length === 0) {
+    return (
+      <div className="bg-[#f6d8ab] min-h-screen w-full font-manrope">
+        <Header />
+        <div className="flex flex-col items-center justify-center py-40">
+          <h2 className="font-lora text-4xl mb-6">Your cart is empty</h2>
+          <Link href="/product-analogue" className="underline font-bold">Continue Shopping</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f6d8ab] min-h-screen w-full font-manrope">
@@ -66,7 +90,7 @@ export default function CartPage() {
         {/* Page Title */}
         <div className="mb-8 flex items-baseline gap-2">
           <h1 className="font-lora text-[40px] lg:text-[72px] text-[#280f0b] leading-none">Cart</h1>
-          <p className="font-lora text-base lg:text-xl text-[#280f0b] opacity-80">(2 items)</p>
+          <p className="font-lora text-base lg:text-xl text-[#280f0b] opacity-80">({getTotalItems()} items)</p>
         </div>
         
         <div className="flex flex-col lg:grid lg:grid-cols-[1fr_526px] gap-10">
@@ -79,7 +103,7 @@ export default function CartPage() {
               <p className="text-[12px] font-bold tracking-[1.2px] uppercase text-right">Subtotal</p>
             </div>
             
-            {displayItems.map((item) => (
+            {cartItems.map((item) => (
               <div key={item.id} className="flex flex-col lg:grid lg:grid-cols-[1fr_120px_100px] lg:items-center gap-6 lg:gap-0">
                 <div className="flex gap-4">
                   <div className="relative size-[95px] lg:size-[110px] shrink-0">
@@ -89,7 +113,6 @@ export default function CartPage() {
                     <p className="text-[#280f0b] text-base font-medium leading-none">{item.name}</p>
                     <p className="text-[#7f3e2f] text-sm font-medium leading-none">{item.variant}</p>
                     
-                    {/* Mobile Only: Stacked Price, Quantity, and Delete */}
                     <div className="flex flex-col gap-3 lg:hidden mt-1">
                       <p className="text-[#280f0b] text-sm font-semibold">${item.price.toFixed(2)} AUD</p>
                       
@@ -122,11 +145,10 @@ export default function CartPage() {
             ))}
           </div>
           
-          {/* Right: Summary Card (Ticket-Style) */}
+          {/* Right: Summary Card */}
           <div className="relative w-full max-w-[526px] mx-auto lg:mx-0">
             <div className="bg-[#FFC26F] rounded-[20px] overflow-hidden relative min-h-[430px] flex flex-col shadow-sm">
               
-              {/* Top Section: Subtotal, Tax, Shipping */}
               <div className="p-6 lg:p-10 flex flex-col gap-4">
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Subtotal</span>
@@ -142,59 +164,46 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* Coupon Section: Wrapped in dashed borders with semicircles */}
               <div className="relative">
-                {/* Upper dashed border */}
                 <div className="w-full border-t border-dashed border-black/40" />
-                
-                {/* Semicircle cuts centered on the coupon row */}
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
 
                 <div className="px-6 lg:px-10 py-6">
-                  <button 
-                    onClick={() => setCouponExpanded(!couponExpanded)}
-                    className="flex items-center gap-4 w-full group"
-                  >
+                  <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group">
                     <div className="size-6 relative shrink-0">
                       <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
                     </div>
-                    <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">
-                      Have a coupon code?
-                    </span>
-                    <svg 
-                      className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} 
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                    >
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">Have a coupon code?</span>
+                    <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </button>
-                  
-                  {/* Expandable coupon input */}
                   <div className={`overflow-hidden transition-all ${couponExpanded ? 'max-h-20 mt-4' : 'max-h-0'}`}>
                      <input type="text" placeholder="Enter code" className="w-full bg-transparent border border-black/20 p-2 rounded text-sm outline-none" />
                   </div>
                 </div>
-
-                {/* Lower dashed border */}
                 <div className="w-full border-b border-dashed border-black/40" />
               </div>
 
-              {/* Bottom Section: Total & Checkout */}
               <div className="p-6 lg:p-10 flex flex-col flex-1">
                 <div className="flex justify-between items-center mb-10">
                   <span className="text-2xl font-bold">Total</span>
                   <span className="text-2xl font-bold">${total.toFixed(2)} AUD</span>
                 </div>
 
-                <Link href="/checkout" className="w-full block">
-                  <button className="w-full mt-auto bg-[#7f3e2f] text-[#fcf3e5] py-4 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-[1.12px] font-semibold text-sm">
-                    Proceed to checkout
+              <Link href="/checkout" className="w-full block">
+                <button 
+                  disabled={isRedirecting}
+                  onClick={handleCheckout} 
+                  className="w-full mt-auto bg-[#7f3e2f] text-[#fcf3e5] py-4 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 disabled:opacity-50 transition-all uppercase tracking-[1.12px] font-semibold text-sm"
+                >
+                  {isRedirecting ? 'Redirecting...' : 'Proceed to checkout'}
+                  {!isRedirecting && (
                     <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
                       <path d={svgPathsDesktop.pdaf5300} fill="#fcf3e5" />
                     </svg>
-                  </button>
-                </Link>
+                  )}
+                </button>
+              </Link>
               </div>
             </div>
           </div>

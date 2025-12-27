@@ -1,15 +1,18 @@
 'use client';
 import Header from '@/components/Header';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useCart } from '@/app/context/CartContext';
+import Link from 'next/link';
 
 /* ---------------- TYPES ---------------- */
 type Product = {
-  id: number;
+  id: string; 
   title: string;
+  handle: string; 
   price: number;
-  category: 'Bracelets' | 'Charms & Pendants';
-  gender: 'For her' | 'For him' | 'Unisex';
+  category: string;
+  gender: string;
   material: string;
   image: string;
 };
@@ -21,22 +24,16 @@ type Filters = {
   material: string[];
 };
 
-/* ---------------- CONSTANTS ---------------- */
 const MATERIAL_OPTIONS = [
   'Obsidian', 'Tiger Eye', 'Lapis Lazuli', 'Rose Quartz', 'Clear Quartz', 'Green Aventurine'
 ];
 
-const PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => ({
-  id: i + 1,
-  title: 'Angel Crystal Pendants',
-  price: 35,
-  category: i % 2 === 0 ? 'Bracelets' : 'Charms & Pendants',
-  gender: i % 3 === 0 ? 'For her' : i % 3 === 1 ? 'For him' : 'Unisex',
-  material: MATERIAL_OPTIONS[i % 6],
-  image: '/assets/images/necklace-img.png',
-}));
-
 export default function ShopPage() {
+  const { addToCart } = useCart();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+  
   const [filters, setFilters] = useState<Filters>({
     price: { min: 0, max: 150 },
     category: [],
@@ -46,11 +43,42 @@ export default function ShopPage() {
 
   const [openSections, setOpenSections] = useState({ category: true, gender: true, material: true });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [quantities, setQuantities] = useState<{ [key: number]: number }>(
-    Object.fromEntries(PRODUCTS.map(p => [p.id, 1]))
-  );
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
-  const getCount = (key: keyof Product, value: string) => PRODUCTS.filter(p => p[key] === value).length;
+  // 1. DYNAMIC FETCH WITH ERROR HANDLING
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        console.log('🔥 useEffect fired');
+        const res = await fetch('/api/shopify/products');
+        const data = await res.json();
+        
+        // Safety Check: Shopify Service layer might return {error: ...} 
+        if (data && Array.isArray(data)) {
+          setAllProducts(data);
+          setQuantities(Object.fromEntries(data.map((p: Product) => [p.id, 1])));
+        } else {
+          console.error("Backend returned non-array data:", data);
+          setApiError(data.error || "Failed to load products from Shopify.");
+          setAllProducts([]); 
+        }
+      } catch (error) {
+        console.error("Failed to load products", error);
+        setApiError("Network error. Please check your Shopify connection.");
+        setAllProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  // 2. SAFETY WRAPPER FOR FILTERING (Prevents the crash)
+  const safeProducts = Array.isArray(allProducts) ? allProducts : [];
+
+  const getCount = (key: keyof Product, value: string) => 
+    safeProducts.filter(p => p[key] === value).length;
+
   const toggleSection = (key: keyof typeof openSections) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const toggleFilter = (key: keyof Filters, value: string) => {
@@ -60,17 +88,31 @@ export default function ShopPage() {
     });
   };
 
-  const updateQuantity = (id: number, delta: number) => {
-    setQuantities(prev => ({ ...prev, [id]: Math.max(1, prev[id] + delta) }));
+  const updateQuantity = (id: string, delta: number) => {
+    setQuantities(prev => ({ ...prev, [id]: Math.max(1, (prev[id] || 1) + delta) }));
   };
 
-  const filteredProducts = PRODUCTS.filter((p) => {
+  const filteredProducts = safeProducts.filter((p) => {
     if (p.price < filters.price.min || p.price > filters.price.max) return false;
     if (filters.category.length && !filters.category.includes(p.category)) return false;
     if (filters.gender.length && !filters.gender.includes(p.gender)) return false;
     if (filters.material.length && !filters.material.includes(p.material)) return false;
     return true;
   });
+
+  if (loading) return (
+    <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center font-lora text-xl">
+      Loading Collection...
+    </div>
+  );
+
+  if (apiError) return (
+    <div className="bg-[#F6D8AB] min-h-screen flex flex-col items-center justify-center p-10 text-center">
+      <h2 className="text-2xl font-lora mb-4">Connection Issue</h2>
+      <p className="opacity-70 mb-6">{apiError}</p>
+      <p className="text-sm italic">Tip: Ensure USE_MOCK_DATA=false is only set when your Shopify .env keys are valid.</p>
+    </div>
+  );
 
   return (
     <>
@@ -80,23 +122,15 @@ export default function ShopPage() {
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
         <div className="px-5 md:px-12 xl:px-24 2xl:px-32 py-10">
 
-          {/* DESKTOP TITLE */}
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-4">
             <div />
             <h1 className="font-lora text-[40px] leading-tight">All Products</h1>
           </div>
-               
+                
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-6">
-            {/* FIXED: Removed h-[40px] to let the border sit tightly against the text */}
-            <h2 className="text-xl font-bold tracking-tight border-b border-[#280F0B33] pb-1 flex items-end">
-              Filters
-            </h2>
-
+            <h2 className="text-xl font-bold tracking-tight border-b border-[#280F0B33] pb-1 flex items-end">Filters</h2>
             <div className="flex justify-between items-end border-b border-[#280F0B33] pb-1">
-              <p className="text-sm opacity-70 leading-none">
-                {filteredProducts.length} Products
-              </p>
-
+              <p className="text-sm opacity-70 leading-none">{filteredProducts.length} Products</p>
               <select className="bg-transparent border-none font-semibold cursor-pointer outline-none text-sm leading-none">
                 <option>Default Sorting</option>
                 <option>Price: Low to High</option>
@@ -106,12 +140,12 @@ export default function ShopPage() {
 
           <div className="flex flex-col lg:flex-row gap-10 items-start">
             <aside className="w-full lg:w-[260px]">
-              {/* MOBILE HEADERS */}
+              {/* Filter Sidebar UI (Logic is safe now) */}
               <div className="lg:hidden flex flex-col mb-6">
                 <h1 className="font-lora text-[40px] leading-tight mb-1">All Products</h1>
                 <p className="text-xs opacity-70">Showing {filteredProducts.length} products</p>
               </div>
-
+              {/* ... REST OF YOUR FILTER UI CODE ... */}
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button 
                   onClick={() => setShowMobileFilters(!showMobileFilters)}
@@ -181,21 +215,30 @@ export default function ShopPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-10">
                 {filteredProducts.map((p) => (
                   <div key={p.id} className="group cursor-pointer">
-                    <div className="aspect-[306/316] relative bg-[#F2EFEA] mb-4 overflow-hidden">
-                      <Image src={p.image} alt={p.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                    </div>
-                    <h4 className="text-[14px] font-semibold mb-1 group-hover:underline truncate">{p.title}</h4>
+                    <Link href={`/product/${p.handle}`}>
+                      <div className="aspect-[306/316] relative bg-[#F2EFEA] mb-4 overflow-hidden">
+                        <Image src={p.image || '/assets/images/necklace-img.png'} alt={p.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                      </div>
+                    </Link>
+                    <Link href={`/product/${p.handle}`}>
+                      <h4 className="text-[14px] font-semibold mb-1 group-hover:underline truncate">{p.title}</h4>
+                    </Link>
                     <div className="relative h-8 flex items-center">
                       <p className="text-[13px] opacity-70 font-medium absolute inset-0 flex items-center transition-opacity duration-300 group-hover:opacity-0">
-                        ${p.price}.00 AUD
+                        ${p.price.toFixed(2)} AUD
                       </p>
                       <div className="flex items-center gap-3 absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[#F6D8AB]">
                         <div className="flex items-center border border-[#280F0B66] h-8">
                           <button onClick={(e) => { e.stopPropagation(); updateQuantity(p.id, -1); }} className="w-7 h-full flex items-center justify-center hover:bg-[#280F0B] hover:text-[#F6D8AB] transition-colors">-</button>
-                          <span className="w-8 h-full flex items-center justify-center border-x border-[#280F0B66] text-sm font-bold">{quantities[p.id]}</span>
+                          <span className="w-8 h-full flex items-center justify-center border-x border-[#280F0B66] text-sm font-bold">{quantities[p.id] || 1}</span>
                           <button onClick={(e) => { e.stopPropagation(); updateQuantity(p.id, 1); }} className="w-7 h-full flex items-center justify-center hover:bg-[#280F0B] hover:text-[#F6D8AB] transition-colors">+</button>
                         </div>
-                        <button className="text-[10px] uppercase font-bold underline whitespace-nowrap">Add to Cart</button>
+                        <button 
+                          onClick={() => addToCart({ id: p.id, name: p.title, variant: "Default", price: p.price, image: p.image })}
+                          className="text-[10px] uppercase font-bold underline whitespace-nowrap"
+                        >
+                          Add to Cart
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -204,7 +247,6 @@ export default function ShopPage() {
             </section>
           </div>
         </div>
-
         <style jsx global>{`
           .custom-slider::-webkit-slider-thumb {
             appearance: none; pointer-events: auto; height: 24px; width: 24px; border-radius: 50%;

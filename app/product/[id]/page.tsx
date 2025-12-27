@@ -1,33 +1,24 @@
 'use client';
-
-import dynamic from 'next/dynamic';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Desktop_pro from './desktop_pro';
 
-const DesktopProduct = dynamic(() => import('./desktop_pro'), { ssr: false });
-//const MobileProduct = dynamic(() => import('./mobile_pro'), { ssr: false });
+export default function ProductPage() {
+  const { id } = useParams();
+  const [product, setProduct] = useState<any>(null);
 
-// function useIsMobile() {
-//   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  useEffect(() => {
+    async function load() {
+      const res = await fetch(`/api/shopify/products?handle=${id}`);
+      const data = await res.json();
+      setProduct(data);
+    }
+    if (id) load();
+  }, [id]);
 
-//   useEffect(() => {
-//     const checkMobile = () => {
-//       setIsMobile(window.innerWidth < 768);
-//     };
+  if (!product) return <div className="p-20 text-center">Loading...</div>;
 
-//     checkMobile();
-//     window.addEventListener('resize', checkMobile);
+  // @ts-ignore: Desktop_pro props are untyped here; passing product prop intentionally
+  return <Desktop_pro product={product} />;
 
-//     return () => window.removeEventListener('resize', checkMobile);
-//   }, []);
-
-//   return isMobile;
-// }
-
-export default function Page() {
-  // const isMobile = useIsMobile();
-
-  // if (isMobile === null) return null;
-
-  // return isMobile ? <MobileProduct /> : <DesktopProduct />;
-  return <DesktopProduct />;
 }
