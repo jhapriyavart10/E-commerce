@@ -1,10 +1,11 @@
 import { shopifyFetch } from '@/lib/shopify';
 
 export const CartService = {
-  async createCart() {
+  // Updated to accept arguments
+  async createCart(variantId: string, quantity: number) {
     const mutation = `
-      mutation cartCreate {
-        cartCreate {
+      mutation cartCreate($input: CartInput) {
+        cartCreate(input: $input) {
           cart {
             id
             checkoutUrl
@@ -12,7 +13,23 @@ export const CartService = {
         }
       }
     `;
-    const res = await shopifyFetch<any>({ query: mutation, cache: 'no-store' });
+    const variables = {
+      input: {
+        lines: [
+          {
+            merchandiseId: variantId,
+            quantity: quantity
+          }
+        ]
+      }
+    };
+
+    const res = await shopifyFetch<any>({ 
+      query: mutation, 
+      variables, 
+      cache: 'no-store' 
+    });
+    
     return res.body.data.cartCreate.cart;
   },
 
@@ -22,19 +39,22 @@ export const CartService = {
         cartLinesAdd(cartId: $cartId, lines: $lines) {
           cart {
             id
-            lines(first: 10) {
-              edges {
-                node {
-                  id
-                  quantity
-                }
-              }
-            }
+            checkoutUrl
           }
         }
       }
     `;
-    const variables = { cartId, lines: [{ merchandiseId: variantId, quantity: 1 }] };
-    return await shopifyFetch({ query: mutation, variables, cache: 'no-store' });
+    const variables = { 
+      cartId, 
+      lines: [{ merchandiseId: variantId, quantity: 1 }] 
+    };
+
+    const res = await shopifyFetch<any>({ 
+      query: mutation, 
+      variables, 
+      cache: 'no-store' 
+    });
+
+    return res.body.data.cartLinesAdd.cart;
   }
 };
