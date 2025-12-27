@@ -1,13 +1,15 @@
 import { shopifyFetch } from '@/lib/shopify';
 import { getProductQuery, getProductsQuery } from '@/lib/shopify/queries';
 
+/**
+ * Fetches all products for the Catalogue Page
+ */
 export async function getProducts() {
-  // 1. Mock Data logic (Safe development)
   if (process.env.USE_MOCK_DATA === 'true') {
     return [
       {
         id: "gid://shopify/ProductVariant/1",
-        name: "Mock Crystal",
+        title: "Mock Crystal",
         handle: "mock-crystal",
         price: 45.00,
         image: "/assets/images/jewellery1.png"
@@ -21,33 +23,49 @@ export async function getProducts() {
       variables: { first: 20 }
     });
 
-    // CRITICAL FIX: Handle cases where Shopify credentials are wrong or API is down
-    if (!res?.body?.data?.products) {
-      console.error("Shopify API Error: No product data received. Check your .env credentials.");
-      return []; // Return empty array so .filter() doesn't crash the frontend
+    // 1. Check if the response body or data is missing
+    if (!res?.body?.data?.products?.edges) {
+      console.error("Shopify API Error: No product edges found. Check credentials.");
+      return []; 
     }
 
     return res.body.data.products.edges.map((edge: any) => {
       const product = edge.node;
+      
+      // 2. Safe extraction using Optional Chaining
+      const variantNode = product.variants?.edges?.[0]?.node;
+      const imageNode = product.images?.edges?.[0]?.node;
+
       return {
-        id: product.variants.edges[0]?.node?.id || product.id,
-        name: product.title,
+        // Use variant ID if available, otherwise fallback to product ID
+        id: variantNode?.id || product.id,
+        title: product.title,
         handle: product.handle,
-        price: parseFloat(product.variants.edges[0]?.node?.price?.amount || "0"),
-        image: product.images.edges[0]?.node?.url || ''
+        // Fallback to 0 if price is missing
+        price: parseFloat(variantNode?.price?.amount || "0"),
+        // Fallback to placeholder image if image is missing
+        image: imageNode?.url || '/assets/images/necklace-img.png',
+        images: product.images?.edges?.map((e: any) => e.node.url) || [],
+        // Add default fields for your frontend filters
+        category: product.productType || 'Jewellery',
+        gender: 'Unisex',
+        material: 'Gold'
       };
     });
   } catch (err) {
-    console.error("Service Layer Failure:", err);
-    return []; // Return empty array to prevent frontend crash
+    console.error("Service Layer Failure (getProducts):", err);
+    return []; 
   }
 }
 
+/**
+ * Fetches a single product by handle
+ */
 export async function getProduct(handle: string) {
   if (process.env.USE_MOCK_DATA === 'true') {
     return {
       id: "gid://shopify/ProductVariant/1",
-      name: "Mock Detail Product",
+      title: "Mock Detail Product",
       price: 45.00,
       image: "/assets/images/jewellery1.png",
       description: "Beautiful mock description"
@@ -63,21 +81,23 @@ export async function getProduct(handle: string) {
     const product = res?.body?.data?.product;
     if (!product) return null;
 
+    const variantNode = product.variants?.edges?.[0]?.node;
+
     return {
-      id: product.variants.edges[0]?.node?.id, 
+      id: variantNode?.id || product.id, 
       productId: product.id,                 
-      name: product.title,
-      price: parseFloat(product.variants.edges[0]?.node?.price?.amount || "0"),
-      image: product.images.edges[0]?.node?.url || '',
+      title: product.title,
+      price: parseFloat(variantNode?.price?.amount || "0"),
+      image: product.images?.edges?.[0]?.node?.url || '/assets/images/necklace-img.png',
       description: product.descriptionHtml,
-      variants: product.variants.edges.map((v: any) => ({
+      variants: (product.variants?.edges || []).map((v: any) => ({
         id: v.node.id,
         title: v.node.title,
         price: v.node.price.amount
       }))
     };
   } catch (err) {
-    console.error("Fetch Product Error:", err);
+    console.error("Fetch Product Error (getProduct):", err);
     return null;
   }
 }

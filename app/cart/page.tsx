@@ -107,10 +107,10 @@ export default function CartPage() {
               <div key={item.id} className="flex flex-col lg:grid lg:grid-cols-[1fr_120px_100px] lg:items-center gap-6 lg:gap-0">
                 <div className="flex gap-4">
                   <div className="relative size-[95px] lg:size-[110px] shrink-0">
-                    <Image alt={item.name} src={item.image} fill className="object-cover" />
+                    <Image alt={item.title} src={item.image} fill className="object-cover" />
                   </div>
                   <div className="flex flex-col gap-2 justify-center">
-                    <p className="text-[#280f0b] text-base font-medium leading-none">{item.name}</p>
+                    <p className="text-[#280f0b] text-base font-medium leading-none">{item.title}</p>
                     <p className="text-[#7f3e2f] text-sm font-medium leading-none">{item.variant}</p>
                     
                     <div className="flex flex-col gap-3 lg:hidden mt-1">

@@ -26,6 +26,7 @@ export const getProductQuery = `
   }
 `;
 
+
 export const getProductsQuery = `
   query getProducts($first: Int!) {
     products(first: $first) {
@@ -34,6 +35,13 @@ export const getProductsQuery = `
           id
           handle
           title
+          images(first: 1) {
+            edges {
+              node {
+                url
+              }
+            }
+          }
           variants(first: 1) {
             edges {
               node {

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import Header from '@/components/Header';
+import { useCart } from '@/app/context/CartContext';
 
 const jewelleryImages = [
   '/assets/images/jewellery1.png',
@@ -22,12 +23,16 @@ const materialOptions = [
   { name: 'Green Aventurine', img: '/assets/images/green adventurine.png' },
 ];
 
-export default function UnifiedProductPage() {
-  const [selectedImage, setSelectedImage] = useState(jewelleryImages[0]);
+export default function UnifiedProductPage({ product }: { product: any }) {
+  const jewelleryImages = product.images && product.images.length > 0 
+    ? product.images 
+    : ['/assets/images/necklace-img.png'];
+  const [selectedImage, setSelectedImage] = useState(product.image || jewelleryImages[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(materialOptions[0].name);
   const [quantity, setQuantity] = useState(1);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
+  const { addToCart } = useCart();
 
   // Review labels ordered specifically for the 2-column mobile grid
   // Index 0 & 2 will be Col 1 (Search, All ratings)
@@ -57,9 +62,13 @@ export default function UnifiedProductPage() {
                 <Image src={selectedImage} alt="Product" fill className="object-cover" priority />
               </div>
               <div className="grid grid-cols-6 gap-2 w-full lg:max-w-[820px]">
-                {jewelleryImages.map((img) => (
-                  <div key={img} onClick={() => setSelectedImage(img)} className={`aspect-square cursor-pointer transition-all ${selectedImage === img ? 'border-2 border-[#280F0B]' : 'border border-[#280F0B]/30'}`}>
-                    <Image src={img} alt="Thumb" width={100} height={100} className="w-full h-full object-cover" />
+                {jewelleryImages.map((img: string, index: number) => (
+                  <div 
+                    key={index} 
+                    onClick={() => setSelectedImage(img)} 
+                    className={`aspect-square cursor-pointer transition-all ${selectedImage === img ? 'border-2 border-[#280F0B]' : 'border border-[#280F0B]/30'}`}
+                  >
+                    <Image src={img} alt={`Thumbnail ${index}`} width={100} height={100} className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
@@ -67,7 +76,7 @@ export default function UnifiedProductPage() {
 
             {/* RIGHT COLUMN: Details */}
             <div className="flex flex-col justify-start">
-              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-semibold mb-2 lg:mb-3 lg:mt-8">Sphere Crystal Pendulums</h1>
+              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-semibold mb-2 lg:mb-3 lg:mt-8">{product.title}</h1>
               <div className="flex items-center gap-2 mb-3 lg:mb-4">
                 <span className="text-[#F5B301] text-lg lg:text-2xl">★ ★ ★ ★ ★</span>
                 <button onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })} className="text-[12px] lg:text-sm cursor-pointer bg-transparent border-none p-0">[7 reviews]</button>
@@ -77,7 +86,7 @@ export default function UnifiedProductPage() {
 
               <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase underline text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
 
-              <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">$35.00 AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
+              <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${product.price.toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
               {/* JEWELLERY MATERIAL: STACKED ON MOBILE/TAB, 3-PER-ROW WITH UNIFORM SPACING ON DESKTOP */}
               <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
@@ -132,7 +141,12 @@ export default function UnifiedProductPage() {
                   <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-12 text-center bg-transparent border-none outline-none font-manrope text-sm" />
                   <button className="px-4 py-2" onClick={() => setQuantity(q => q + 1)}>+</button>
                 </div>
-                <button className="w-full bg-[#7A3E2E] text-white py-4 uppercase font-semibold tracking-wide mb-3">Add to cart</button>
+                <button 
+                  onClick={() => addToCart({ ...product, variant: "Default", quantity })}
+                  className="w-full bg-[#7A3E2E] text-white py-4 uppercase font-semibold tracking-wide mb-3"
+                >
+                  Add to cart
+                </button>
                 <button className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3">Buy with SHOP</button>
               </div>
 
@@ -152,7 +166,7 @@ export default function UnifiedProductPage() {
                         <span className={`text-xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
                       </button>
                       <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <p className="text-[14px] opacity-80 leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p className="text-[14px] opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
                       </div>
                     </div>
                   );

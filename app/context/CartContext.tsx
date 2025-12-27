@@ -4,7 +4,7 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 
 export interface CartItem {
   id: string; // This will now represent the Shopify Variant GID
-  name: string;
+  title: string;
   variant: string;
   price: number;
   quantity: number;

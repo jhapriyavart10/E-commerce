@@ -234,7 +234,7 @@ export default function ShopPage() {
                           <button onClick={(e) => { e.stopPropagation(); updateQuantity(p.id, 1); }} className="w-7 h-full flex items-center justify-center hover:bg-[#280F0B] hover:text-[#F6D8AB] transition-colors">+</button>
                         </div>
                         <button 
-                          onClick={() => addToCart({ id: p.id, name: p.title, variant: "Default", price: p.price, image: p.image })}
+                          onClick={() => addToCart({ id: p.id, title: p.title, variant: "Default", price: p.price, image: p.image })}
                           className="text-[10px] uppercase font-bold underline whitespace-nowrap"
                         >
                           Add to Cart
