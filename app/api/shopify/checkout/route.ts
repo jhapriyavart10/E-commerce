@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { CheckoutService } from '@/services/checkout.service'; // Fixed Import
+import { CheckoutService } from '@/services/checkout.service';
 
 export async function POST(req: Request) {
   try {
@@ -9,16 +9,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Cart ID is required' }, { status: 400 });
     }
     
-    // Use the method from the checkout service
+    // Attempt to get the secure Shopify checkout URL
     const url = await CheckoutService.getCheckoutUrl(cartId);
     
     if (!url) {
-      return NextResponse.json({ error: 'Could not generate checkout URL' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Could not generate checkout URL from Shopify' }, 
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ url });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Checkout API Error:", error);
-    return NextResponse.json({ error: 'Failed to generate checkout' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to generate checkout' }, 
+      { status: 500 }
+    );
   }
 }

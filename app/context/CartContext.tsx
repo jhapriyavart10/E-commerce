@@ -2,8 +2,9 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
+/* ---------------- TYPES ---------------- */
 export interface CartItem {
-  id: string; // This will now represent the Shopify Variant GID
+  id: string; // Shopify Variant GID
   title: string;
   variant: string;
   price: number;
@@ -13,8 +14,8 @@ export interface CartItem {
 
 interface CartContextType {
   cartItems: CartItem[];
-  cartId: string | null; // Added: Shopify Cart ID
-  addToCart: (item: Omit<CartItem, 'quantity'>) => Promise<void>; // Updated to async
+  cartId: string | null;
+  addToCart: (item: Omit<CartItem, 'quantity'>) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
@@ -23,18 +24,38 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+/* ---------------- PROVIDER ---------------- */
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string | null>(null);
 
-  // Initialize Cart ID from localStorage on mount
+  // 1. INITIAL LOAD (Hydration)
+  // Runs once when the app starts to pull data from the browser's memory
   useEffect(() => {
     const savedCartId = localStorage.getItem('shopify_cart_id');
-    if (savedCartId) setCartId(savedCartId);
+    const savedItems = localStorage.getItem('local_cart_items');
+    
+    if (savedCartId) {
+      setCartId(savedCartId);
+    }
+    
+    if (savedItems) {
+      try {
+        setCartItems(JSON.parse(savedItems));
+      } catch (e) {
+        console.error("Failed to parse local cart items:", e);
+      }
+    }
   }, []);
 
+  // 2. AUTO-SAVE (Persistence)
+  // Every time cartItems changes, we update localStorage
+  useEffect(() => {
+    localStorage.setItem('local_cart_items', JSON.stringify(cartItems));
+  }, [cartItems]);
+
   const addToCart = async (item: Omit<CartItem, 'quantity'>) => {
-    // 1. UI Update (Immediate response for user)
+    // Update local UI state immediately
     setCartItems(currentItems => {
       const existingItem = currentItems.find(i => i.id === item.id);
       if (existingItem) {
@@ -43,25 +64,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...currentItems, { ...item, quantity: 1 }];
     });
 
-    // 2. Shopify Sync (Background)
+    // Sync with Shopify Backend
     try {
       const response = await fetch('/api/shopify/cart', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cartId: cartId,
-          variantId: item.id, // item.id should be the gid:// variant ID
+          variantId: item.id,
           quantity: 1
         })
       });
+      
       const data = await response.json();
       
-      // If a new cart was created, save the ID
+      // If Shopify creates a new cart session, save that ID
       if (!cartId && data.id) {
         setCartId(data.id);
         localStorage.setItem('shopify_cart_id', data.id);
       }
     } catch (error) {
-      console.error("Failed to sync cart with Shopify", error);
+      console.error("Failed to sync cart with Shopify:", error);
     }
   };
 
@@ -72,18 +95,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         item.id === id ? { ...item, quantity } : item
       )
     );
-    // Optional: Call /api/shopify/cart (PUT) here to sync quantity changes
   };
 
   const removeFromCart = (id: string) => {
     setCartItems(currentItems => currentItems.filter(item => item.id !== id));
-    // Optional: Call /api/shopify/cart (DELETE) here
   };
 
   const clearCart = () => {
     setCartItems([]);
     setCartId(null);
     localStorage.removeItem('shopify_cart_id');
+    localStorage.removeItem('local_cart_items');
   };
 
   const getTotalItems = () => {
@@ -107,6 +129,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* ---------------- HOOK ---------------- */
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {

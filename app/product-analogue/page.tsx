@@ -25,7 +25,9 @@ type Filters = {
 };
 
 const MATERIAL_OPTIONS = [
-  'Obsidian', 'Tiger Eye', 'Lapis Lazuli', 'Rose Quartz', 'Clear Quartz', 'Green Aventurine'
+  'Grey Jasper', 'Blue Goldstone', 'Black Onyx', 'White Agate', 'Pink Shell', 'White Howlite', 'Blue Howlite',
+  'Turquoise Howlite', 'Gold Stone', 'Red Howlite', 'Sodalite', 'Blue Lace Agate', 'Opalite', 'Green Adventurine', 'Moonstone', 'Selenite', 'Magnetite', 'Blue Tiger Eye',
+  'Volcanic Stone', 'Unakite', 'Labradorite', 'Garnet', 'Malachite', 'Turquoise Stone', 'Red Jasper', 'Red Agate', 'Lapis Lazuli', 'Rose Quartz', 'Clear Quartz', 'Amethyst', 'Tiger Eye'
 ];
 
 export default function ShopPage() {
@@ -252,23 +254,19 @@ export default function ShopPage() {
                     <Link href={`/product/${p.handle}`}>
                       <h4 className="text-[14px] font-semibold mb-1 group-hover:underline truncate">{p.title}</h4>
                     </Link>
-                    <div className="relative h-8 flex items-center">
-                      <p className="text-[13px] opacity-70 font-medium absolute inset-0 flex items-center transition-opacity duration-300 group-hover:opacity-0">
-                        ${p.price.toFixed(2)} AUD
-                      </p>
-                      <div className="flex items-center gap-3 absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[#F6D8AB]">
-                        <div className="flex items-center border border-[#280F0B66] h-8">
-                          <button onClick={(e) => { e.stopPropagation(); updateQuantity(p.id, -1); }} className="w-7 h-full flex items-center justify-center hover:bg-[#280F0B] hover:text-[#F6D8AB] transition-colors">-</button>
-                          <span className="w-8 h-full flex items-center justify-center border-x border-[#280F0B66] text-sm font-bold">{quantities[p.id] || 1}</span>
-                          <button onClick={(e) => { e.stopPropagation(); updateQuantity(p.id, 1); }} className="w-7 h-full flex items-center justify-center hover:bg-[#280F0B] hover:text-[#F6D8AB] transition-colors">+</button>
-                        </div>
+                    <div className="relative h-8 overflow-hidden group/btn flex items-center">
+                        {/* Price - Moves UP and fades out on hover */}
+                        <p className="text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 group-hover:translate-y-[-100%] group-hover:opacity-0 flex items-center h-full">
+                          ${p.price.toFixed(2)} AUD
+                        </p>
+
+                        {/* Add to Cart Button - Moves UP from below the container into view */}
                         <button 
-                          onClick={() => addToCart({ id: p.id, title: p.title, variant: "Default", price: p.price, image: p.image })}
-                          className="text-[10px] uppercase font-bold underline whitespace-nowrap"
+                          onClick={() => handleAddToCart(p)}
+                          className="absolute top-0 left-0 w-full h-full text-[14px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 flex items-center hover:text-black"
                         >
-                          Add to Cart
+                          + Add to Cart 
                         </button>
-                      </div>
                     </div>
                   </div>
                 ))}
