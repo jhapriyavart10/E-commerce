@@ -13,6 +13,11 @@ const config: Config = {
         'brand-cream': '#F5E6D3',
         'brand-orange': '#F4C89F',
       },
+      // ADD THIS SECTION BELOW
+      fontFamily: {
+        lora: ['var(--font-lora)', 'serif'],
+        manrope: ['var(--font-manrope)', 'sans-serif'],
+      },
     },
   },
   plugins: [],

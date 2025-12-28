@@ -33,6 +33,7 @@ export default function ShopPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<Filters>({
     price: { min: 0, max: 150 },
@@ -49,7 +50,6 @@ export default function ShopPage() {
   useEffect(() => {
     async function loadProducts() {
       try {
-        console.log('🔥 useEffect fired');
         const res = await fetch('/api/shopify/products');
         const data = await res.json();
         
@@ -92,6 +92,14 @@ export default function ShopPage() {
     setQuantities(prev => ({ ...prev, [id]: Math.max(1, (prev[id] || 1) + delta) }));
   };
 
+  const handleAddToCart = (p: Product) => {
+    addToCart({ id: p.id, title: p.title, variant: "Default", price: p.price, image: p.image });
+    setNotification(null);
+    //setNotification(`${p.title} added to cart!`);
+    setTimeout(() => {setNotification(p.title);}, 10);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const filteredProducts = safeProducts.filter((p) => {
     if (p.price < filters.price.min || p.price > filters.price.max) return false;
     if (filters.category.length && !filters.category.includes(p.category)) return false;
@@ -118,17 +126,37 @@ export default function ShopPage() {
     <>
       <Header />
       <div className="h-[80px] md:h-[150px] w-full bg-[#F6D8AB]" />
+      <div className="fixed top-5 right-5 z-[9999] pointer-events-none">
+        {notification && (
+          <div className="w-[calc(100vw-40px)] sm:w-[350px] pointer-events-auto bg-[#280F0B] text-[#F6D8AB] p-4 rounded-md shadow-2xl border border-[#F6D8AB33] relative flex items-start gap-4 animate-slideInRight">
+            <div className="bg-[#F6D8AB] text-[#280F0B] rounded-full p-1.5 flex-shrink-0 mt-0.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.42-6.446z"/>
+              </svg>
+            </div>
+            <div className="flex-1 pr-6">
+              <p className="font-lora font-bold text-sm leading-tight mb-1">Added to Cart</p>
+              <p className="text-xs opacity-90 line-clamp-2 leading-relaxed">{notification}</p>
+              <div className="mt-3 flex gap-4">
+                <Link href="/cart" className="text-[11px] uppercase tracking-wider font-bold underline underline-offset-4 hover:text-white transition-colors">View Cart</Link>
+                <button onClick={() => setNotification(null)} className="text-[11px] uppercase tracking-wider font-bold opacity-60 hover:opacity-100">Dismiss</button>
+              </div>
+            </div>
+            <button onClick={() => setNotification(null)} className="absolute top-3 right-3 text-[#F6D8AB] p-1"><svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg></button>
+          </div>
+        )}
+      </div>
 
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
         <div className="px-5 md:px-12 xl:px-24 2xl:px-32 py-10">
 
-          <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-4">
+          <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-1">
             <div />
             <h1 className="font-lora text-[40px] leading-tight">All Products</h1>
           </div>
                 
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-6">
-            <h2 className="text-xl font-bold tracking-tight border-b border-[#280F0B33] pb-1 flex items-end">Filters</h2>
+            <h2 className="text-xl font-bold border-b border-[#280F0B33] pb-1 flex items-end tracking-[0px]">Filters</h2>
             <div className="flex justify-between items-end border-b border-[#280F0B33] pb-1">
               <p className="text-sm opacity-70 leading-none">{filteredProducts.length} Products</p>
               <select className="bg-transparent border-none font-semibold cursor-pointer outline-none text-sm leading-none">
@@ -174,6 +202,7 @@ export default function ShopPage() {
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
                       <input type="number" className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" value={filters.price.min} onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Number(e.target.value)}}))} />
                     </div>
+                    <span className="text-[#000000]">—</span>
                     <div className="relative w-1/2">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
                       <input type="number" className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" value={filters.price.max} onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Number(e.target.value)}}))} />
@@ -255,6 +284,20 @@ export default function ShopPage() {
           .custom-slider::-moz-range-thumb {
             appearance: none; pointer-events: auto; height: 20px; width: 20px; border-radius: 50%;
             background: #280F0B; border: 2px solid #F6D8AB; box-shadow: 0 0 0 2px #280F0B; cursor: pointer;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+          }
+          @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+          .animate-slideInRight {
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           }
         `}</style>
       </main>

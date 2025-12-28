@@ -20,7 +20,7 @@ export async function getProducts() {
   try {
     const res = await shopifyFetch<any>({
       query: getProductsQuery,
-      variables: { first: 20 }
+      variables: { first: 28}
     });
 
     // 1. Check if the response body or data is missing
@@ -41,9 +41,7 @@ export async function getProducts() {
         id: variantNode?.id || product.id,
         title: product.title,
         handle: product.handle,
-        // Fallback to 0 if price is missing
         price: parseFloat(variantNode?.price?.amount || "0"),
-        // Fallback to placeholder image if image is missing
         image: imageNode?.url || '/assets/images/necklace-img.png',
         images: product.images?.edges?.map((e: any) => e.node.url) || [],
         // Add default fields for your frontend filters

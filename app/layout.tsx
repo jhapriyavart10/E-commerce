@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Manrope } from 'next/font/google'
+import {Lora, Manrope } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from './context/CartContext'
 
@@ -7,6 +7,12 @@ const manrope = Manrope({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-manrope',
+})
+
+const lora = Lora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-lora',
 })
 
 export const metadata: Metadata = {
@@ -21,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} font-sans`}>
+      <body className={`${lora.variable} ${manrope.variable}`}>
         <CartProvider>
           {children}
         </CartProvider>
