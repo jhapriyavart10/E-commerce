@@ -36,6 +36,7 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [sortBy, setBy] = useState<string>('Default Sorting');
   
   const [filters, setFilters] = useState<Filters>({
     price: { min: 0, max: 150 },
@@ -110,6 +111,23 @@ export default function ShopPage() {
     return true;
   });
 
+  const sortedProducts = useMemo(() => {
+  const items = [...filteredProducts]; // Create a copy to avoid mutating state
+  
+  switch (sortBy) {
+    case 'Price: Low to High':
+      return items.sort((a, b) => a.price - b.price);
+    case 'Price: High to Low':
+      return items.sort((a, b) => b.price - a.price);
+    case 'Price: A to Z':
+      return items.sort((a, b) => a.title.localeCompare(b.title));
+    case 'Price: Z to A':
+      return items.sort((a, b) => b.title.localeCompare(a.title));
+    default:
+      return items; // 'Default Sorting'
+  }
+}, [filteredProducts, sortBy]);
+
   if (loading) return (
     <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center font-lora text-xl">
       Loading Collection...
@@ -161,9 +179,18 @@ export default function ShopPage() {
             <h2 className="text-xl font-bold border-b border-[#280F0B33] pb-1 flex items-end tracking-[0px]">Filters</h2>
             <div className="flex justify-between items-end border-b border-[#280F0B33] pb-1">
               <p className="text-sm opacity-70 leading-none">{filteredProducts.length} Products</p>
-              <select className="bg-transparent border-none font-semibold cursor-pointer outline-none text-sm leading-none">
+              <select 
+                value={sortBy}
+                onChange={(e) => setBy(e.target.value)}
+                className="bg-transparent border-none font-semibold cursor-pointer outline-none text-sm leading-none"
+              >
                 <option>Default Sorting</option>
                 <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Name: A to Z</option>
+                <option>Name: Z to A</option>
+                <option>Best selling</option>
+                <option>Featured</option>
               </select>
             </div>
           </div>
@@ -187,9 +214,18 @@ export default function ShopPage() {
                 {showMobileFilters ? (
                   <button onClick={() => setShowMobileFilters(false)} className="text-3xl font-light leading-none">×</button>
                 ) : (
-                  <select className="bg-transparent border-none font-semibold cursor-pointer outline-none text-xs">
+                  <select 
+                    value={sortBy}
+                    onChange={(e) => setBy(e.target.value)}
+                    className="bg-transparent border-none font-semibold cursor-pointer outline-none text-xs"
+                  >
                     <option>Default Sorting</option>
                     <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Name: A to Z</option>
+                    <option>Name: Z to A</option>
+                    <option>Best selling</option>
+                    <option>Featured</option>
                   </select>
                 )}
               </div>
@@ -225,7 +261,7 @@ export default function ShopPage() {
                   <div key={section.id} className="border-t border-[#280F0B33] pt-3 mt-5">
                     <button onClick={() => toggleSection(section.id)} className="w-full flex justify-between items-center text-[12px] font-bold uppercase tracking-wider mb-2">
                       {section.label}
-                      <Image src="/assets/images/dropdown.svg" alt="" width={10} height={10} className={openSections[section.id] ? 'rotate-180' : ''} />
+                      <Image src="/assets/images/dropdown.svg" alt="" width={24} height={24} className={openSections[section.id] ? 'rotate-180' : ''} />
                     </button>
                     {openSections[section.id] && (
                       <div className="space-y-2 pb-1">
@@ -244,7 +280,7 @@ export default function ShopPage() {
 
             <section className="flex-1 w-full lg:pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-10">
-                {filteredProducts.map((p) => (
+                {sortedProducts.map((p) => (
                   <div key={p.id} className="group cursor-pointer">
                     <Link href={`/product/${p.handle}`}>
                       <div className="aspect-[306/316] relative bg-[#F2EFEA] mb-4 overflow-hidden">
@@ -252,7 +288,7 @@ export default function ShopPage() {
                       </div>
                     </Link>
                     <Link href={`/product/${p.handle}`}>
-                      <h4 className="text-[14px] font-semibold mb-1 group-hover:underline truncate">{p.title}</h4>
+                      <h4 className="text-[14px] font-semibold mb-1 group-hover: truncate">{p.title}</h4>
                     </Link>
                     <div className="relative h-8 overflow-hidden group/btn flex items-center">
                         {/* Price - Moves UP and fades out on hover */}

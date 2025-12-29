@@ -5,7 +5,7 @@ const Subscriptions = () => {
     <div className="flex flex-col items-center text-center py-12 animate-in fade-in duration-500">
       <h2 className="text-3xl font-serif text-[#3D1F16] mb-2">Subscriptions</h2>
       <p className="text-[#3D1F16]/70 mb-8">You don't have any active subscriptions.</p>
-      <button className="border border-[#3D1F16] text-[#3D1F16] px-10 py-4 rounded-sm font-medium tracking-widest hover:bg-[#3D1F16] hover:text-[#F2D7AD] transition-all uppercase text-sm">
+      <button className="border border-[#3D1F16] text-[#3D1F16] px-10 py-4 rounded-sm font-medium tracking-widest hover:bg-[#3D1F16] hover:text-[#F2D7AD] transition-all uppercase text-sm w-full md:w-[349px]">
         Browse Plans
       </button>
     </div>

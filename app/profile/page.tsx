@@ -44,19 +44,19 @@ export default function AccountPage() {
           <div className="flex flex-col md:flex-row gap-12 lg:gap-24">
             {/* Sidebar Navigation */}
             <nav className="flex flex-col gap-6 min-w-[200px] border-b border-[#3D1F16]/10 pb-8 md:border-none md:pb-0">
-              {SECTIONS.map((section) => (
+            {SECTIONS.map((section) => (
                 <button
-                  key={section.id}
-                  onClick={() => setActiveTab(section.id as AccountSection)}
-                  className={`text-left text-xl transition-all duration-300 ${
+                key={section.id}
+                onClick={() => setActiveTab(section.id as AccountSection)}
+                className={`text-left text-xl transition-all duration-300 ease-out ${
                     activeTab === section.id
-                      ? 'text-[#280F0B] font-medium md:translate-x-2'
-                      : 'text-[#280F0B]/40 hover:text-[#280F0B]/70'
-                  }`}
+                    ? 'text-[#280F0B] font-semibold scale-105 origin-left' // Removed translate-x, added scale
+                    : 'text-[#280F0B]/40 hover:text-[#280F0B]/70 hover:scale-105 origin-left'
+                }`}
                 >
-                  {section.label}
+                {section.label}
                 </button>
-              ))}
+            ))}
             </nav>
 
             {/* Dynamic Content Area */}

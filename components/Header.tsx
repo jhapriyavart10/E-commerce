@@ -108,9 +108,9 @@ export default function Header() {
             {/* Desktop Layout */}
             <div className="hidden lg:block">
               <nav className="absolute left-[72px] top-[50px] flex items-center gap-[50px]">
-                <Link href="/shop" className="hover:text-gray-300 transition-colors text-base">Shop</Link>
+                <Link href="/product-analogue" className="hover:text-gray-300 transition-colors text-base">Shop</Link>
                 <Link href="/plans" className="hover:text-gray-300 transition-colors text-base">Plans</Link>
-                <Link href="/raw-earth-logo" className="hover:text-gray-300 transition-colors text-base">Raw Earth Logo</Link>
+                <Link href="/raw-earth-logo" className="hover:text-gray-300 transition-colors text-base">Raw Earth Dojo</Link>
                 <Link href="/about" className="hover:text-gray-300 transition-colors text-base">About</Link>
               </nav>
 

@@ -20,7 +20,7 @@ const OrdersContent = () => {
         You don't have any orders yet.
       </h2>
 
-      <button className="group flex items-center gap-2 bg-[#7F3E2F] text-[#FCF3E5] px-8 py-3 rounded-sm font-medium tracking-widest hover:bg-[#6D3A2D] transition-colors uppercase text-sm">
+      <button className="flex items-center justify-center gap-3 bg-[#7F3E2F] text-[#FCF3E5] px-10 py-4 rounded-sm font-medium tracking-widest hover:bg-[#6D3A2D] transition-colors uppercase text-sm w-full md:w-[349px]">
         Start Shopping
         <span className="group-hover:translate-x-1 transition-transform">→</span>
       </button>

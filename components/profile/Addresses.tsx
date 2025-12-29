@@ -14,13 +14,13 @@ const Addresses = () => {
       </p>
 
       {/* Add Address Button with Home Icon */}
-      <button className="flex items-center justify-center gap-3 bg-[#7F3E2F] text-[#FCF3E5] px-10 py-4 rounded-sm font-medium tracking-widest hover:bg-[#6D3A2D] transition-colors uppercase text-sm w-full md:w-auto">
+      <button className="flex items-center justify-center gap-3 bg-[#7F3E2F] text-[#FCF3E5] px-10 py-4 rounded-sm font-medium tracking-widest hover:bg-[#6D3A2D] transition-colors uppercase text-sm w-full md:w-[349px]">
         <Image 
             src="/assets/images/home.svg" 
             alt="Home Icon"
-            width={16} 
-            height={16}
-            className="w-4 h-4 brightness-0 invert" // Ensures the SVG appears white/cream to match the text
+            width={24} 
+            height={24}
+            className="w-5 h-5 brightness-0 invert" // Ensures the SVG appears white/cream to match the text
         />
         Add an Address
       </button>
