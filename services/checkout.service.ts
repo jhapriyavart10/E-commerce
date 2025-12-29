@@ -1,39 +1,122 @@
-import { shopifyFetch } from '@/lib/shopify';
+import { NextResponse } from 'next/server';
 
-export const CheckoutService = {
-  /**
-   * Generates a secure Shopify-hosted checkout URL for a specific cart.
-   * @param cartId - The full Shopify GID (e.g., 'gid://shopify/Cart/...')
-   */
-  async getCheckoutUrl(cartId: string): Promise<string> {
-    const query = `
+const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN!;
+const SHOPIFY_STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_TOKEN!;
+const SHOPIFY_API_VERSION = '2024-04';
+
+const SHOPIFY_ENDPOINT = `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
+
+async function shopifyFetch(query: string, variables: any) {
+  const res = await fetch(SHOPIFY_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN,
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  const json = await res.json();
+
+  if (json.errors) {
+    throw new Error(json.errors[0].message);
+  }
+
+  return json.data;
+}
+
+export async function POST(req: Request) {
+  try {
+    const { cartId } = await req.json();
+
+    if (!cartId) {
+      return NextResponse.json(
+        { error: 'cartId is required' },
+        { status: 400 }
+      );
+    }
+
+    /* -----------------------------
+       1. FETCH CART LINE ITEMS
+    ------------------------------*/
+    const cartQuery = `
       query getCart($id: ID!) {
         cart(id: $id) {
-          checkoutUrl
+          lines(first: 50) {
+            edges {
+              node {
+                quantity
+                merchandise {
+                  ... on ProductVariant {
+                    id
+                  }
+                }
+              }
+            }
+          }
         }
       }
     `;
 
-    try {
-      const res = await shopifyFetch<any>({ 
-        query, 
-        variables: { id: cartId }, 
-        cache: 'no-store' 
-      });
+    const cartData = await shopifyFetch(cartQuery, { id: cartId });
 
-      // Safety check: Ensure the response body and data exist
-      const checkoutUrl = res.body?.data?.cart?.checkoutUrl;
+    const lines = cartData?.cart?.lines?.edges;
 
-      if (!checkoutUrl) {
-        console.warn(`No checkout URL found for Cart ID: ${cartId}. The cart may have expired.`);
-        return '';
-      }
-
-      return checkoutUrl;
-    } catch (error) {
-      console.error("Error in CheckoutService.getCheckoutUrl:", error);
-      // Return empty string to allow the API route to handle the 404/500 response
-      return '';
+    if (!lines || lines.length === 0) {
+      return NextResponse.json(
+        { error: 'Cart is empty or invalid' },
+        { status: 400 }
+      );
     }
+
+    const lineItems = lines.map((edge: any) => ({
+      variantId: edge.node.merchandise.id,
+      quantity: edge.node.quantity,
+    }));
+
+    /* -----------------------------
+       2. CREATE CHECKOUT
+    ------------------------------*/
+    const checkoutMutation = `
+      mutation checkoutCreate($input: CheckoutCreateInput!) {
+        checkoutCreate(input: $input) {
+          checkout {
+            webUrl
+          }
+          checkoutUserErrors {
+            message
+          }
+        }
+      }
+    `;
+
+    const checkoutData = await shopifyFetch(checkoutMutation, {
+      input: {
+        lineItems,
+      },
+    });
+
+    const checkout = checkoutData.checkoutCreate.checkout;
+    const errors = checkoutData.checkoutCreate.checkoutUserErrors;
+
+    if (errors && errors.length > 0) {
+      throw new Error(errors[0].message);
+    }
+
+    if (!checkout?.webUrl) {
+      throw new Error('Checkout URL not returned by Shopify');
+    }
+
+    /* -----------------------------
+       3. RETURN CHECKOUT URL
+    ------------------------------*/
+    return NextResponse.json({ url: checkout.webUrl });
+
+  } catch (error: any) {
+    console.error('Checkout API Error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Checkout failed' },
+      { status: 500 }
+    );
   }
-};
+}

@@ -19,6 +19,17 @@ const svgPathsDesktop = {
   p1553ba00: "M8 7.25C7.58579 7.25 7.25 7.58579 7.25 8C7.25 8.41421 7.58579 8.75 8 8.75V8V7.25ZM25.5303 8.53033C25.8232 8.23744 25.8232 7.76256 25.5303 7.46967L20.7574 2.6967C20.4645 2.40381 19.9896 2.40381 19.6967 2.6967C19.4038 2.98959 19.4038 3.46447 19.6967 3.75736L23.9393 8L19.6967 12.2426C19.4038 12.5355 19.4038 13.0104 19.6967 13.3033C19.9896 13.5962 20.4645 13.5962 20.7574 13.3033L25.5303 8.53033ZM8 8V8.75H25V8V7.25H8V8Z",
 };
 
+// Type for tracking which fields have errors
+type FormErrors = {
+  firstName?: boolean;
+  lastName?: boolean;
+  email?: boolean;
+  streetAddress?: boolean;
+  townCity?: boolean;
+  pincode?: boolean;
+  state?: boolean;
+};
+
 export default function CheckoutPage() {
   const { cartItems, cartId, getTotalItems } = useCart();
   
@@ -28,6 +39,9 @@ export default function CheckoutPage() {
   const [countrySearch, setCountrySearch] = useState('');
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Error state for validation
+  const [errors, setErrors] = useState<FormErrors>({});
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -43,13 +57,11 @@ export default function CheckoutPage() {
     orderNotes: ''
   });
 
-  // 1. HYDRATION GUARD: Prevents the page from acting on "empty" state 
-  // until localStorage has been read by the Context.
   useEffect(() => {
     setIsHydrated(true);
   }, []);
 
-  // 2. Calculations
+  // Calculations
   const subtotal = useMemo(() => 
     cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
   , [cartItems]);
@@ -69,10 +81,32 @@ export default function CheckoutPage() {
     setCountrySearch('');
   };
 
-  // 3. SECURE REDIRECT LOGIC
+  // Validation Logic: Issues warning for everything except phone and country
+  const validateForm = () => {
+    const newErrors: FormErrors = {};
+    
+    if (!formData.firstName.trim()) newErrors.firstName = true;
+    if (!formData.lastName.trim()) newErrors.lastName = true;
+    if (!formData.email.trim() || !formData.email.includes('@')) newErrors.email = true;
+    if (!formData.streetAddress.trim()) newErrors.streetAddress = true;
+    if (!formData.townCity.trim()) newErrors.townCity = true;
+    if (!formData.pincode.trim()) newErrors.pincode = true;
+    if (!formData.state) newErrors.state = true;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Secure Redirect Logic
   const handlePaymentClick = async () => {
-    // Only proceed if hydrated and cart is valid
     if (!isHydrated) return;
+
+    // Trigger validation
+    if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     if (!cartId || cartItems.length === 0) {
       alert("Your cart is empty. Please add items before checking out.");
       return;
@@ -84,26 +118,25 @@ export default function CheckoutPage() {
       const response = await fetch('/api/shopify/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cartId }),
+        body: JSON.stringify({ cartId, customerDetails: formData }),
       });
 
       const data = await response.json();
 
       if (data.url) {
-        // Use replace to prevent "back button" loops if necessary
         window.location.href = data.url;
       } else {
         throw new Error("Checkout URL missing");
       }
     } catch (err) {
-      console.error("Payment Redirect Error:", err);
-      alert("Failed to reach payment gateway. Please check your connection.");
-    } finally {
+      console.error("Payment Redirect Error:", err); 
+      alert(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } 
+    finally {
       setIsProcessing(false);
     }
   };
 
-  // Handle Loading/Hydration State
   if (!isHydrated) {
     return (
       <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center font-lora text-xl">
@@ -112,7 +145,6 @@ export default function CheckoutPage() {
     );
   }
 
-  // Handle Empty Cart State (after hydration)
   if (cartItems.length === 0) {
     return (
       <div className="bg-[#F6D8AB] min-h-screen flex flex-col items-center justify-center p-10 text-center">
@@ -163,10 +195,34 @@ export default function CheckoutPage() {
               <div>
                 <h3 className="text-lg font-bold mb-4 tracking-wider uppercase">Contact</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input type="text" placeholder="First name" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B]" />
-                  <input type="text" placeholder="Last name" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B]" />
-                  <input type="email" placeholder="Email Address" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B]" />
-                  <input type="tel" placeholder="Phone (optional)" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B]" />
+                  <input 
+                    type="text" 
+                    placeholder={errors.firstName ? "First Name Required *" : "First name"} 
+                    value={formData.firstName}
+                    onChange={(e) => { setFormData({...formData, firstName: e.target.value}); if(errors.firstName) setErrors({...errors, firstName: false}); }}
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.firstName ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B]'}`} 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder={errors.lastName ? "Last Name Required *" : "Last name"} 
+                    value={formData.lastName}
+                    onChange={(e) => { setFormData({...formData, lastName: e.target.value}); if(errors.lastName) setErrors({...errors, lastName: false}); }}
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.lastName ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B]'}`} 
+                  />
+                  <input 
+                    type="email" 
+                    placeholder={errors.email ? "Valid Email Required *" : "Email Address"} 
+                    value={formData.email}
+                    onChange={(e) => { setFormData({...formData, email: e.target.value}); if(errors.email) setErrors({...errors, email: false}); }}
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors md:col-span-2 ${errors.email ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B]'}`} 
+                  />
+                  <input 
+                    type="tel" 
+                    placeholder="Phone (optional)" 
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B] md:col-span-2" 
+                  />
                 </div>
               </div>
 
@@ -190,15 +246,40 @@ export default function CheckoutPage() {
                       </div>
                     )}
                   </div>
-                  <input type="text" placeholder="Street Address" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none" />
+                  <input 
+                    type="text" 
+                    placeholder={errors.streetAddress ? "Street Address Required *" : "Street Address"} 
+                    value={formData.streetAddress}
+                    onChange={(e) => { setFormData({...formData, streetAddress: e.target.value}); if(errors.streetAddress) setErrors({...errors, streetAddress: false}); }}
+                    className={`w-full bg-transparent border p-4 outline-none ${errors.streetAddress ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66]'}`} 
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" placeholder="Town/City" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none" />
-                    <input type="text" placeholder="Pincode" className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none" />
+                    <input 
+                      type="text" 
+                      placeholder={errors.townCity ? "City Required *" : "Town/City"} 
+                      value={formData.townCity}
+                      onChange={(e) => { setFormData({...formData, townCity: e.target.value}); if(errors.townCity) setErrors({...errors, townCity: false}); }}
+                      className={`w-full bg-transparent border p-4 outline-none ${errors.townCity ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66]'}`} 
+                    />
+                    <input 
+                      type="text" 
+                      placeholder={errors.pincode ? "Pincode Required *" : "Pincode"} 
+                      value={formData.pincode}
+                      onChange={(e) => { setFormData({...formData, pincode: e.target.value}); if(errors.pincode) setErrors({...errors, pincode: false}); }}
+                      className={`w-full bg-transparent border p-4 outline-none ${errors.pincode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66]'}`} 
+                    />
                   </div>
-                  <select value={formData.state} onChange={(e) => setFormData({...formData, state: e.target.value})} className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none appearance-none cursor-pointer">
-                    <option value="" disabled>Select State/Province</option>
-                    {COUNTRY_DATA[formData.country]?.map(state => <option key={state} value={state}>{state}</option>)}
-                  </select>
+                  <div className="relative">
+                    <select 
+                      value={formData.state} 
+                      onChange={(e) => { setFormData({...formData, state: e.target.value}); if(errors.state) setErrors({...errors, state: false}); }} 
+                      className={`w-full bg-transparent border p-4 outline-none appearance-none cursor-pointer ${errors.state ? 'border-red-600 text-red-600' : 'border-[#280F0B66]'}`}
+                    >
+                      <option value="" disabled>Select State/Province</option>
+                      {COUNTRY_DATA[formData.country]?.map(state => <option key={state} value={state} className="text-black">{state}</option>)}
+                    </select>
+                    {errors.state && <p className="text-red-600 text-xs mt-1 font-bold">Please select a state</p>}
+                  </div>
                 </div>
               </div>
             </section>

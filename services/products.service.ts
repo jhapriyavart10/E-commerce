@@ -37,17 +37,17 @@ export async function getProducts() {
       const imageNode = product.images?.edges?.[0]?.node;
 
       return {
-        // Use variant ID if available, otherwise fallback to product ID
         id: variantNode?.id || product.id,
         title: product.title,
         handle: product.handle,
         price: parseFloat(variantNode?.price?.amount || "0"),
         image: imageNode?.url || '/assets/images/necklace-img.png',
         images: product.images?.edges?.map((e: any) => e.node.url) || [],
-        // Add default fields for your frontend filters
         category: product.productType || 'Jewellery',
-        gender: 'Unisex',
-        material: 'Gold'
+        //gender: product.gender || 'Unisex',
+        gender: product.metafield?.value || 'Unisex',
+        material: product.metafield?.value || 'Gold'
+
       };
     });
   } catch (err) {

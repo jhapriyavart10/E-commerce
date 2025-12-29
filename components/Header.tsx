@@ -26,11 +26,11 @@ export default function Header() {
     if (!showBanner || paused) return;
 
     const interval = setInterval(() => {
-      setAnimate(true); // Start fade out
+      setAnimate(true); 
       setTimeout(() => {
         setMessageIndex((prev) => (prev + 1) % BANNER_MESSAGES.length);
         setNextIndex((prev) => (prev + 2) % BANNER_MESSAGES.length);
-        setAnimate(false); // Start fade in
+        setAnimate(false); 
       }, 500);
     }, 5000);
 
@@ -64,8 +64,6 @@ export default function Header() {
             ✕
           </button>
         </div>
-
-        
       )}
 
       {/* Main Header */}
@@ -73,7 +71,7 @@ export default function Header() {
         <div className="w-full max-w-[1440px] mx-auto h-full relative">
           <div className="h-full px-4 sm:px-6 lg:px-0 lg:block">
             
-            {/* Mobile Layout - Kept Logo on Left */}
+            {/* Mobile Layout */}
             <div className="flex items-center justify-between h-full lg:hidden">
               <Link href="/" className="flex items-center">
                 <Image 
@@ -87,6 +85,13 @@ export default function Header() {
               </Link>
               
               <div className="flex items-center gap-4">
+                {/* Mobile Profile Link */}
+                <Link href="/profile" className="hover:text-gray-300 transition-colors" aria-label="Account">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </Link>
+
                 <Link href="/cart" className="hover:text-gray-300 transition-colors relative" aria-label="Cart">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -97,19 +102,14 @@ export default function Header() {
                     </span>
                   )}
                 </Link>
-                <button className="hover:text-gray-300 transition-colors" aria-label="Menu">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
               </div>
             </div>
 
-            {/* Desktop Layout - Kept as provided */}
+            {/* Desktop Layout */}
             <div className="hidden lg:block">
               <nav className="absolute left-[72px] top-[50px] flex items-center gap-[50px]">
                 <Link href="/shop" className="hover:text-gray-300 transition-colors text-base">Shop</Link>
-                <Link href="/plants" className="hover:text-gray-300 transition-colors text-base">Plants</Link>
+                <Link href="/plans" className="hover:text-gray-300 transition-colors text-base">Plans</Link>
                 <Link href="/raw-earth-logo" className="hover:text-gray-300 transition-colors text-base">Raw Earth Logo</Link>
                 <Link href="/about" className="hover:text-gray-300 transition-colors text-base">About</Link>
               </nav>
@@ -133,11 +133,14 @@ export default function Header() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                <button className="hover:text-gray-300 transition-colors" aria-label="Account">
+
+                {/* CHANGED: Wrapped Account icon in a Link to /profile */}
+                <Link href="/profile" className="hover:text-gray-300 transition-colors" aria-label="Account">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                </button>
+                </Link>
+
                 <Link href="/cart" className="hover:text-gray-300 transition-colors relative" aria-label="Cart">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
