@@ -14,7 +14,7 @@ export default function Footer() {
             <h2 className="text-4xl lg:text-5xl font-lora leading-tight mb-6">
               Your <span className="italic">spiritual journey</span> <br /> begins here.
             </h2>
-            <p className="text-sm opacity-80 max-w-sm mb-8 font-manrope">
+            <p className="text-sm text-white opacity-60 max-w-sm mb-8 font-manrope">
               Healing Bracelets from the house of Raw Earth Crystals. Every bracelet tells a beautiful story.
             </p>
             
@@ -71,7 +71,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-[11px] opacity-60 font-manrope tracking-wide uppercase text-center lg:text-left">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-[13px] text-white opacity-60 font-manrope tracking-wide uppercase text-center lg:text-left">
           <p>© {new Date().getFullYear()} Raw Earth Crystals All rights reserved.</p>
           <p>Designed & Developed by Dtory Studio</p>
         </div>
