@@ -20,35 +20,35 @@ function resolveMetaobjectValue(metafield: any, fallback: string): string {
  * Resolves gender and maps it to the frontend sidebar labels
  */
 function resolveGender(product: any): string {
-  const rawValue = product.gender?.value;
-  if (!rawValue) return 'Unisex';
+  // Access the first node in the references list
+  const genderNode = product.gender?.references?.edges?.[0]?.node;
+  
+  if (!genderNode) return 'Unisex';
 
-  try {
-    const parsed = JSON.parse(rawValue);
-    const handle = Array.isArray(parsed) ? parsed[0] : parsed;
+  // 1. Try to get the Display Name (Label) directly: "For Him"
+  const label = genderNode.field?.value;
+  if (label) return label;
 
-    // Mapping handles from client image to your sidebar labels
-    const genderMap: Record<string, string> = {
-      'male': 'For Him',
-      'female': 'For Her',
-      'unisex': 'Unisex'
-    };
+  // 2. Fallback: Map the handle if the label field query failed
+  const handle = genderNode.handle?.toLowerCase();
+  const genderMap: Record<string, string> = {
+    male: 'For Him',
+    female: 'For Her',
+    unisex: 'Unisex',
+  };
 
-    return genderMap[handle.toLowerCase()] || 'Unisex';
-  } catch (e) {
-    return 'Unisex';
-  }
+  return genderMap[handle] || 'Unisex';
 }
+
 function resolveMaterial(product: any): string {
-  // Access the first reference in the list
-  const firstRef = product.material?.references?.edges?.[0]?.node;
-  if (!firstRef) return 'Pink Shell';
+  const node = product.material?.references?.edges?.[0]?.node;
+  
+  if (!node) return 'Missing Material'; // DON'T default to 'Pink Shell'
 
-  const nameField = firstRef.fields?.find((f: any) => 
-    f.key === 'name' || f.key === 'label'
-  );
-
-  return nameField?.value || 'Pink Shell';
+  // Standard Shopify fields usually use 'label' for the display name
+  const displayValue = node.field?.value; 
+  
+  return displayValue || 'Missing Material';
 }
 
 export async function getProducts() {

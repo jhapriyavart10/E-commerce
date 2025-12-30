@@ -7,7 +7,7 @@ export const getProductQuery = `
       productType
       descriptionHtml
       
-      gender: metafield(namespace: "shopify", key: "target_gender") {
+      gender: metafield(namespace: "shopify", key: "target-gender") {
         reference {
           ... on Metaobject {
             fields {
@@ -63,18 +63,13 @@ export const getProductsQuery = `
           productType
           
           # 1. Gender check
-          gender: metafield(namespace: "shopify", key: "Target_gender") {
-            value
-          }
-
-          # 2. Material check (using references plural because it's a list)
-          material: metafield(namespace: "shopify", key: "jewelry-material") {
-            references(first: 5) {
+          gender: metafield(namespace: "shopify", key: "target-gender") {
+            references(first: 1) {
               edges {
                 node {
                   ... on Metaobject {
-                    fields {
-                      key
+                    handle
+                    field(key: "label") { # Directly get the 'For Him' label
                       value
                     }
                   }
@@ -82,6 +77,19 @@ export const getProductsQuery = `
               }
             }
           }
+
+          # 2. Material check (using references plural because it's a list)
+         material: metafield(namespace: "shopify", key: "jewelry-material") {
+          references(first: 1) {
+            edges {
+              node {
+                ... on Metaobject {
+                  field(key: "label") { value } # Or key: "name"
+                }
+              }
+            }
+          }
+        }
 
           images(first: 1) {
             edges { node { url } }

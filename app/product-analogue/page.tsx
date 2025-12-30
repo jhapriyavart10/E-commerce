@@ -103,6 +103,26 @@ export default function ShopPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  // Inside ShopPage component, above filteredProducts
+const dynamicMaterials = useMemo(() => {
+  const counts: Record<string, number> = {};
+  
+  // Count occurrences of each material
+  safeProducts.forEach(p => {
+    if (p.material) {
+      counts[p.material] = (counts[p.material] || 0) + 1;
+    }
+  });
+
+  // Convert to array, sort by count (descending), then alphabetically if counts are equal
+  return Object.entries(counts)
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1]; // Higher count first
+      return a[0].localeCompare(b[0]);       // Alphabetical fallback
+    })
+    .map(([name]) => name);
+}, [safeProducts]);
+
   const filteredProducts = safeProducts.filter((p) => {
     if (p.price < filters.price.min || p.price > filters.price.max) return false;
     if (filters.category.length && !filters.category.includes(p.category)) return false;
@@ -258,7 +278,7 @@ export default function ShopPage() {
                 {[
                   { id: 'category' as const, label: 'Product category', options: ['Bracelets', 'Charms & Pendants'] },
                   { id: 'gender' as const, label: 'Gender', options: ['For Her', 'For Him', 'Unisex'] },
-                  { id: 'material' as const, label: 'Jewellery Material', options: MATERIAL_OPTIONS },
+                  { id: 'material' as const, label: 'Jewellery Material', options: dynamicMaterials },
                 ].map((section) => (
                   <div key={section.id} className="border-t border-[#280F0B33] pt-3 mt-5">
                     <button onClick={() => toggleSection(section.id)} className="w-full flex justify-between items-center text-[12px] font-bold uppercase tracking-wider mb-2">
