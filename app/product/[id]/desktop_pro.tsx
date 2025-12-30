@@ -252,33 +252,42 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
         {/* SECTION 4 – RECOMMENDED FOR YOU (Dynamic Backend Data) */}
         <section className="pb-24 pt-4 px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[2500px] mx-auto">
-            <h2 className="text-2xl lg:text-[32px] font-bold mb-10 text-[#280F0B]">
-              Recommended for you
-            </h2>
-            
-            {isRecLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
-                {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[4/5] bg-gray-200" />)}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
-                {recommendedProducts.slice(0,4).map((item) => (
-                  <div key={item.id} className="group flex flex-col">
-                    <div className="relative aspect-[4/5] w-full bg-[#F2EFEA] overflow-hidden mb-4">
-                      <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/20 to-transparent">
-                    </div>
-                  </div>
+          <h2 className="text-2xl lg:text-[32px] font-bold mb-10 text-[#280F0B]">
+            Recommended for you
+          </h2>
+          
+          {isRecLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
+              {/* Changed aspect-ratio to square for skeleton loading */}
+              {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-gray-200" />)}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
+              {recommendedProducts.slice(0, 4).map((item) => (
+                <div key={item.id} className="group flex flex-col">
+                  {/* Changed aspect-[4/5] to aspect-square */}
+                  <div className="relative aspect-square w-full bg-[#F2EFEA] overflow-hidden mb-4 border border-gray-100">
+                    <Image 
+                      src={item.image} 
+                      alt={item.title} 
+                      fill 
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover object-center transition-transform duration-700 group-hover:scale-110" 
+                    />
                     
-                    <Link href={`/product/${item.handle}`} className="flex flex-col gap-1 cursor-pointer">
-                      <h3 className="text-sm lg:text-base font-semibold text-[#280F0B]  tracking-tight">
-                        {item.title}
-                      </h3>
-                    </Link>
+                    {/* Quick View or Overlay effect */}
+                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                ))}
-              </div>
-            )}
+                  
+                  <Link href={`/product/${item.handle}`} className="flex flex-col gap-1 cursor-pointer group/text">
+                    <h3 className="text-sm lg:text-base font-semibold text-[#280F0B] tracking-tight group-hover/text: decoration-1 underline-offset-4">
+                      {item.title}
+                    </h3>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </>
