@@ -57,13 +57,13 @@ export default function Footer() {
         </div>
 
         {/* REFINED Massive Logo Text */}
-        <div className="w-full  pt-2 lg:pt-4 mb-10">
+        <div className="w-full pt-2 lg:pt-4 mb-10 container-type-inline-size">
           <h1
-            className="font-bold leading-none tracking-tighter text-[#F6D8AB] text-center select-none uppercase
-                      whitespace-normal lg:whitespace-nowrap break-words"
+            className="font-bold leading-none text-[#F6D8AB] text-center select-none uppercase
+                      whitespace-normal lg:whitespace-nowrap"
             style={{
-              fontSize: 'clamp(2.5rem, 9vw, 11rem)',
-              letterSpacing: '-0.04em',
+              fontSize: 'clamp(2.5rem, 8.5cqw, 10.5rem)',
+              letterSpacing: '-0.035em',
             }}
           >
             Raw Earth Crystals
