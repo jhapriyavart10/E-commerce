@@ -8,11 +8,17 @@ export async function GET(req: Request) {
   try {
     if (handle) {
       const product = await getProduct(handle);
+      console.log('API → single product response:\n',
+        JSON.stringify(product, null, 2)
+      );
       if (!product) return NextResponse.json({ error: 'Not Found' }, { status: 404 });
       return NextResponse.json(product);
     }
 
     const products = await getProducts();
+    console.log('API → first product in list:\n',
+      JSON.stringify(products?.[0], null, 2)
+    );
     // Verification: ensure we always return an array to the frontend
     return NextResponse.json(Array.isArray(products) ? products : []);
   } catch (error) {

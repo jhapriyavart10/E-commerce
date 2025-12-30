@@ -99,7 +99,9 @@ export default function Header() {
             <nav className="hidden lg:flex items-center gap-[50px] absolute left-[72px] top-[50px]">
               <Link href="/product-analogue" className="hover:text-gray-300 transition-colors text-base">Shop</Link>
               <Link href="/plans" className="hover:text-gray-300 transition-colors text-base">Plans</Link>
-              <Link href="/raw-earth-logo" className="hover:text-gray-300 transition-colors text-base">Raw Earth Dojo</Link>
+              <Link href="https://azure-takeaways-956863.framer.app/blogs" className="flex items-center text-base transition-colors hover:text-gray-300">
+                Raw Earth Dojo
+              </Link>
               <Link href="/about" className="hover:text-gray-300 transition-colors text-base">About</Link>
             </nav>
 

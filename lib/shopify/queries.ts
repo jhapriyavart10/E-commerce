@@ -6,11 +6,10 @@ export const getProductQuery = `
       handle
       productType
       descriptionHtml
-
-      gender: metafield(namespace: "custom", key: "target_gender") {
+      
+      gender: metafield(namespace: "shopify", key: "target_gender") {
         reference {
           ... on Metaobject {
-            handle
             fields {
               key
               value
@@ -22,7 +21,6 @@ export const getProductQuery = `
       material: metafield(namespace: "shopify", key: "jewelry-material") {
         reference {
           ... on Metaobject {
-            handle
             fields {
               key
               value
@@ -63,48 +61,33 @@ export const getProductsQuery = `
           handle
           title
           productType
-
-          gender: metafield(namespace: "custom", key: "target_gender") {
-            reference {
-              ... on Metaobject {
-                handle
-                fields {
-                  key
-                  value
-                }
-              }
-            }
+          
+          # 1. Gender check
+          gender: metafield(namespace: "shopify", key: "Target_gender") {
+            value
           }
 
+          # 2. Material check (using references plural because it's a list)
           material: metafield(namespace: "shopify", key: "jewelry-material") {
-            reference {
-              ... on Metaobject {
-                handle
-                fields {
-                  key
-                  value
+            references(first: 5) {
+              edges {
+                node {
+                  ... on Metaobject {
+                    fields {
+                      key
+                      value
+                    }
+                  }
                 }
               }
             }
           }
 
           images(first: 1) {
-            edges {
-              node {
-                url
-              }
-            }
+            edges { node { url } }
           }
-
           variants(first: 1) {
-            edges {
-              node {
-                id
-                price {
-                  amount
-                }
-              }
-            }
+            edges { node { id price { amount } } }
           }
         }
       }

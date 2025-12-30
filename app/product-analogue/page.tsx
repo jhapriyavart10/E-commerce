@@ -112,19 +112,21 @@ export default function ShopPage() {
   });
 
   const sortedProducts = useMemo(() => {
-  const items = [...filteredProducts]; // Create a copy to avoid mutating state
+  const items = [...filteredProducts]; 
   
   switch (sortBy) {
     case 'Price: Low to High':
       return items.sort((a, b) => a.price - b.price);
     case 'Price: High to Low':
       return items.sort((a, b) => b.price - a.price);
-    case 'Price: A to Z':
+    // FIXED: Changed 'Price: A to Z' to 'Name: A to Z' to match your <option>
+    case 'Name: A to Z': 
       return items.sort((a, b) => a.title.localeCompare(b.title));
-    case 'Price: Z to A':
+    // FIXED: Changed 'Price: Z to A' to 'Name: Z to A' to match your <option>
+    case 'Name: Z to A':
       return items.sort((a, b) => b.title.localeCompare(a.title));
     default:
-      return items; // 'Default Sorting'
+      return items; 
   }
 }, [filteredProducts, sortBy]);
 

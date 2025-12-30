@@ -2,37 +2,55 @@ import { shopifyFetch } from '@/lib/shopify';
 import { getProductQuery, getProductsQuery } from '@/lib/shopify/queries';
 
 /**
- * Utility: Resolve gender from metaobject reference
+ * Helper to extract display values from Metaobject fields
  */
-function resolveGender(product: any): string {
-  const genderRef = product.gender?.reference;
-  const handle = genderRef?.handle;
+function resolveMetaobjectValue(metafield: any, fallback: string): string {
+  const fields = metafield?.reference?.fields;
+  if (!fields || !Array.isArray(fields)) return fallback;
 
-  if (handle === 'male') return 'For Him';
-  if (handle === 'female') return 'For Her';
-
-  return 'Unisex';
-}
-
-/**
- * Utility: Resolve jewelry material from metaobject reference
- */
-function resolveMaterial(product: any): string {
-  const materialRef = product.material?.reference;
-
-  if (!materialRef) return 'Unknown';
-
-  // Prefer label field if client configured it
-  const labelField = materialRef.fields?.find(
-    (f: any) => f.key === 'label'
+  // Search for common keys used by Shopify to store the display name
+  const displayField = fields.find((f: any) => 
+    f.key === 'name' || f.key === 'label' || f.key === 'value' || f.key === 'display_name'
   );
 
-  return labelField?.value || materialRef.handle || 'Unknown';
+  return displayField?.value || fallback;
 }
 
 /**
- * Fetch all products for Catalogue
+ * Resolves gender and maps it to the frontend sidebar labels
  */
+function resolveGender(product: any): string {
+  const rawValue = product.gender?.value;
+  if (!rawValue) return 'Unisex';
+
+  try {
+    const parsed = JSON.parse(rawValue);
+    const handle = Array.isArray(parsed) ? parsed[0] : parsed;
+
+    // Mapping handles from client image to your sidebar labels
+    const genderMap: Record<string, string> = {
+      'male': 'For Him',
+      'female': 'For Her',
+      'unisex': 'Unisex'
+    };
+
+    return genderMap[handle.toLowerCase()] || 'Unisex';
+  } catch (e) {
+    return 'Unisex';
+  }
+}
+function resolveMaterial(product: any): string {
+  // Access the first reference in the list
+  const firstRef = product.material?.references?.edges?.[0]?.node;
+  if (!firstRef) return 'Pink Shell';
+
+  const nameField = firstRef.fields?.find((f: any) => 
+    f.key === 'name' || f.key === 'label'
+  );
+
+  return nameField?.value || 'Pink Shell';
+}
+
 export async function getProducts() {
   if (process.env.USE_MOCK_DATA === 'true') {
     return [
@@ -60,9 +78,12 @@ export async function getProducts() {
 
     return edges.map((edge: any) => {
       const product = edge.node;
-
       const variantNode = product.variants?.edges?.[0]?.node;
       const imageNode = product.images?.edges?.[0]?.node;
+      if (product.handle === 'spiral-crystal-pendants') {
+        console.log('--- DEBUGGING METAFIELDS ---');
+        console.log(JSON.stringify(product.debugMetafields, null, 2));
+      }
 
       return {
         id: variantNode?.id || product.id,
@@ -82,9 +103,6 @@ export async function getProducts() {
   }
 }
 
-/**
- * Fetch single product by handle
- */
 export async function getProduct(handle: string) {
   if (process.env.USE_MOCK_DATA === 'true') {
     return {
@@ -116,9 +134,7 @@ export async function getProduct(handle: string) {
       title: product.title,
       handle: product.handle,
       price: Number(variantNode?.price?.amount || 0),
-      image:
-        product.images?.edges?.[0]?.node?.url ||
-        '/assets/images/necklace-img.png',
+      image: product.images?.edges?.[0]?.node?.url || '/assets/images/necklace-img.png',
       description: product.descriptionHtml,
       category: product.productType || 'Jewellery',
       gender: resolveGender(product),
