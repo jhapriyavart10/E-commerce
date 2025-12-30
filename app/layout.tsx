@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
-import {Lora, Manrope } from 'next/font/google'
+import { Lora, Manrope } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from './context/CartContext'
+//import Header from '@/components/Header' // Adjust path based on your folder structure
+import Footer from '@/components/Footer' // Adjust path based on your folder structure
 
 const manrope = Manrope({ 
   subsets: ['latin'],
@@ -27,9 +29,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${lora.variable} ${manrope.variable}`}>
+      {/* 1. Added flex flex-col and min-h-screen to the body */}
+      <body className={`${lora.variable} ${manrope.variable} flex flex-col min-h-screen`}>
         <CartProvider>
-          {children}
+          {/* 2. Header added here appears on all pages */}
+          
+
+          {/* 3. flex-grow ensures this area takes up all available space, pushing footer down */}
+          <main className="flex-grow">
+            {children}
+          </main>
+
+          {/* 4. Footer added here appears on all pages */}
+          <Footer />
         </CartProvider>
       </body>
     </html>

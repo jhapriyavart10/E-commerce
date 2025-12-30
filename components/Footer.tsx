@@ -1,91 +1,81 @@
 import Link from 'next/link';
+import { Instagram, Twitter, Facebook } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#280F0B] text-white py-12 mt-auto">
-      <div className="max-w-[1280px] mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Raw Earth Crystals</h3>
-            <p className="text-sm text-gray-300">
-              Your trusted source for authentic crystals and minerals.
+    <footer className="bg-[#280F0B] text-[#F6D8AB] pt-16 pb-10 mt-auto px-4 sm:px-6 lg:px-12 overflow-hidden">
+      <div className="max-w-[1440px] mx-auto">
+        
+        {/* Main Content Grid */}
+        <div className="flex flex-col lg:flex-row lg:justify-between gap-12 lg:gap-8 mb-16 lg:mb-24">
+          
+          {/* Tagline & Socials */}
+          <div className="flex-1">
+            <h2 className="text-4xl lg:text-5xl font-lora leading-tight mb-6">
+              Your <span className="italic">spiritual journey</span> <br /> begins here.
+            </h2>
+            <p className="text-sm opacity-80 max-w-sm mb-8 font-manrope">
+              Healing Bracelets from the house of Raw Earth Crystals. Every bracelet tells a beautiful story.
             </p>
+            
+            <div className="flex gap-5">
+              <Link href="#" className="hover:opacity-70 transition-opacity"><Twitter size={20} /></Link>
+              <Link href="#" className="hover:opacity-70 transition-opacity"><Instagram size={20} /></Link>
+              <Link href="#" className="hover:opacity-70 transition-opacity"><Facebook size={20} /></Link>
+            </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/shop" className="text-gray-300 hover:text-white transition-colors">
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link href="/plants" className="text-gray-300 hover:text-white transition-colors">
-                  Plants
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="/product-analogue" className="text-gray-300 hover:text-white transition-colors">
-                  Product Catalogue
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Links Section */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 lg:gap-16">
+            <div className="flex flex-col">
+              <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-widest mb-4 font-manrope">Index</h3>
+              <ul className="space-y-2 text-[15px] font-manrope">
+                <li><Link href="/" className="hover:opacity-70">Home</Link></li>
+                <li><Link href="https://azure-takeaways-956863.framer.app/blogs" className="hover:opacity-70">Dojo</Link></li>
+                <li><Link href="/testimonials" className="hover:opacity-70">Testimonials</Link></li>
+                <li><Link href="/account" className="hover:opacity-70">User Account</Link></li>
+                <li><Link href="/shop" className="hover:opacity-70">Shop</Link></li>
+                <li><Link href="/faqs" className="hover:opacity-70">FAQs</Link></li>
+              </ul>
+            </div>
 
-          {/* Policies */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Policies</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/policies/refund" className="text-gray-300 hover:text-white transition-colors">
-                  Refund Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/shipping" className="text-gray-300 hover:text-white transition-colors">
-                  Shipping Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/privacy" className="text-gray-300 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/terms" className="text-gray-300 hover:text-white transition-colors">
-                  Terms of Service
-                </Link>
-              </li>
-            </ul>
-          </div>
+            <div className="flex flex-col ">
+              <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-widest mb-4 font-manrope">Legal</h3>
+              <ul className="space-y-2 text-[15px] font-manrope">
+                <li><Link href="/policies/privacy" className="hover:opacity-70">Privacy Policy</Link></li>
+                <li><Link href="/policies/terms" className="hover:opacity-70">Terms of service</Link></li>
+                <li><Link href="/policies/refund" className="hover:opacity-70">Refund policy</Link></li>
+                <li><Link href="/policies/shipping" className="hover:opacity-70">Shipping policy</Link></li>
+              </ul>
+            </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Contact</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li>Email: help@rawearthcrystals.com</li>
-              <li>Website: rawearthcrystals.com.au</li>
-              <li>
-                <Link href="/chatbot" className="text-gray-300 hover:text-white transition-colors">
-                  Customer Care
-                </Link>
-              </li>
-            </ul>
+            <div className="flex flex-col">
+              <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-widest mb-4 font-manrope">Contact</h3>
+              <p className="text-[15px] font-manrope">rawearth@crystals.com</p>
+            </div>
           </div>
+        </div>
+
+        {/* REFINED Massive Logo Text */}
+        <div className="w-full  pt-2 lg:pt-4 mb-10">
+          <h1
+            className="font-bold leading-none tracking-tighter text-[#F6D8AB] text-center select-none uppercase
+                      whitespace-normal lg:whitespace-nowrap break-words"
+            style={{
+              fontSize: 'clamp(2.5rem, 9vw, 11rem)',
+              letterSpacing: '-0.04em',
+            }}
+          >
+            Raw Earth Crystals
+          </h1>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-600 mt-8 pt-8 text-center text-sm text-gray-300">
-          <p>&copy; {new Date().getFullYear()} Raw Earth Crystals. All rights reserved.</p>
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-4 text-[11px] opacity-60 font-manrope tracking-wide uppercase text-center lg:text-left">
+          <p>© {new Date().getFullYear()} Raw Earth Crystals All rights reserved.</p>
+          <p>Designed & Developed by Dtory Studio</p>
         </div>
+
       </div>
     </footer>
   );

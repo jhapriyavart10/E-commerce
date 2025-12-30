@@ -16,12 +16,12 @@ interface Product {
 }
 
 const materialOptions = [
-  { name: 'Obsidian', img: '/assets/images/obsidian.png' },
-  { name: 'Tiger Eye', img: '/assets/images/tiger eye.png' },
+  { name: 'Obsidian', img: '/assets/images/obsidian.svg' },
+  { name: 'Tiger Eye', img: '/assets/images/tiger eye.svg' },
   { name: 'Lapis Lazuli', img: '/assets/images/Lapis Lazuli.svg' },
-  { name: 'Rose Quartz', img: '/assets/images/rose quartz.png' },
-  { name: 'Clear Quartz', img: '/assets/images/clear quartz.png' },
-  { name: 'Green Aventurine', img: '/assets/images/green adventurine.png' },
+  { name: 'Rose Quartz', img: '/assets/images/rose quartz.svg' },
+  { name: 'Clear Quartz', img: '/assets/images/clear quartz.svg' },
+  { name: 'Green Aventurine', img: '/assets/images/green adventurine.svg' },
 ];
 
 export default function UnifiedProductPage({ product }: { product: any }) {
@@ -149,10 +149,18 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                 </button>
                 <button className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3">Buy with SHOP</button>
               </div>
-            <div className="flex items-start gap-3 mt-4 opacity-80">
-                <Image src="/assets/images/truck.jpeg" alt="Truck" width={32} height={32} className="shrink-0" />
-                <p className="text-[14px] lg:text-[15px] leading-snug">Orders are fulfilled within 24 hours. 3–5 business days delivery average.</p>
-              </div>
+             <div className="flex items-center gap-1 mt-4 opacity-80">
+              <Image 
+                src="/assets/images/truck.jpeg" 
+                alt="Truck" 
+                width={34} 
+                height={34} 
+                className="shrink-0 object-contain -translate-y-[1px]" 
+              />
+              <p className="text-[14px] lg:text-[15px] leading-tight">
+                Orders are fulfilled within 24 hours. 3–5 business days delivery average.
+              </p>
+            </div>
 
               {/* Accordions */}
 
@@ -283,6 +291,26 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                     <h3 className="text-sm lg:text-base font-semibold text-[#280F0B] tracking-tight group-hover/text: decoration-1 underline-offset-4">
                       {item.title}
                     </h3>
+
+                    {/* Sliding Container */}
+                    <div className="relative h-6 overflow-hidden">
+                      {/* State 1: Price (Visible by default) */}
+                      <p className="text-[13px] font-manrope font-bold text-[#280F0B] transition-all duration-300 ease-in-out transform translate-y-0 group-hover/text:-translate-y-full group-hover/text:opacity-0 flex items-center h-full">
+                        ${item.price.toFixed(2)} <span className="ml-1 text-[10px]">AUD</span>
+                      </p>
+
+                      {/* State 2: Add to Cart (Hidden below, slides up on hover) */}
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation(); // Prevents the link from triggering
+                          addToCart({ ...product, variant: selectedMaterial, quantity })
+                        }}
+                        className="absolute inset-0 w-full h-full text-[13px] font-bold text-[#7f3e2f] uppercase tracking-wider transition-all duration-300 ease-in-out transform translate-y-full group-hover/text:translate-y-0 flex items-center hover:text-[#280F0B]"
+                      >
+                        + Add to Cart
+                      </button>
+                    </div>
                   </Link>
                 </div>
               ))}

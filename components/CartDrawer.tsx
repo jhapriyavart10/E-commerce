@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { X, Plus, Minus, ChevronDown } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
   };
 
-  if (!isOpen) return null;
+  //if (!isOpen) return null;
 
   const goToCheckout = () => {
     onClose(); // Close the drawer first
@@ -49,16 +49,23 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className={`fixed inset-0 z-50 flex justify-end transition-opacity duration-800 ${
+        isOpen ? "pointer-events-auto" : "pointer-events-none"
+      }`}>
       {/* Overlay */}
       <div 
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity" 
+        className={`fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
         onClick={onClose}
       />
 
       {/* Cart Sidebar */}
-      <section className="relative flex h-full w-full flex-col bg-[#f6d8ab] shadow-2xl transition-transform md:w-[486px]">
-        
+      <section 
+        className={`relative flex h-full w-full flex-col bg-[#f6d8ab] shadow-2xl transition-transform duration-300 ease-in-out md:w-[486px] ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#280f0b]/10 px-6 py-8">
           <div className="flex items-baseline gap-2">
