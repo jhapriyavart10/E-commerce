@@ -19,36 +19,32 @@ function resolveMetaobjectValue(metafield: any, fallback: string): string {
 /**
  * Resolves gender and maps it to the frontend sidebar labels
  */
-function resolveGender(product: any): string {
-  // Access the first node in the references list
-  const genderNode = product.gender?.references?.edges?.[0]?.node;
-  
-  if (!genderNode) return 'Unisex';
+export function resolveGender(product: any): string[] {
+  const nodes = product.gender?.references?.edges?.map((edge: any) => edge.node) || [];
 
-  // 1. Try to get the Display Name (Label) directly: "For Him"
-  const label = genderNode.field?.value;
-  if (label) return label;
+  // If truly no data, return a single 'Unisex' entry
+  if (nodes.length === 0) return ['Unisex'];
 
-  // 2. Fallback: Map the handle if the label field query failed
-  const handle = genderNode.handle?.toLowerCase();
-  const genderMap: Record<string, string> = {
-    male: 'For Him',
-    female: 'For Her',
-    unisex: 'Unisex',
-  };
+  const genders = nodes.map((node: any) => {
+    return node.field?.value || 'Unisex';
+  });
 
-  return genderMap[handle] || 'Unisex';
+  // FIX: Use Set to remove duplicates like ['Unisex', 'Unisex']
+  return Array.from(new Set(genders)); 
 }
+export function resolveMaterial(product: any): string[] {
+  // 1. Extract all nodes from the references list
+  const nodes = product.material?.references?.edges?.map((edge: any) => edge.node) || [];
 
-function resolveMaterial(product: any): string {
-  const node = product.material?.references?.edges?.[0]?.node;
-  
-  if (!node) return 'Missing Material'; // DON'T default to 'Pink Shell'
+  // 2. Fallback if no materials are assigned
+  if (nodes.length === 0) return ['Uncategorized'];
 
-  // Standard Shopify fields usually use 'label' for the display name
-  const displayValue = node.field?.value; 
-  
-  return displayValue || 'Missing Material';
+  // 3. Map nodes to their labels and remove duplicates using a Set
+  const materials = nodes.map((node: any) => {
+    return node.field?.value || 'Uncategorized';
+  });
+
+  return Array.from(new Set(materials));
 }
 
 export async function getProducts() {

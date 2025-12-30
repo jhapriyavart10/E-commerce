@@ -64,7 +64,7 @@ export const getProductsQuery = `
           
           # 1. Gender check
           gender: metafield(namespace: "shopify", key: "target-gender") {
-            references(first: 1) {
+            references(first: 5) {
               edges {
                 node {
                   ... on Metaobject {
@@ -80,7 +80,7 @@ export const getProductsQuery = `
 
           # 2. Material check (using references plural because it's a list)
          material: metafield(namespace: "shopify", key: "jewelry-material") {
-          references(first: 1) {
+          references(first: 5) {
             edges {
               node {
                 ... on Metaobject {

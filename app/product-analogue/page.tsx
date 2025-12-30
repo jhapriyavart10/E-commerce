@@ -79,8 +79,17 @@ export default function ShopPage() {
   // 2. SAFETY WRAPPER FOR FILTERING (Prevents the crash)
   const safeProducts = Array.isArray(allProducts) ? allProducts : [];
 
-  const getCount = (key: keyof Product, value: string) => 
-    safeProducts.filter(p => p[key] === value).length;
+  const getCount = (key: keyof Product, value: string) => {
+    return safeProducts.filter(p => {
+      const val = p[key];
+      // If it's an array (like our new gender list), check if it includes the value
+      if (Array.isArray(val)) {
+        return val.includes(value);
+      }
+      // Fallback for single strings (like category)
+      return val === value;
+    }).length;
+  };
 
   const toggleSection = (key: keyof typeof openSections) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -104,30 +113,41 @@ export default function ShopPage() {
   };
 
   // Inside ShopPage component, above filteredProducts
-const dynamicMaterials = useMemo(() => {
-  const counts: Record<string, number> = {};
-  
-  // Count occurrences of each material
-  safeProducts.forEach(p => {
-    if (p.material) {
-      counts[p.material] = (counts[p.material] || 0) + 1;
-    }
-  });
+  const dynamicMaterials = useMemo(() => {
+    const counts: Record<string, number> = {};
+    
+    safeProducts.forEach(p => {
+      // p.material is now string[]
+      const materials = Array.isArray(p.material) ? p.material : [p.material];
+      materials.forEach(m => {
+        if (m) counts[m] = (counts[m] || 0) + 1;
+      });
+    });
 
-  // Convert to array, sort by count (descending), then alphabetically if counts are equal
-  return Object.entries(counts)
-    .sort((a, b) => {
-      if (b[1] !== a[1]) return b[1] - a[1]; // Higher count first
-      return a[0].localeCompare(b[0]);       // Alphabetical fallback
-    })
-    .map(([name]) => name);
-}, [safeProducts]);
+    return Object.entries(counts)
+      .sort((a, b) => {
+        // Keep 'Uncategorized' at the very bottom
+        if (a[0] === 'Uncategorized') return 1;
+        if (b[0] === 'Uncategorized') return -1;
+        // Sort by count descending
+        return b[1] - a[1];
+      })
+      .map(([name]) => name);
+  }, [safeProducts]);
 
   const filteredProducts = safeProducts.filter((p) => {
     if (p.price < filters.price.min || p.price > filters.price.max) return false;
     if (filters.category.length && !filters.category.includes(p.category)) return false;
-    if (filters.gender.length && !filters.gender.includes(p.gender)) return false;
-    if (filters.material.length && !filters.material.includes(p.material)) return false;
+    if (filters.gender.length) {
+      const productGenders = Array.isArray(p.gender) ? p.gender : [p.gender];
+      const hasMatch = productGenders.some(g => filters.gender.includes(g));
+      if (!hasMatch) return false;
+    }
+      if (filters.material.length) {
+      const productMaterials = Array.isArray(p.material) ? p.material : [p.material];
+      const hasMatch = productMaterials.some(m => filters.material.includes(m));
+      if (!hasMatch) return false;
+    }
     return true;
   });
 
@@ -255,23 +275,75 @@ const dynamicMaterials = useMemo(() => {
               {/* FILTER CONTENT */}
               {/* FIXED: Removed space-y-4 and added individual margins for precise control */}
               <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block animate-fadeIn`}>
-                <div className="mt-2 mb-6">
-                  <p className="text-[12px] font-bold uppercase mb-3 tracking-wider">Price</p>
-                  <div className="flex gap-3 mb-5">
+                <div className="mt-2 mb-6 w-full max-w-[260px]">
+                  <p className="text-[12px] font-bold uppercase mb-3 tracking-wider text-[#280F0B]">Price</p>
+                  
+                  {/* Input Boxes */}
+                  <div className="flex gap-3 mb-5 items-center">
                     <div className="relative w-1/2">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
-                      <input type="number" className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" value={filters.price.min} onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Number(e.target.value)}}))} />
+                      <input 
+                        type="number" 
+                        className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
+                        value={filters.price.min} 
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setFilters(p => ({...p, price: {...p.price, min: val}}));
+                        }} 
+                      />
                     </div>
-                    <span className="text-[#000000]">—</span>
+                    <span className="text-[#280F0B] opacity-50">—</span>
                     <div className="relative w-1/2">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
-                      <input type="number" className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" value={filters.price.max} onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Number(e.target.value)}}))} />
+                      <input 
+                        type="number" 
+                        className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
+                        value={filters.price.max} 
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setFilters(p => ({...p, price: {...p.price, max: val}}));
+                        }} 
+                      />
                     </div>
                   </div>
-                  <div className="relative h-1.5 bg-[#280F0B33] w-full rounded-full">
-                    <div className="absolute h-full bg-[#725C4B]" style={{ left: `${(filters.price.min / 150) * 100}%`, right: `${100 - (filters.price.max / 150) * 100}%` }} />
-                    <input type="range" min="0" max="150" value={filters.price.min} onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Math.min(Number(e.target.value), p.price.max)}}))} className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent h-1.5" />
-                    <input type="range" min="0" max="150" value={filters.price.max} onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Math.max(Number(e.target.value), p.price.min)}}))} className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent h-1.5" />
+
+                  {/* Slider Track Container */}
+                  <div className="relative h-6 w-full flex items-center px-1"> 
+                    {/* Background Track */}
+                    <div className="absolute h-1.5 bg-[#280F0B33] w-full rounded-full overflow-hidden">
+                      {/* Active Range Highlight */}
+                      <div 
+                        className="absolute h-full bg-[#725C4B]" 
+                        style={{ 
+                          left: `${Math.min((filters.price.min / 150) * 100, 100)}%`, 
+                          right: `${Math.max(100 - (filters.price.max / 150) * 100, 0)}%` 
+                        }} 
+                      />
+                    </div>
+                    
+                    {/* Dual Range Inputs */}
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="150" 
+                      value={filters.price.min} 
+                      onChange={(e) => {
+                        const val = Math.min(Number(e.target.value), filters.price.max);
+                        setFilters(p => ({...p, price: {...p.price, min: val}}));
+                      }} 
+                      className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
+                    />
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="150" 
+                      value={filters.price.max} 
+                      onChange={(e) => {
+                        const val = Math.max(Number(e.target.value), filters.price.min);
+                        setFilters(p => ({...p, price: {...p.price, max: val}}));
+                      }} 
+                      className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
+                    />
                   </div>
                 </div>
 
@@ -285,11 +357,14 @@ const dynamicMaterials = useMemo(() => {
                       {section.label}
                       <Image src="/assets/images/dropdown.svg" alt="" width={24} height={24} className={openSections[section.id] ? 'rotate-180' : ''} />
                     </button>
-                    {openSections[section.id] && (
-                      <div className="space-y-2 pb-1">
+                    {/* Replace {openSections[section.id] && ( ... )} with this: */}
+                    <div className={`
+                      overflow-hidden transition-all duration-500 ease-in-out
+                      ${openSections[section.id] ? 'max-height-animate opacity-100 mt-2' : 'max-height-0 opacity-0'}
+                    `}>
+                      <div className="space-y-2 pb-3">
                         {section.options.map(opt => (
                           <label key={opt} className="flex items-center gap-3 text-sm cursor-pointer hover:opacity-70 transition-opacity">
-                            {/* Wrap input and SVG in a relative div so the checkmark stays centered */}
                             <div className="relative flex items-center justify-center w-4 h-4">
                               <input 
                                 type="checkbox" 
@@ -297,7 +372,6 @@ const dynamicMaterials = useMemo(() => {
                                 checked={filters[section.id].includes(opt)} 
                                 onChange={() => toggleFilter(section.id, opt)} 
                               />
-                              {/* This SVG will now only appear inside the transparent box when checked */}
                               <svg 
                                 className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block text-[#280F0B]" 
                                 xmlns="http://www.w3.org/2000/svg" 
@@ -315,7 +389,7 @@ const dynamicMaterials = useMemo(() => {
                           </label>
                         ))}
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -375,6 +449,30 @@ const dynamicMaterials = useMemo(() => {
           }
           .animate-slideInRight {
             animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+          
+          .max-height-0 {
+            max-height: 0;
+          }
+
+          .max-height-animate {
+            /* Set to a value larger than your longest list (e.g., Materials) */
+            max-height: 1000px; 
+          }
+
+          /* Ensure the dropdown icon rotates smoothly */
+          .transition-transform {
+            transition: transform 0.3s ease-in-out;
+          }
+
+          /* Optional: Smooth fade for checkbox appearance */
+          .peer:checked + svg {
+            animation: checkboxPop 0.2s ease-out forwards;
+          }
+
+          @keyframes checkboxPop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
           }
         `}</style>
       </main>
