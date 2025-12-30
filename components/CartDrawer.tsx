@@ -158,7 +158,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           <div className="flex items-end justify-between mb-2">
             <div>
               <p className="text-2xl font-bold font-lora">Subtotal</p>
-              <p className="text-[11px] opacity-60 mt-1 tracking-tight">
+              <p className="text-[13px] opacity-60 mt-1 tracking-tight">
                 Tax included. Shipping calculated at checkout.
               </p>
             </div>

@@ -3,15 +3,43 @@ export const getProductQuery = `
     product(handle: $handle) {
       id
       title
+      handle
+      productType
       descriptionHtml
-      images(first: 1) {
+
+      gender: metafield(namespace: "custom", key: "target_gender") {
+        reference {
+          ... on Metaobject {
+            handle
+            fields {
+              key
+              value
+            }
+          }
+        }
+      }
+
+      material: metafield(namespace: "shopify", key: "jewelry-material") {
+        reference {
+          ... on Metaobject {
+            handle
+            fields {
+              key
+              value
+            }
+          }
+        }
+      }
+
+      images(first: 6) {
         edges {
           node {
             url
           }
         }
       }
-      variants(first: 1) {
+
+      variants(first: 10) {
         edges {
           node {
             id
@@ -26,7 +54,6 @@ export const getProductQuery = `
   }
 `;
 
-
 export const getProductsQuery = `
   query getProducts($first: Int!) {
     products(first: $first) {
@@ -35,6 +62,32 @@ export const getProductsQuery = `
           id
           handle
           title
+          productType
+
+          gender: metafield(namespace: "custom", key: "target_gender") {
+            reference {
+              ... on Metaobject {
+                handle
+                fields {
+                  key
+                  value
+                }
+              }
+            }
+          }
+
+          material: metafield(namespace: "shopify", key: "jewelry-material") {
+            reference {
+              ... on Metaobject {
+                handle
+                fields {
+                  key
+                  value
+                }
+              }
+            }
+          }
+
           images(first: 1) {
             edges {
               node {
@@ -42,6 +95,7 @@ export const getProductsQuery = `
               }
             }
           }
+
           variants(first: 1) {
             edges {
               node {

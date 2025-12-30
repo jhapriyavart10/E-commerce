@@ -149,6 +149,30 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                 </button>
                 <button className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3">Buy with SHOP</button>
               </div>
+            <div className="flex items-start gap-3 mt-4 opacity-80">
+                <Image src="/assets/images/truck.jpeg" alt="Truck" width={32} height={32} className="shrink-0" />
+                <p className="text-[14px] lg:text-[15px] leading-snug">Orders are fulfilled within 24 hours. 3–5 business days delivery average.</p>
+              </div>
+
+              {/* Accordions */}
+
+              <div className="mt-8">
+                {['Description', 'How to use', 'Product Details', 'Ideal for'].map((title) => {
+                  const isOpen = openAccordion === title;
+                  return (
+                    <div key={title} ref={title === 'Description' ? descriptionRef : null} className="border-b border-[#280F0B]/30 py-4">
+                      <button onClick={() => setOpenAccordion(isOpen ? null : title)} className="w-full flex justify-between items-center text-left font-semibold text-[18px] lg:text-[18px] bg-transparent border-none p-0">
+                        {title}
+                        <span className={`text-xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
+                      </button>
+
+                      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <p className="text-[14px] opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
@@ -197,10 +221,37 @@ export default function UnifiedProductPage({ product }: { product: any }) {
               </button>
             </div>
           </div>
+           <div className="mt-16">
+            <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
+
+            {/* REVIEW FILTERS: 2 COLS ON MOBILE (Search/All Ratings in Col 1), ROW ON DESKTOP */}
+            <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-8">
+              {reviewFilters.map((f, idx) => (
+                <div key={idx} className="flex items-center justify-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:w-[177px] lg:h-[42px]">
+                  {f.isSearch && <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4" />}
+                  <span>{f.label}</span>
+                  {!f.isSearch && <img src="/assets/images/dropdown.svg" alt="v" />}
+                </div>
+              ))}
+            </div>
+
+            {[1, 2].map(i => (
+              <div key={i} className="bg-[#FDC77B] p-6 mb-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-bold">Raman S.</span>
+                  <img src="/assets/images/verified.png" alt="v" className="w-4 h-4" />
+                  <span className="text-sm font-normal">Verified Buyer</span>
+                </div>
+
+                <p className="text-[12px] opacity-60 mb-3">18 days ago</p>
+                <p className="text-sm leading-relaxed">I bought the black Ball Crystal Pendulum for my wife and she says it has a steady, smooth swing and feels very responsive...</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* SECTION 4 – RECOMMENDED FOR YOU (Dynamic Backend Data) */}
-        <section className="py-24 px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[2500px] mx-auto">
+        <section className="pb-24 pt-4 px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[2500px] mx-auto">
             <h2 className="text-2xl lg:text-[32px] font-bold mb-10 text-[#280F0B]">
               Recommended for you
             </h2>
@@ -216,33 +267,13 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                     <div className="relative aspect-[4/5] w-full bg-[#F2EFEA] overflow-hidden mb-4">
                       <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
                       <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/20 to-transparent">
-                        <button 
-                          onClick={() => {
-                            const { id, title, price, image } = item; 
-                            
-                            addToCart({ 
-                              id, 
-                              title, 
-                              price, 
-                              image, 
-                              variant: "Default" 
-                            });
-                          }}
-                          className="w-full bg-[#280F0B] text-white py-3 text-xs font-bold  tracking-widest hover:bg-[#3d1a13]"
-                        >
-                          Quick Add
-                        </button>
-                      </div>
                     </div>
+                  </div>
                     
                     <Link href={`/product/${item.handle}`} className="flex flex-col gap-1 cursor-pointer">
                       <h3 className="text-sm lg:text-base font-semibold text-[#280F0B]  tracking-tight">
                         {item.title}
                       </h3>
-                      <div className="flex items-center justify-between">
-                        <p className="text-[#7F3E2F] font-bold text-lg">${item.price.toFixed(2)} AUD</p>
-                        <div className="flex text-[#F5B301] text-[10px]">★ ★ ★ ★ ★</div>
-                      </div>
                     </Link>
                   </div>
                 ))}

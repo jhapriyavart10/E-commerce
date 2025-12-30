@@ -202,7 +202,7 @@ export default function ShopPage() {
                 <h1 className="font-lora text-[40px] leading-tight mb-1">All Products</h1>
                 <p className="text-xs opacity-70">Showing {filteredProducts.length} products</p>
               </div>
-              {/* ... REST OF YOUR FILTER UI CODE ... */}
+
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button 
                   onClick={() => setShowMobileFilters(!showMobileFilters)}
@@ -255,7 +255,7 @@ export default function ShopPage() {
 
                 {[
                   { id: 'category' as const, label: 'Product category', options: ['Bracelets', 'Charms & Pendants'] },
-                  { id: 'gender' as const, label: 'Gender', options: ['For her', 'For him', 'Unisex'] },
+                  { id: 'gender' as const, label: 'Gender', options: ['For Her', 'For Him', 'Unisex'] },
                   { id: 'material' as const, label: 'Jewellery Material', options: MATERIAL_OPTIONS },
                 ].map((section) => (
                   <div key={section.id} className="border-t border-[#280F0B33] pt-3 mt-5">
@@ -267,7 +267,28 @@ export default function ShopPage() {
                       <div className="space-y-2 pb-1">
                         {section.options.map(opt => (
                           <label key={opt} className="flex items-center gap-3 text-sm cursor-pointer hover:opacity-70 transition-opacity">
-                            <input type="checkbox" className="accent-[#280F0B] w-4 h-4" checked={filters[section.id].includes(opt)} onChange={() => toggleFilter(section.id, opt)} />
+                            {/* Wrap input and SVG in a relative div so the checkmark stays centered */}
+                            <div className="relative flex items-center justify-center w-4 h-4">
+                              <input 
+                                type="checkbox" 
+                                className="peer appearance-none w-4 h-4 border border-[#280F0B] rounded-sm bg-transparent checked:bg-transparent transition-all cursor-pointer" 
+                                checked={filters[section.id].includes(opt)} 
+                                onChange={() => toggleFilter(section.id, opt)} 
+                              />
+                              {/* This SVG will now only appear inside the transparent box when checked */}
+                              <svg 
+                                className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block text-[#280F0B]" 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="4" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                            </div>
                             <span>{opt} ({getCount(section.id, opt)})</span>
                           </label>
                         ))}
