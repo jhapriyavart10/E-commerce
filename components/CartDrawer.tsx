@@ -49,7 +49,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   };
 
   return (
-    <div className={`fixed inset-0 z-50 flex justify-end transition-opacity duration-800 ${
+    <div className={`fixed inset-0 z-[100] flex justify-end transition-opacity duration-800 ${
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       }`}>
       {/* Overlay */}
@@ -108,7 +108,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         )}
                       </div>
                       <p className="font-manrope font-bold text-[#280f0b]">
-                        ${item.price.toFixed(2)} <span className="text-[10px]">AUD</span>
+                        ${item.price.toFixed(2)} <span className="text-[12px]">AUD</span>
                       </p>
                     </div>
 
@@ -163,13 +163,16 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         {/* Summary Footer */}
         <div className="bg-[#280f0b] p-8 text-[#f6d8ab]">
           <div className="flex items-end justify-between mb-2">
-            <div>
-              <p className="text-2xl font-bold font-lora">Subtotal</p>
-              <p className="text-[13px] opacity-60 mt-1 tracking-tight">
+            <div className="flex-1 mr-4">
+              {/* Reduced label to 18px */}
+              <p className="text-[18px] font-bold font-lora">Subtotal</p>
+              {/* Reduced disclaimer for better fit on mobile */}
+              <p className="text-[11px] md:text-[13px] opacity-60 mt-1 tracking-tight whitespace-nowrap">
                 Tax included. Shipping calculated at checkout.
               </p>
             </div>
-            <p className="text-2xl font-bold font-manrope">
+            {/* Set price to 18px and forced no wrap to stay on one line */}
+            <p className="text-[18px] font-bold font-manrope whitespace-nowrap">
               ${subtotal.toFixed(2)} AUD
             </p>
           </div>
@@ -178,14 +181,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <Link 
               href="/cart"
               onClick={onClose}
-              className="flex items-center justify-center border border-[#f6d8ab]/40 py-4 text-xs font-bold uppercase tracking-[1.5px] hover:bg-white/10 transition-all rounded"
+              className="flex items-center justify-center border border-[#f6d8ab]/40 py-4 text-xs font-bold uppercase tracking-[1.5px] hover:bg-white/10 transition-all"
             >
               View Cart
             </Link>
             <button 
               onClick={goToCheckout}
               disabled={isRedirecting || cartItems.length === 0}
-              className="bg-[#7f3e2f] flex items-center justify-center py-4 text-xs font-bold uppercase tracking-[1.5px] text-white hover:brightness-110 transition-all rounded disabled:opacity-50"
+              className="bg-[#7f3e2f] flex items-center justify-center py-4 text-xs font-bold uppercase tracking-[1.5px] text-white hover:brightness-110 transition-all disabled:opacity-50"
             >
               {isRedirecting ? 'Processing...' : 'Checkout'}
             </button>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Instagram, Twitter, Facebook } from 'lucide-react';
+import { Instagram, Facebook} from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -11,17 +11,27 @@ export default function Footer() {
           
           {/* Tagline & Socials */}
           <div className="flex-1">
-            <h2 className="text-3xl lg:text-4xl font-lora leading-tight mb-6">
-              Your <span className="italic">spiritual journey</span> <br /> begins here.
+            <h2 className="font-lora text-[32px] md:text-[48px] leading-tight text-[#F6D8AB] mb-6">
+              Your <span className="italic font-medium text-[#F6D8AB]">spiritual journey</span> <br /> 
+              begins <span className="font-medium text-[#ce953f]">here</span>.
             </h2>
-            <p className="text-sm text-white opacity-60 max-w-sm mb-8 font-manrope">
-              Healing Bracelets from the house of Raw Earth Crystals. Every bracelet tells a beautiful story.
-            </p>
-            
+            <p className="font-manrope text-base text-[14px] text-white opacity-70 max-w-md mb-8 leading-relaxed">
+              Healing Bracelets from the house of Raw Earth Crystals. <br className="hidden md:block" />
+              Every bracelet tells a beautiful story.
+            </p>    
             <div className="flex gap-5">
-              <Link href="#" className="hover:opacity-70 transition-opacity"><Twitter size={20} /></Link>
-              <Link href="#" className="hover:opacity-70 transition-opacity"><Instagram size={20} /></Link>
-              <Link href="#" className="hover:opacity-70 transition-opacity"><Facebook size={20} /></Link>
+              <Link href="#" aria-label="X">
+                <img src="/assets/images/X.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
+              </Link>
+              <Link href="#" aria-label="Instagram">
+                <img src="/assets/images/instagram.png" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
+              </Link> 
+              <Link href="#" aria-label="Facebook">
+                <img src="/assets/images/facebook.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
+              </Link>
+              <Link href="#" aria-label="TikTok">
+                <img src="/assets/images/tiktok.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
+              </Link>      
             </div>
           </div>
 
@@ -62,7 +72,7 @@ export default function Footer() {
         </div>
 
         {/* REFINED Massive Logo Text */}
-        <div className="w-full pt-2 lg:pt-4 mb-10 container-type-inline-size">
+        <div className="w-full pt-2 lg:pt-3 mb-10 container-type-inline-size">
           <h1
             className="font-muslone font-bold leading-none text-[#F6D8AB] text-center select-none uppercase
                       whitespace-normal lg:whitespace-nowrap"
