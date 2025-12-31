@@ -118,6 +118,7 @@ export async function getProduct(handle: string) {
       query: getProductQuery,
       variables: { handle },
     });
+    console.log('RAW SHOPIFY DATA:', JSON.stringify(res.body.data.product, null, 2));
 
     const product = res?.body?.data?.product;
     if (!product) return null;
@@ -140,6 +141,9 @@ export async function getProduct(handle: string) {
         title: v.node.title,
         price: v.node.price.amount,
       })) || [],
+      rating: product.rating?.value ? parseFloat(product.rating.value) : 0,
+      reviewCount: product.reviewCount?.value ? parseInt(product.reviewCount.value) : 0,
+      reviews: product.reviewList?.value ? JSON.parse(product.reviewList.value) : []
     };
   } catch (err) {
     console.error('Fetch Product Error (getProduct):', err);

@@ -202,10 +202,17 @@ export default function UnifiedProductPage({ product }: { product: any }) {
             <div>
               <h2 className="text-[28px] lg:text-[40px] font-bold mb-6">Customer Reviews</h2>
               <div className="flex items-center gap-6 mb-8">
-                <span className="text-[48px] lg:text-[64px] font-bold">4.8</span>
+                {/* Replace 4.8 with dynamic rating */}
+                <span className="text-[48px] lg:text-[64px] font-bold">
+                  {product.rating > 0 ? product.rating.toFixed(1) : "0.0"}
+                </span>
                 <div>
-                  <div className="text-[#F5B301] text-lg">★ ★ ★ ★ ★</div>
-                  <p className="text-sm opacity-70">Based on 7 Ratings</p>
+                  <div className="text-[#F5B301] text-lg">
+                    {/* Simple star logic */}
+                    {"★".repeat(Math.round(product.rating))}{"☆".repeat(5 - Math.round(product.rating))}
+                  </div>
+                  {/* Replace 7 Ratings with dynamic count */}
+                  <p className="text-sm opacity-70">Based on {product.reviewCount} Ratings</p>
                 </div>
               </div>
               <div className="space-y-2 max-w-[820px]">
@@ -259,7 +266,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
         </section>
 
         {/* SECTION 4 – RECOMMENDED FOR YOU (Dynamic Backend Data) */}
-        <section className="pb-24 pt-4 px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[2500px] mx-auto">
+        <section className="pb-24 pt-4 px-6 lg:px-12 xl:px-24 max-w-[2500px] mx-auto">
           <h2 className="text-2xl lg:text-[32px] font-bold mb-10 text-[#280F0B]">
             Recommended for you
           </h2>
@@ -274,7 +281,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
               {recommendedProducts.slice(0, 4).map((item) => (
                 <div key={item.id} className="group flex flex-col">
                   {/* Changed aspect-[4/5] to aspect-square */}
-                  <div className="relative aspect-square w-full bg-[#F2EFEA] overflow-hidden mb-4 border border-gray-100">
+                  <div className="relative aspect-square w-full bg-[#F2EFEA] overflow-hidden mb-4 border">
                     <Image 
                       src={item.image} 
                       alt={item.title} 
@@ -296,7 +303,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                     <div className="relative h-6 overflow-hidden">
                       {/* State 1: Price (Visible by default) */}
                       <p className="text-[13px] font-manrope font-bold text-[#280F0B] transition-all duration-300 ease-in-out transform translate-y-0 group-hover/text:-translate-y-full group-hover/text:opacity-0 flex items-center h-full">
-                        ${item.price.toFixed(2)} <span className="ml-1 text-[10px]">AUD</span>
+                        ${item.price.toFixed(2)} <span className="ml-1 text-[13px]">AUD</span>
                       </p>
 
                       {/* State 2: Add to Cart (Hidden below, slides up on hover) */}

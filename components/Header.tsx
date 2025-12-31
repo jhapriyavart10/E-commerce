@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation' // Import router for search navigation
+import { useRouter } from 'next/navigation'
 import { useCart } from '@/app/context/CartContext'
 import CartDrawer from '@/components/CartDrawer'
+import { Menu, X, Search, ShoppingBag, User } from 'lucide-react' // Using Lucide for cleaner icons
 
 const BANNER_MESSAGES = [
   "Free Standard Domestic Shipping above $135",
@@ -24,22 +25,20 @@ export default function Header() {
   const [nextIndex, setNextIndex] = useState(1);
   const [paused, setPaused] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile Menu State
 
-  // --- Search Functionality States ---
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Redirect to your search results page with the query
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
       setSearchQuery('');
     }
   };
 
-  // Banner Text Carousel Logic
   useEffect(() => {
     if (!showBanner || paused) return;
     const interval = setInterval(() => {
@@ -57,7 +56,7 @@ export default function Header() {
     <>
       {/* Top Banner */}
       {showBanner && (
-        <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative overflow-hidden"
+        <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative overflow-hidden z-[60]"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           >  
@@ -72,77 +71,106 @@ export default function Header() {
       )}
 
       {/* Main Header */}
-      <header className="bg-[#280F0B] text-white w-full h-[120px] relative z-40">
-        <div className="w-full max-w-[1440px] mx-auto h-full relative">
+      <header className="bg-[#280F0B] text-white w-full h-[80px] lg:h-[120px] relative z-50">
+        <div className="w-full max-w-[1440px] mx-auto h-full px-4 lg:px-[72px] flex items-center justify-between relative">
           
-          {/* Overlay Search Bar (Appears when isSearchOpen is true) */}
+          {/* 1. Mobile Hamburger (Left) - Only visible on Mobile */}
+          <button 
+            className="lg:hidden p-2" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle Menu"
+          >
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+
+          {/* 2. Desktop Nav (Left) - Hidden on Mobile */}
+          <nav className="hidden lg:flex items-center gap-[40px]">
+            <Link href="/product-analogue" className="hover:text-gray-300 transition-colors text-base font-manrope">Shop</Link>
+            <Link href="/plans" className="hover:text-gray-300 transition-colors text-base font-manrope">Plans</Link>
+            <Link href="https://azure-takeaways-956863.framer.app/blogs" className="text-base transition-colors hover:text-gray-300 font-manrope">
+              Raw Earth Dojo
+            </Link>
+            <Link href="/about" className="hover:text-gray-300 transition-colors text-base font-manrope">About</Link>
+          </nav>
+
+          {/* 3. Logo (Center) - Responsive Width */}
+          <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+            <Link href="/">
+              <Image 
+                src="/assets/images/Logo.png" 
+                alt="Raw Earth Crystals" 
+                width={186} 
+                height={72} 
+                className="object-contain w-[120px] lg:w-[186px]" 
+                priority 
+              />
+            </Link>
+          </div>
+
+          {/* 4. Action Icons (Right) */}
+          <div className="flex items-center gap-2 lg:gap-6">
+            <button 
+              onClick={() => setIsSearchOpen(true)} 
+              className="p-2 hover:text-gray-300 transition-colors"
+            >
+              <Search size={24} />
+            </button>
+
+            {/* Profile Icon - Hidden on Mobile (moved to menu) */}
+            <Link href="/profile" className="hidden lg:block p-2 hover:text-gray-300 transition-colors">
+              <User size={24} />
+            </Link>
+
+            <button 
+              onClick={() => setIsCartOpen(true)} 
+              className="p-2 hover:text-gray-300 transition-colors relative"
+            >
+              <ShoppingBag size={24} />
+              {totalItems > 0 && (
+                <span className="absolute top-0 right-0 bg-[#7F3E2F] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* --- Overlay Search Bar --- */}
           {isSearchOpen && (
-            <div className="absolute inset-0 bg-[#280F0B] z-50 flex items-center px-6 lg:px-[72px]">
+            <div className="absolute inset-0 bg-[#280F0B] z-[70] flex items-center px-4 lg:px-[72px]">
               <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-4">
                 <input 
                   autoFocus
                   type="text" 
-                  placeholder="Search for products (e.g. Rose Quartz, Pendants)..."
-                  className="bg-transparent border-b border-white/30 w-full py-2 outline-none text-xl font-manrope placeholder:text-white/40"
+                  placeholder="Search products..."
+                  className="bg-transparent border-b border-white/30 w-full py-2 outline-none text-lg lg:text-xl font-manrope placeholder:text-white/40"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button type="submit" className="uppercase font-bold text-sm tracking-widest hover:text-[#f6d8ab]">Search</button>
-                <button type="button" onClick={() => setIsSearchOpen(false)} className="ml-4 text-white/60 hover:text-white text-sm">CLOSE</button>
+                <button type="submit" className="uppercase font-bold text-xs lg:text-sm tracking-widest hover:text-[#f6d8ab]">Search</button>
+                <button type="button" onClick={() => setIsSearchOpen(false)} className="text-white/60 hover:text-white text-xs">CLOSE</button>
               </form>
             </div>
           )}
+        </div>
 
-          <div className="h-full px-4 sm:px-6 lg:px-0 flex items-center justify-between">
+        {/* --- Mobile Sidebar Menu --- */}
+        <div className={`fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300 lg:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsMenuOpen(false)}>
+          <div 
+            className={`absolute top-0 left-0 w-[80%] h-full bg-[#280F0B] p-6 transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+          >
+            <div className="flex justify-between items-center mb-8">
+              <span className="text-xl font-lora font-bold">Menu</span>
+              <button onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+            </div>
             
-            {/* Desktop Nav (Left) */}
-            <nav className="hidden lg:flex items-center gap-[50px] absolute left-[72px] top-[50px]">
-              <Link href="/product-analogue" className="hover:text-gray-300 transition-colors text-base">Shop</Link>
-              <Link href="/plans" className="hover:text-gray-300 transition-colors text-base">Plans</Link>
-              <Link href="https://azure-takeaways-956863.framer.app/blogs" className="flex items-center text-base transition-colors hover:text-gray-300">
-                Raw Earth Dojo
-              </Link>
-              <Link href="/about" className="hover:text-gray-300 transition-colors text-base">About</Link>
+            <nav className="flex flex-col gap-6 text-lg font-manrope">
+              <Link href="/product-analogue" onClick={() => setIsMenuOpen(false)} className="border-b border-white/10 pb-2">Go to Shop</Link>
+              <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="border-b border-white/10 pb-2">My Profile</Link>
+              <Link href="/plans" onClick={() => setIsMenuOpen(false)} className="border-b border-white/10 pb-2">Plans</Link>
+              <Link href="/about" onClick={() => setIsMenuOpen(false)} className="border-b border-white/10 pb-2">About Us</Link>
+              <Link href="https://azure-takeaways-956863.framer.app/blogs" onClick={() => setIsMenuOpen(false)} className="border-b border-white/10 pb-2">Raw Earth Dojo</Link>
             </nav>
-
-            {/* Logo (Center) */}
-            <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-[24px]">
-              <Link href="/" className="flex items-center">
-                <Image src="/assets/images/Logo.png" alt="Raw Earth Crystals" width={186} height={72} className="object-contain w-[140px] lg:w-[186px]" priority />
-              </Link>
-            </div>
-
-            {/* Icons (Right) */}
-            <div className="flex items-center gap-[16px] lg:gap-[24px] lg:absolute lg:right-[48px] lg:top-[48px]">
-              
-              {/* Search Trigger */}
-              <button 
-                onClick={() => setIsSearchOpen(true)} 
-                className="hover:text-gray-300 transition-colors" 
-                aria-label="Search"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-
-              <Link href="/profile" className="hover:text-gray-300 transition-colors" aria-label="Account">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </Link>
-
-              <button onClick={() => setIsCartOpen(true)} className="hover:text-gray-300 transition-colors relative" aria-label="Cart">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#7F3E2F] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
-            </div>
           </div>
         </div>
       </header>

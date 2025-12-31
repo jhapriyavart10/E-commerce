@@ -8,11 +8,7 @@ import { useCart } from '@/app/context/CartContext';
 
 // Sample Data for Country-State logic
 const COUNTRY_DATA: Record<string, string[]> = {
-  "Australia": ["New South Wales", "Victoria", "Queensland", "Western Australia", "South Australia", "Tasmania"],
-  "United States": ["California", "Texas", "New York", "Florida", "Illinois"],
-  "India": ["Maharashtra", "Karnataka", "Delhi", "Tamil Nadu", "Gujarat"],
-  "United Kingdom": ["England", "Scotland", "Wales", "Northern Ireland"],
-  "Canada": ["Ontario", "Quebec", "British Columbia", "Alberta"]
+  "Australia": ["New South Wales", "Victoria", "Queensland", "Western Australia", "South Australia", "Tasmania"]
 };
 
 const svgPathsDesktop = {
@@ -161,7 +157,7 @@ export default function CheckoutPage() {
     <div className="bg-[#F6D8AB] w-full min-h-screen font-manrope text-[#280F0B]">
       <Header />
       
-      <main className="max-w-[1440px] mx-auto px-5 md:px-12 xl:px-24 2xl:px-32 py-10">
+      <main className="max-w-[1440px] mx-auto px-6 py-6 md:px-12 lg:px-[72px] lg:py-[50px]">
         {/* Progress Stepper */}
         <div className="hidden md:flex items-center gap-4 mb-12">
           <Link href="/cart" className="flex gap-3 items-center group cursor-pointer">
@@ -184,9 +180,9 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-16 items-start">
+        <div className="flex flex-col lg:flex-row gap-16 items-start"> 
           <div className="flex-1 w-full order-1">
-            <h1 className="font-lora text-[32px] lg:text-[72px] mb-2 leading-tight">
+            <h1 className="font-lora text-[40px] lg:text-[72px] text-[#280f0b] leading-none mb-8">
               Checkout <span className="text-lg opacity-60 font-manrope font-normal">({getTotalItems()} items)</span>
             </h1>
             
@@ -286,7 +282,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Right Column: Dynamic Summary Card */}
-          <div className="relative w-full max-w-[526px] mx-auto lg:mx-0 order-2 lg:mt-[120px]">
+          <div className="relative w-full max-w-[526px] mx-auto lg:mx-0 order-2">
             <div className="bg-[#FFC26F] rounded-[20px] overflow-hidden relative flex flex-col shadow-sm">
               <div className="p-6 lg:p-10 flex flex-col gap-4">
                 <div className="flex justify-between items-center text-[#280f0b]">
@@ -306,8 +302,8 @@ export default function CheckoutPage() {
               {/* Coupon Section */}
               <div className="relative">
                 <div className="w-full border-t border-dashed border-black/40" />
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab]" />
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab]" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10"  />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10" />
                 <div className="px-6 lg:px-10 py-6">
                   <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group">
                     <div className="size-6 relative shrink-0">

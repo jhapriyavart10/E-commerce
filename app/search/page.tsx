@@ -16,7 +16,6 @@ type Product = {
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q')?.toLowerCase() || '';
-  
   const { addToCart } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,13 +36,16 @@ function SearchContent() {
   }, []);
 
   const searchResults = useMemo(() => {
-    if (!query) return allProducts;
+  if (!query) return allProducts;
     return allProducts.filter((p) => {
-      return (
-        p.title.toLowerCase().includes(query) || 
-        p.category.toLowerCase().includes(query) || 
-        p.material.toLowerCase().includes(query)
-      );
+      // Check if title or category matches
+      const matchesTitle = p.title.toLowerCase().includes(query);
+      const matchesCategory = p.category.toLowerCase().includes(query);
+      const matchesMaterial = Array.isArray(p.material) 
+        ? p.material.some(m => m.toLowerCase().includes(query))
+        : typeof p.material === 'string' && p.material.toLowerCase().includes(query);
+
+      return matchesTitle || matchesCategory || matchesMaterial;
     });
   }, [allProducts, query]);
 
@@ -93,7 +95,7 @@ export default function SearchResultsPage() {
   return (
     <>
       <Header />
-      <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen pt-40 px-6 lg:px-24">
+      <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen pt-20 lg:pt-24 px-6 lg:px-24 pb-20">
         <Suspense fallback={<div className="text-center py-20 font-lora">Loading search parameters...</div>}>
           <SearchContent />
         </Suspense>

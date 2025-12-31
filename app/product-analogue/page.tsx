@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
 import { useCart } from '@/app/context/CartContext';
 import Link from 'next/link';
-
+import CartDrawer from '@/components/CartDrawer';
 /* ---------------- TYPES ---------------- */
 type Product = {
   id: string; 
@@ -48,6 +48,7 @@ export default function ShopPage() {
   const [openSections, setOpenSections] = useState({ category: true, gender: true, material: true });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // 1. DYNAMIC FETCH WITH ERROR HANDLING
   useEffect(() => {
@@ -106,10 +107,7 @@ export default function ShopPage() {
 
   const handleAddToCart = (p: Product) => {
     addToCart({ id: p.id, title: p.title, variant: "Default", price: p.price, image: p.image });
-    setNotification(null);
-    //setNotification(`${p.title} added to cart!`);
-    setTimeout(() => {setNotification(p.title);}, 10);
-    setTimeout(() => setNotification(null), 3000);
+    setIsCartOpen(true);
   };
 
   // Inside ShopPage component, above filteredProducts
@@ -248,7 +246,7 @@ export default function ShopPage() {
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button 
                   onClick={() => setShowMobileFilters(!showMobileFilters)}
-                  className={`flex items-center gap-2 text-[#280F0B] font-semibold tracking-widest transition-all ${showMobileFilters ? 'text-[20px]' : 'text-sm'}`}
+                  className={`flex items-center gap-2 text-[#280F0B] font-semibold tracking-tighter transition-all ${showMobileFilters ? 'text-[20px]' : 'text-sm'}`}
                 >
                   {!showMobileFilters && <Image src="/assets/images/filter.svg" alt="" width={14} height={14} />}
                   <span>Filters</span>
@@ -275,7 +273,7 @@ export default function ShopPage() {
               {/* FILTER CONTENT */}
               {/* FIXED: Removed space-y-4 and added individual margins for precise control */}
               <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block animate-fadeIn`}>
-                <div className="mt-2 mb-6 w-full max-w-[260px]">
+                <div className="mt-2 mb-6 w-full">
                   <p className="text-[12px] font-bold uppercase mb-3 tracking-wider text-[#280F0B]">Price</p>
                   
                   {/* Input Boxes */}
@@ -476,6 +474,7 @@ export default function ShopPage() {
           }
         `}</style>
       </main>
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 }

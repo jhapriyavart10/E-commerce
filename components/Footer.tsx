@@ -11,7 +11,7 @@ export default function Footer() {
           
           {/* Tagline & Socials */}
           <div className="flex-1">
-            <h2 className="text-4xl lg:text-5xl font-lora leading-tight mb-6">
+            <h2 className="text-3xl lg:text-4xl font-lora leading-tight mb-6">
               Your <span className="italic">spiritual journey</span> <br /> begins here.
             </h2>
             <p className="text-sm text-white opacity-60 max-w-sm mb-8 font-manrope">
@@ -33,8 +33,8 @@ export default function Footer() {
                 <li><Link href="/" className="hover:opacity-70">Home</Link></li>
                 <li><Link href="https://azure-takeaways-956863.framer.app/blogs" className="hover:opacity-70">Dojo</Link></li>
                 <li><Link href="/testimonials" className="hover:opacity-70">Testimonials</Link></li>
-                <li><Link href="/account" className="hover:opacity-70">User Account</Link></li>
-                <li><Link href="/shop" className="hover:opacity-70">Shop</Link></li>
+                <li><Link href="/profile" className="hover:opacity-70">User Account</Link></li>
+                <li><Link href="/product-analogue" className="hover:opacity-70">Shop</Link></li>
                 <li><Link href="/faqs" className="hover:opacity-70">FAQs</Link></li>
               </ul>
             </div>
@@ -51,7 +51,12 @@ export default function Footer() {
 
             <div className="flex flex-col">
               <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-widest mb-4 font-manrope">Contact</h3>
-              <p className="text-[15px] font-manrope">rawearth@crystals.com</p>
+              <a 
+                href="mailto:rawearth@crystals.com" 
+                className="text-[15px] font-manrope hover:text-[#F6D8AB] transition-colors"
+              >
+                rawearth@crystals.com
+              </a>
             </div>
           </div>
         </div>
@@ -59,7 +64,7 @@ export default function Footer() {
         {/* REFINED Massive Logo Text */}
         <div className="w-full pt-2 lg:pt-4 mb-10 container-type-inline-size">
           <h1
-            className="font-bold leading-none text-[#F6D8AB] text-center select-none uppercase
+            className="font-muslone font-bold leading-none text-[#F6D8AB] text-center select-none uppercase
                       whitespace-normal lg:whitespace-nowrap"
             style={{
               fontSize: 'clamp(2.5rem, 8.5cqw, 10.5rem)',

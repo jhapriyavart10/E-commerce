@@ -6,6 +6,19 @@ export const getProductQuery = `
       handle
       productType
       descriptionHtml
+
+      # Fetch Review Rating (Example namespace: "reviews")
+      rating: metafield(namespace: "reviews", key: "rating") {
+        value
+      }
+      # Fetch Review Count
+      reviewCount: metafield(namespace: "reviews", key: "rating_count") {
+        value
+      }
+      # Fetch actual review list if stored as a JSON metafield
+      reviewList: metafield(namespace: "reviews", key: "list") {
+        value
+      }
       
       gender: metafield(namespace: "shopify", key: "target-gender") {
         reference {

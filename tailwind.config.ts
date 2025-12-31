@@ -15,6 +15,7 @@ const config: Config = {
       },
       // ADD THIS SECTION BELOW
       fontFamily: {
+        muslone: ['var(--font-muslone)'],
         lora: ['var(--font-lora)', 'serif'],
         manrope: ['var(--font-manrope)', 'sans-serif'],
       },

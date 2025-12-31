@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN!;
 const SHOPIFY_STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_TOKEN!;
-const SHOPIFY_API_VERSION = '2024-04';
+const SHOPIFY_API_VERSION = '2024-01';
 
 const SHOPIFY_ENDPOINT = `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
