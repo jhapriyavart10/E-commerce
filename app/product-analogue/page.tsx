@@ -237,159 +237,145 @@ export default function ShopPage() {
 
           <div className="flex flex-col lg:flex-row gap-10 items-start">
             <aside className="w-full lg:w-[260px]">
-              {/* Filter Sidebar UI (Logic is safe now) */}
+              {/* Mobile Header: Title and Product Count */}
               <div className="lg:hidden flex flex-col mb-6">
                 <h1 className="font-lora text-[40px] leading-tight mb-1">All Products</h1>
                 <p className="text-xs opacity-70">Showing {filteredProducts.length} products</p>
               </div>
 
+              {/* Mobile Toggle Bar */}
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button 
-                  onClick={() => setShowMobileFilters(!showMobileFilters)}
-                  className={`flex items-center gap-2 text-[#280F0B] font-semibold tracking-tighter transition-all ${showMobileFilters ? 'text-[20px]' : 'text-sm'}`}
+                  onClick={() => setShowMobileFilters(true)}
+                  className="flex items-center gap-2 text-[#280F0B] font-semibold tracking-tighter"
                 >
-                  {!showMobileFilters && <Image src="/assets/images/filter.svg" alt="" width={14} height={14} />}
+                  <Image src="/assets/images/filter.svg" alt="" width={14} height={14} />
                   <span>Filters</span>
                 </button>
-                {showMobileFilters ? (
-                  <button onClick={() => setShowMobileFilters(false)} className="text-3xl font-light leading-none">×</button>
-                ) : (
-                  <select 
-                    value={sortBy}
-                    onChange={(e) => setBy(e.target.value)}
-                    className="bg-transparent border-none font-semibold cursor-pointer outline-none text-xs"
-                  >
-                    <option>Default Sorting</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                    <option>Name: A to Z</option>
-                    <option>Name: Z to A</option>
-                    <option>Best selling</option>
-                    <option>Featured</option>
-                  </select>
-                )}
+
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setBy(e.target.value)}
+                  className="bg-transparent border-none font-semibold cursor-pointer outline-none text-xs"
+                >
+                  <option>Default Sorting</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Name: A to Z</option>
+                  <option>Name: Z to A</option>
+                </select>
               </div>
 
-              {/* FILTER CONTENT */}
-              {/* FIXED: Removed space-y-4 and added individual margins for precise control */}
-              <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block animate-fadeIn`}>
-                <div className="mt-2 mb-6 w-full">
-                  <p className="text-[12px] font-bold uppercase mb-3 tracking-wider text-[#280F0B]">Price</p>
+              {/* THE FIXED DRAWER SYSTEM */}
+              <div className={`
+                fixed inset-0 z-[100] 
+                ${showMobileFilters ? 'visible' : 'invisible lg:visible lg:static'}
+              `}>
+                {/* 1. Backdrop (Mobile only) */}
+                <div 
+                  className={`absolute inset-0 bg-black/40 transition-opacity duration-300 lg:hidden ${showMobileFilters ? 'opacity-100' : 'opacity-0'}`}
+                  onClick={() => setShowMobileFilters(false)}
+                />
+
+                {/* 2. Sliding Panel */}
+                <div className={`
+                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl overflow-y-auto
+                  transition-transform duration-300 ease-in-out transform
+                  ${showMobileFilters ? 'translate-x-0' : '-translate-x-full'}
+                  lg:static lg:w-full lg:max-w-none lg:translate-x-0 lg:p-0 lg:bg-transparent lg:shadow-none lg:overflow-visible
+                `}>
                   
-                  {/* Input Boxes */}
-                  <div className="flex gap-3 mb-5 items-center">
-                    <div className="relative w-1/2">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
-                      <input 
-                        type="number" 
-                        className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
-                        value={filters.price.min} 
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          setFilters(p => ({...p, price: {...p.price, min: val}}));
-                        }} 
-                      />
-                    </div>
-                    <span className="text-[#280F0B] opacity-50">—</span>
-                    <div className="relative w-1/2">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
-                      <input 
-                        type="number" 
-                        className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
-                        value={filters.price.max} 
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          setFilters(p => ({...p, price: {...p.price, max: val}}));
-                        }} 
-                      />
-                    </div>
+                  {/* Mobile-Only Header inside drawer */}
+                  <div className="flex justify-between items-center mb-8 lg:hidden">
+                    <span className="font-lora text-2xl">Filters</span>
+                    <button onClick={() => setShowMobileFilters(false)} className="text-3xl font-light">×</button>
                   </div>
 
-                  {/* Slider Track Container */}
-                  <div className="relative h-6 w-full flex items-center px-1"> 
-                    {/* Background Track */}
-                    <div className="absolute h-1.5 bg-[#280F0B33] w-full rounded-full overflow-hidden">
-                      {/* Active Range Highlight */}
-                      <div 
-                        className="absolute h-full bg-[#725C4B]" 
-                        style={{ 
-                          left: `${Math.min((filters.price.min / 150) * 100, 100)}%`, 
-                          right: `${Math.max(100 - (filters.price.max / 150) * 100, 0)}%` 
-                        }} 
-                      />
-                    </div>
-                    
-                    {/* Dual Range Inputs */}
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="150" 
-                      value={filters.price.min} 
-                      onChange={(e) => {
-                        const val = Math.min(Number(e.target.value), filters.price.max);
-                        setFilters(p => ({...p, price: {...p.price, min: val}}));
-                      }} 
-                      className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
-                    />
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="150" 
-                      value={filters.price.max} 
-                      onChange={(e) => {
-                        const val = Math.max(Number(e.target.value), filters.price.min);
-                        setFilters(p => ({...p, price: {...p.price, max: val}}));
-                      }} 
-                      className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
-                    />
-                  </div>
-                </div>
-
-                {[
-                  { id: 'category' as const, label: 'Product category', options: ['Bracelets', 'Charms & Pendants'] },
-                  { id: 'gender' as const, label: 'Gender', options: ['For Her', 'For Him', 'Unisex'] },
-                  { id: 'material' as const, label: 'Jewellery Material', options: dynamicMaterials },
-                ].map((section) => (
-                  <div key={section.id} className="border-t border-[#280F0B33] pt-3 mt-5">
-                    <button onClick={() => toggleSection(section.id)} className="w-full flex justify-between items-center text-[12px] font-bold uppercase tracking-wider mb-2">
-                      {section.label}
-                      <Image src="/assets/images/dropdown.svg" alt="" width={24} height={24} className={openSections[section.id] ? 'rotate-180' : ''} />
-                    </button>
-                    {/* Replace {openSections[section.id] && ( ... )} with this: */}
-                    <div className={`
-                      overflow-hidden transition-all duration-500 ease-in-out
-                      ${openSections[section.id] ? 'max-height-animate opacity-100 mt-2' : 'max-height-0 opacity-0'}
-                    `}>
-                      <div className="space-y-2 pb-3">
-                        {section.options.map(opt => (
-                          <label key={opt} className="flex items-center gap-3 text-sm cursor-pointer hover:opacity-70 transition-opacity">
-                            <div className="relative flex items-center justify-center w-4 h-4">
-                              <input 
-                                type="checkbox" 
-                                className="peer appearance-none w-4 h-4 border border-[#280F0B] rounded-sm bg-transparent checked:bg-transparent transition-all cursor-pointer" 
-                                checked={filters[section.id].includes(opt)} 
-                                onChange={() => toggleFilter(section.id, opt)} 
-                              />
-                              <svg 
-                                className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block text-[#280F0B]" 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                strokeWidth="4" 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round"
-                              >
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                              </svg>
-                            </div>
-                            <span>{opt} ({getCount(section.id, opt)})</span>
-                          </label>
-                        ))}
+                  {/* PRICE FILTER SECTION */}
+                  <div className="mt-2 mb-6 w-full">
+                    <p className="text-[12px] font-bold uppercase mb-3 tracking-wider text-[#280F0B]">Price</p>
+                    <div className="flex gap-3 mb-5 items-center">
+                      <div className="relative w-1/2">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
+                        <input 
+                          type="number" 
+                          className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
+                          value={filters.price.min} 
+                          onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Number(e.target.value)}}))} 
+                        />
+                      </div>
+                      <span className="text-[#280F0B] opacity-50">—</span>
+                      <div className="relative w-1/2">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
+                        <input 
+                          type="number" 
+                          className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
+                          value={filters.price.max} 
+                          onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Number(e.target.value)}}))} 
+                        />
                       </div>
                     </div>
+
+                    {/* Dual Range Sliders */}
+                    <div className="relative h-6 w-full flex items-center px-1"> 
+                      <div className="absolute h-1.5 bg-[#280F0B33] w-full rounded-full overflow-hidden">
+                        <div 
+                          className="absolute h-full bg-[#725C4B]" 
+                          style={{ 
+                            left: `${(filters.price.min / 150) * 100}%`, 
+                            right: `${100 - (filters.price.max / 150) * 100}%` 
+                          }} 
+                        />
+                      </div>
+                      <input 
+                        type="range" min="0" max="150" value={filters.price.min} 
+                        onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Math.min(Number(e.target.value), filters.price.max)}}))}
+                        className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
+                      />
+                      <input 
+                        type="range" min="0" max="150" value={filters.price.max} 
+                        onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Math.max(Number(e.target.value), filters.price.min)}}))}
+                        className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
+                      />
+                    </div>
                   </div>
-                ))}
+
+                  {/* DYNAMIC CATEGORY SECTIONS */}
+                  {[
+                    { id: 'category' as const, label: 'Product category', options: ['Bracelets', 'Charms & Pendants'] },
+                    { id: 'gender' as const, label: 'Gender', options: ['For Her', 'For Him', 'Unisex'] },
+                    { id: 'material' as const, label: 'Jewellery Material', options: dynamicMaterials },
+                  ].map((section) => (
+                    <div key={section.id} className="border-t border-[#280F0B33] pt-3 mt-5">
+                      <button onClick={() => toggleSection(section.id)} className="w-full flex justify-between items-center text-[12px] font-bold uppercase tracking-wider mb-2">
+                        {section.label}
+                        <Image 
+                            src="/assets/images/dropdown.svg" 
+                            alt="" width={24} height={24} 
+                            className={`transition-transform duration-300 ${openSections[section.id] ? 'rotate-180' : ''}`} 
+                        />
+                      </button>
+                      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openSections[section.id] ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                        <div className="space-y-2 pb-3">
+                          {section.options.map(opt => (
+                            <label key={opt} className="flex items-center gap-3 text-sm cursor-pointer hover:opacity-70 transition-opacity">
+                              <div className="relative flex items-center justify-center w-4 h-4">
+                                <input 
+                                  type="checkbox" 
+                                  className="peer appearance-none w-4 h-4 border border-[#280F0B] rounded-sm bg-transparent checked:bg-[#280F0B] transition-all cursor-pointer" 
+                                  checked={filters[section.id].includes(opt)} 
+                                  onChange={() => toggleFilter(section.id, opt)} 
+                                />
+                                <svg className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block text-[#F6D8AB]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                              </div>
+                              <span>{opt} ({getCount(section.id, opt)})</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </aside>
 

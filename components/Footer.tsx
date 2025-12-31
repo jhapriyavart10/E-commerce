@@ -3,15 +3,15 @@ import { Instagram, Facebook} from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#280F0B] text-[#F6D8AB] pt-16 pb-10 mt-auto px-4 sm:px-6 lg:px-12 overflow-hidden">
-      <div className="max-w-[1440px] mx-auto">
+    <footer className="bg-[#280F0B] text-[#F6D8AB] pt-16 pb-10 mt-auto px-4 sm:px-6 lg:px-12">
+      <div className="max-w-[2440px] mx-auto">
         
         {/* Main Content Grid */}
         <div className="flex flex-col lg:flex-row lg:justify-between gap-12 lg:gap-8 mb-16 lg:mb-24">
           
           {/* Tagline & Socials */}
           <div className="flex-1">
-            <h2 className="font-lora text-[32px] md:text-[48px] leading-tight text-[#F6D8AB] mb-6">
+            <h2 className="font-lora text-[32px] md:text-[32px] leading-tight text-[#F6D8AB] mb-6">
               Your <span className="italic font-medium text-[#F6D8AB]">spiritual journey</span> <br /> 
               begins <span className="font-medium text-[#ce953f]">here</span>.
             </h2>
@@ -24,19 +24,19 @@ export default function Footer() {
                 <img src="/assets/images/X.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
               </Link>
               <Link href="#" aria-label="Instagram">
-                <img src="/assets/images/instagram.png" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
+                <img src="/assets/images/insta.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
               </Link> 
-              <Link href="#" aria-label="Facebook">
-                <img src="/assets/images/facebook.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
-              </Link>
               <Link href="#" aria-label="TikTok">
                 <img src="/assets/images/tiktok.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
+              </Link>
+              <Link href="#" aria-label="Facebook">
+                <img src="/assets/images/facebook.svg" className="w-5 h-5 invert brightness-0 hover:opacity-70" />
               </Link>      
             </div>
           </div>
 
           {/* Links Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 lg:gap-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 lg:gap-16 w-full lg:w-auto">
             <div className="flex flex-col">
               <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-widest mb-4 font-manrope">Index</h3>
               <ul className="space-y-2 text-[15px] font-manrope">
@@ -59,7 +59,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex flex-col lg:items-end">
               <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-widest mb-4 font-manrope">Contact</h3>
               <a 
                 href="mailto:rawearth@crystals.com" 
@@ -72,13 +72,13 @@ export default function Footer() {
         </div>
 
         {/* REFINED Massive Logo Text */}
-        <div className="w-full pt-2 lg:pt-3 mb-10 container-type-inline-size">
+        <div className="w-full mb-10 ">
           <h1
-            className="font-muslone font-bold leading-none text-[#F6D8AB] text-center select-none uppercase
+            className="font-muslone font-bold leading-[0.8] text-[#F6D8AB] text-center select-none uppercase
                       whitespace-normal lg:whitespace-nowrap"
             style={{
-              fontSize: 'clamp(2.5rem, 8.5cqw, 10.5rem)',
-              letterSpacing: '-0.035em',
+              fontSize: 'clamp(2.2rem, 8vw, 10rem)',
+              letterSpacing: '-0.04em',
             }}
           >
             Raw Earth Crystals
