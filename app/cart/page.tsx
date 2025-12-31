@@ -72,10 +72,12 @@ export default function CartPage() {
               <path d={svgPathsDesktop.p1553ba00} fill="black" />
             </svg>
           </div>
-          <div className="flex gap-3 items-center opacity-40">
-            <div className="bg-[#280f0b] flex items-center justify-center rounded-full size-[30px] text-[#f6d8ab] font-bold">2</div>
-            <p className="text-[#280f0b] text-base">Checkout</p>
-          </div>
+          <Link href="/checkout" className="flex gap-3 items-center opacity-40">
+            <div className="bg-[#280f0b] flex items-center justify-center rounded-full size-[30px] text-[#f6d8ab] font-bold group-hover:bg-[#ce953f] transition-colors">
+              2
+            </div>
+            <p className="text-[#280f0b] text-base font-medium">Checkout</p>
+          </Link>
           <div className="w-[33px] h-[16px] opacity-40">
             <svg className="w-full h-full" fill="none" viewBox="0 0 33 16">
               <path d={svgPathsDesktop.p1553ba00} fill="black" />
