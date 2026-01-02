@@ -9,11 +9,13 @@ export default function Footer() {
   useEffect(() => {
     const updateScale = () => {
       if (!logoRef.current || !containerRef.current) return;
+      logoRef.current.style.transform = 'scale(1)';
       const textWidth = logoRef.current.offsetWidth;
       const containerWidth = containerRef.current.offsetWidth;
       if (textWidth === 0 || containerWidth === 0) return;
       const rawScale = containerWidth / textWidth;
-      const clampedScale = Math.min(Math.max(rawScale, 0.82), 1.12);
+      const isMobile = window.innerWidth < 768;
+      const clampedScale = isMobile ? Math.min(rawScale, 1.0) : Math.min(Math.max(rawScale, 0.82), 1.12);
       setScale(clampedScale);
     };
 
@@ -25,7 +27,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#280F0B] text-[#F6D8AB] pt-16 pb-10 mt-auto">
-      <div ref={containerRef} className="w-[85vw] max-w-[2440px] mx-auto px-4 sm:px-0">
+      <div ref={containerRef} className="w-[99vw] sm:w-[85vw] max-w-[2440px] mx-auto px-4 sm:px-0">
 
         {/* Main Content Grid */}
         <div className="flex flex-col lg:flex-row lg:justify-between gap-12 lg:gap-8 mb-16 lg:mb-24">
@@ -39,7 +41,7 @@ export default function Footer() {
               }}
             >
               Your <span className="italic font-normal">spiritual journey</span> <br />
-              begins <span className="font-normal text-[#ce953f]">here</span>.
+              begins <span className="font-normal text-[#FFC26F]">here</span>.
             </h2>
 
             <p className="font-manrope text-[14px] text-white opacity-70 max-w-md mb-8 leading-[1.6]">
@@ -102,11 +104,11 @@ export default function Footer() {
         </div>
 
         {/* Massive Logo Text */}
-        <div className="w-full mb-10 overflow-hidden">
+        <div className="w-full mb-10 overflow-hidden flex justify-center">
           <h1
-            className="font-muslone uppercase text-center select-none whitespace-nowrap"
+            className="font-muslone uppercase select-none whitespace-nowrap tracking-wider"
             style={{
-              fontSize: 'clamp(2.2rem, 7vw, 10rem)',      // FIXED base size
+              fontSize: 'clamp(1.2rem, 8vw, 12rem)',      // FIXED base size
               fontWeight: 500,         // FIXED weight
               lineHeight: 0.9,
               WebkitFontSmoothing: 'antialiased',
@@ -118,7 +120,8 @@ export default function Footer() {
               style={{
                 display: 'inline-block',
                 transform: `scale(${scale})`,
-                transformOrigin: 'center',
+                transformOrigin: 'center center',
+                willChange: 'transform',
               }}
             >
               Raw Earth Crystals
@@ -127,9 +130,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-4
-                        text-[12px] text-white opacity-60 font-manrope
-                        tracking-[0.08em]  text-center lg:text-left">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-4 w-full 
+                font-manrope text-[14px] font-medium tracking-[-0.1px] leading-[1.4em] 
+                text-[#CCCCCC] text-center lg:text-left">
           <p>© {new Date().getFullYear()} Raw Earth Crystals All rights reserved.</p>
           <p>Designed & Developed by Dtory Studio</p>
         </div>
