@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { X, Plus, Minus, ChevronDown } from 'lucide-react';
+import { X, Plus, Minus, ChevronDown, CircleX } from 'lucide-react';
 import { useCart } from '@/app/context/CartContext';
 import { useRouter } from 'next/navigation';
 
@@ -13,7 +13,7 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { cartItems, updateQuantity, cartId, getTotalItems } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, cartId, getTotalItems } = useCart();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [couponExpanded, setCouponExpanded] = useState(false);
   const router = useRouter();
@@ -88,13 +88,24 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <div className="space-y-8">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex gap-4">
-                  <div className="relative h-28 w-24 flex-shrink-0 overflow-hidden rounded bg-white/50">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="relative h-28 w-24 flex-shrink-0">
+                    <div className="h-full w-full overflow-hidden rounded bg-white/50">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    
+                    {/* CROSS REMOVE BUTTON (Top Left) */}
+                    <button 
+                      onClick={() => removeFromCart(item.id)}
+                      className="absolute -top-2 -left-2 z-10 bg-white rounded-full text-[#280f0b] hover:text-red-600 shadow-sm transition-colors"
+                      title="Remove item"
+                    >
+                      <CircleX size={22} fill="currentColor" stroke="white" strokeWidth={1.5} />
+                    </button>
                   </div>
 
                   <div className="flex flex-1 flex-col justify-between py-1">

@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/app/context/CartContext'
 import CartDrawer from '@/components/CartDrawer'
-import { Menu, X, Search, ShoppingBag, User } from 'lucide-react' // Using Lucide for cleaner icons
+import { Menu, X, Search, ShoppingBag } from 'lucide-react' // Using Lucide for cleaner icons
 
 const BANNER_MESSAGES = [
   "Free Standard Domestic Shipping above $135",
@@ -117,8 +117,13 @@ export default function Header() {
             </button>
 
             {/* Profile Icon - Hidden on Mobile (moved to menu) */}
-            <Link href="/profile" className="hidden lg:block p-2 hover:text-gray-300 transition-colors">
-              <User size={24} />
+            <Link href="/profile" className="hidden lg:block p-2 hover:opacity-80 transition-opacity">
+              <Image 
+                src="/assets/images/profile.svg" 
+                alt="Profile" 
+                width={24} 
+                height={24} 
+              />
             </Link>
 
             <button 
