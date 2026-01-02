@@ -1,9 +1,31 @@
+"use client";
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Footer() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLSpanElement>(null);
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const updateScale = () => {
+      if (!logoRef.current || !containerRef.current) return;
+      const textWidth = logoRef.current.offsetWidth;
+      const containerWidth = containerRef.current.offsetWidth;
+      if (textWidth === 0 || containerWidth === 0) return;
+      const rawScale = containerWidth / textWidth;
+      const clampedScale = Math.min(Math.max(rawScale, 0.82), 1.12);
+      setScale(clampedScale);
+    };
+
+    requestAnimationFrame(updateScale);
+    window.addEventListener('resize', updateScale);
+
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
   return (
-    <footer className="bg-[#280F0B] text-[#F6D8AB] pt-16 pb-10 mt-auto px-4 sm:px-6 lg:px-12">
-      <div className="max-w-[2440px] mx-auto">
+    <footer className="bg-[#280F0B] text-[#F6D8AB] pt-16 pb-10 mt-auto">
+      <div ref={containerRef} className="w-[85vw] max-w-[2440px] mx-auto px-4 sm:px-0">
 
         {/* Main Content Grid */}
         <div className="flex flex-col lg:flex-row lg:justify-between gap-12 lg:gap-8 mb-16 lg:mb-24">
@@ -65,7 +87,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div className="lg:text-right">
+            <div className="lg:text-left">
               <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-[0.2em] mb-4 font-manrope">
                 Contact
               </h3>
@@ -84,21 +106,18 @@ export default function Footer() {
           <h1
             className="font-muslone uppercase text-center select-none whitespace-nowrap"
             style={{
-              fontSize: 'clamp(2rem, 7vw, 10rem)',
-              fontWeight: 500,
+              fontSize: 'clamp(2.2rem, 7vw, 10rem)',      // FIXED base size
+              fontWeight: 500,         // FIXED weight
               lineHeight: 0.9,
               WebkitFontSmoothing: 'antialiased',
               paddingTop: '0.08em',
             }}
           >
             <span
+              ref={logoRef}
               style={{
                 display: 'inline-block',
-                transform: `
-                  scaleX(
-                    clamp(0.8, 100vw / 520, 1.06)
-                  )
-                `,
+                transform: `scale(${scale})`,
                 transformOrigin: 'center',
               }}
             >
@@ -107,11 +126,10 @@ export default function Footer() {
           </h1>
         </div>
 
-
         {/* Bottom Bar */}
         <div className="flex flex-col lg:flex-row justify-between items-center gap-4
                         text-[12px] text-white opacity-60 font-manrope
-                        tracking-[0.08em] uppercase text-center lg:text-left">
+                        tracking-[0.08em]  text-center lg:text-left">
           <p>© {new Date().getFullYear()} Raw Earth Crystals All rights reserved.</p>
           <p>Designed & Developed by Dtory Studio</p>
         </div>
