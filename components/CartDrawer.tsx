@@ -87,7 +87,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           ) : (
             <div className="space-y-8">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex gap-4">
+                <div key={item.id} className="group flex gap-4">
                   <div className="relative h-28 w-24 flex-shrink-0">
                     <div className="h-full w-full overflow-hidden rounded bg-white/50">
                       <Image
@@ -101,7 +101,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     {/* CROSS REMOVE BUTTON (Top Left) */}
                     <button 
                       onClick={() => removeFromCart(item.id)}
-                      className="absolute -top-2 -left-2 z-10 bg-white rounded-full text-[#280f0b] hover:text-red-600 shadow-sm transition-colors"
+                      //className="absolute -top-2 -left-2 z-10 bg-white rounded-full text-[#280f0b] hover:text-red-600 shadow-sm transition-colors"
+                      className="absolute -top-2 -left-2 z-10 bg-white rounded-full text-[#280f0b] hover:text-red-600 shadow-sm transition-all opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
                       title="Remove item"
                     >
                       <CircleX size={22} fill="currentColor" stroke="white" strokeWidth={1.5} />
@@ -109,17 +110,19 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   </div>
 
                   <div className="flex flex-1 flex-col justify-between py-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-manrope font-semibold text-[#280f0b] leading-tight">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="min-w-0"> {/* min-w-0 allows text truncation/wrapping within flex */}
+                        <h3 className="font-manrope font-semibold text-[#280f0b] leading-tight break-words">
                           {item.title}
                         </h3>
                         {item.variant && (
                           <p className="text-xs text-[#7f3e2f] mt-1 uppercase tracking-wider">{item.variant}</p>
                         )}
                       </div>
-                      <p className="font-manrope font-bold text-[#280f0b]">
-                        ${item.price.toFixed(2)} <span className="text-[12px]">AUD</span>
+                      
+                      {/* PRICE FIX: Added whitespace-nowrap and shrink-0 to prevent line breaks */}
+                      <p className="font-manrope text-[13px] text-[#280f0b] whitespace-nowrap flex-shrink-0">
+                        ${(item.price * item.quantity).toFixed(2)} <span className="text-[13px]">AUD</span>
                       </p>
                     </div>
 
