@@ -20,6 +20,11 @@ const lora = localFont({
       style: 'normal',
     },
     {
+      path: '../public/assets/font/Lora-MediumItalic.ttf',
+      weight: '400',
+      style: 'italic',
+    },
+    {
       path: '../public/assets/font/Lora-BoldItalic.ttf',
       weight: '700',
       style: 'italic',
