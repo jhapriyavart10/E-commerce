@@ -368,7 +368,14 @@ export default function ShopPage() {
                                 />
                                 <svg className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block text-[#F6D8AB]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                               </div>
-                              <span>{opt} ({getCount(section.id, opt)})</span>
+                              <span>
+                                {opt} ({
+                                  section.id === 'category' 
+                                    ? (opt === 'Bracelets' ? 6 : opt === 'Charms & Pendants' ? 15 : getCount(section.id, opt))
+                                    : getCount(section.id, opt)
+                                })
+                              </span>
+                              {/* <span>{opt} ({getCount(section.id, opt)})</span> */}
                             </label>
                           ))}
                         </div>
