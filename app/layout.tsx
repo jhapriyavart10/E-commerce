@@ -1,14 +1,12 @@
 import type { Metadata } from 'next'
+import { Manrope } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { CartProvider } from './context/CartContext'
 //import Header from '@/components/Header' // Adjust path based on your folder structure
 import Footer from '@/components/Footer' // Adjust path based on your folder structure
 
-const manrope = localFont({
-  src: "../public/assets/font/Manrope-Regular.ttf",
-  variable: '--font-manrope',
-})
+const manrope = Manrope({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-manrope', })
 const muslone = localFont({
   src: '../public/assets/font/muslone.otf', // Ensure you upload the font file here
   variable: '--font-muslone',
@@ -34,9 +32,7 @@ export default function RootLayout({
       {/* 1. Added flex flex-col and min-h-screen to the body */}
       <body className={`${lora.variable} ${manrope.variable} ${muslone.variable} flex flex-col min-h-screen`}>
         <CartProvider>
-          {/* 2. Header added here appears on all pages */}
-          
-
+    
           {/* 3. flex-grow ensures this area takes up all available space, pushing footer down */}
           <main className="flex-grow">
             {children}

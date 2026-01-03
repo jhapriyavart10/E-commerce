@@ -64,12 +64,14 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   useEffect(() => {
     async function fetchRecommended() {
       try {
-        const response = await fetch('/api/shopify/products?limit=4'); 
+        const response = await fetch('/api/shopify/products'); 
         const data = await response.json();
-        const filtered = data.filter((p: Product) => p.id !== product.id);
-        const shuffled = filtered.sort(() => 0.5 - Math.random());
+        const otherProducts = data.filter((p: Product) => p.id !== product.id);
+        const shuffled = [...otherProducts]
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 4);
+          
         setRecommendedProducts(shuffled);
-
       } catch (error) {
         console.error("Failed to fetch recommended products:", error);
       } finally {
@@ -77,7 +79,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
       }
     }
     fetchRecommended();
-  }, []);
+  }, [product.id]);
 
   return (
     <>
