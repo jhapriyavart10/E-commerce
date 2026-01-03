@@ -127,7 +127,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
               <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
                 <div className="flex justify-between items-center mb-4">
-                  <p className="text-sm font-semibold uppercase tracking-tight">Jewellery Material</p>
+                  <p className="text-sm font-semibold uppercase tracking-widest">Jewellery Material</p>
                   <div className="hidden lg:block">
                     <Image src="/assets/images/book.svg" alt="Material Guide" width={22} height={22} className="cursor-pointer" />
                   </div>

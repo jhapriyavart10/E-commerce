@@ -13,9 +13,20 @@ const muslone = localFont({
 })
 
 const lora = localFont({
-  src: "../public/assets/font/Lora-BoldItalic.ttf",
+  src: [
+    {
+      path: '../public/assets/font/Lora-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../public/assets/font/Lora-BoldItalic.ttf',
+      weight: '700',
+      style: 'italic',
+    },
+  ],
   variable: '--font-lora',
-})
+});
 
 export const metadata: Metadata = {
   title: 'Raw Earth Crystals',

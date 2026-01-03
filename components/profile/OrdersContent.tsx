@@ -16,7 +16,7 @@ const OrdersContent = () => {
         />
       </div>
 
-      <h2 className="text-2xl md:text-3xl font-bold text-[#280F0B] mb-6">
+      <h2 className="font-manrope font-bold text-[20px] md:text-[24px] leading-[100%] tracking-[-0.5px] text-[#280F0B] mb-6">
         You don't have any orders yet.
       </h2>
 
