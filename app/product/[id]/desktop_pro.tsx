@@ -42,6 +42,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   // Logic for Recommended Products Backend
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [isRecLoading, setIsRecLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const reviewFilters = [
     { label: 'Search reviews', isSearch: true },
@@ -59,6 +60,28 @@ export default function UnifiedProductPage({ product }: { product: any }) {
       image: p.image 
     });
     setIsCartOpen(true);
+  };
+
+  const handleShopPay = async () => {
+    const variantId = product.variants?.[0]?.id || product.id; 
+    try {
+      const response = await fetch('/api/shopify/checkout', {
+        method: 'POST',
+        body: JSON.stringify({
+          variantId: variantId, 
+          quantity: quantity
+        })
+      });
+      
+      const data = await response.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        console.error("No checkout URL returned:", data);
+      }
+    } catch (error) {
+      console.error("Shop Pay redirect failed", error);
+    }
   };
 
   useEffect(() => {
@@ -162,7 +185,12 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                 >
                   Add to cart
                 </button>
-                <button className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3">Buy with SHOP</button>
+                <button 
+                  onClick={handleShopPay}
+                  className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3 flex items-center justify-center gap-2"
+                >
+                  Buy with <span className="normal">SHOP</span> 
+                </button>
               </div>
              <div className="flex items-center gap-1 mt-4 opacity-80">
               <Image 
@@ -256,23 +284,34 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
             {/* REVIEW FILTERS: 2 COLS ON MOBILE, ROW ON DESKTOP */}
             <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-8">
-              {reviewFilters.map((f, idx) => (
-                <div 
-                  key={idx} 
-                  className={`flex items-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:w-[177px] lg:h-[42px] 
-                    ${f.isSearch ? 'lg:w-[280px] justify-start' : 'justify-center'}`}
-                >
-                  {f.isSearch && (
-                    <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4 ml-1" />
-                  )}
-                  
-                  <span>{f.label}</span>
+              {reviewFilters.map((f, idx) => {
+                const containerClasses = `flex items-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:h-[42px] transition-all
+                  ${f.isSearch 
+                    ? 'lg:w-[450px] justify-start border border-transparent focus-within:border-[#280F0B66] focus-within:bg-[#7F3E2F4D]' 
+                    : 'lg:w-[177px] justify-center cursor-pointer hover:bg-[#7F3E2F4D]'}`;
 
-                  {!f.isSearch && (
-                    <img src="/assets/images/dropdown.svg" alt="v" className="w-4 h-4" />
-                  )}
-                </div>
-              ))}
+                return (
+                  <div key={idx} className={containerClasses}>
+                    {f.isSearch ? (
+                      <>
+                        <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4 ml-1 opacity-70" />
+                        <input
+                          type="text"
+                          placeholder={f.label}
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="bg-transparent border-none outline-none w-full text-[#280F0B] placeholder-[#280F0B80] text-sm"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <span>{f.label}</span>
+                        <img src="/assets/images/dropdown.svg" alt="v" className="w-4 h-4" />
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {[1, 2].map(i => (

@@ -8,7 +8,8 @@ import Footer from '@/components/Footer' // Adjust path based on your folder str
 
 const manrope = Manrope({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-manrope', })
 const muslone = localFont({
-  src: '../public/assets/font/muslone.otf', // Ensure you upload the font file here
+  src: '../public/assets/font/muslone.otf', 
+  
   variable: '--font-muslone',
 })
 

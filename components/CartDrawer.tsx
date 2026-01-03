@@ -82,7 +82,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           {cartItems.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <p className="font-lora text-xl opacity-60">Your cart is empty</p>
-              <button onClick={onClose} className="mt-4 underline font-bold">Continue Shopping</button>
+              <Link 
+                href="/product-analogue" 
+                onClick={onClose} 
+                className="mt-4 underline font-bold inline-block"
+              >
+                Continue Shopping
+              </Link>
             </div>
           ) : (
             <div className="space-y-8">

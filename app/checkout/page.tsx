@@ -183,7 +183,7 @@ export default function CheckoutPage() {
         <div className="flex flex-col lg:flex-row gap-16 items-start"> 
           <div className="flex-1 w-full order-1">
             <h1 className="font-lora text-[40px] lg:text-[72px] text-[#280f0b] leading-none mb-8">
-              Checkout <span className="text-lg opacity-60 font-manrope font-normal">({getTotalItems()} items)</span>
+              Checkout <span className="text-lg opacity-60 font-lora font-normal">({getTotalItems()} items)</span>
             </h1>
             
             <section className="space-y-8 mt-8">
