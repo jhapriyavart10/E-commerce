@@ -135,7 +135,15 @@ export default function ShopPage() {
 
   const filteredProducts = safeProducts.filter((p) => {
     if (p.price < filters.price.min || p.price > filters.price.max) return false;
-    if (filters.category.length && !filters.category.includes(p.category)) return false;
+    if (filters.category.length > 0) {
+      const title = p.title.toLowerCase();
+      const isBraceletItem = title.includes('bracelets') || title.includes('bracelet');
+      const isPendantItem = title.includes('pendants') || (!isBraceletItem && !title.includes('bracelet'));
+      const matchesSelectedBracelets = filters.category.includes('Bracelets') && isBraceletItem;
+      const matchesSelectedPendants = filters.category.includes('Charms & Pendants') && isPendantItem;
+
+      if (!matchesSelectedBracelets && !matchesSelectedPendants) return false;
+    }
     if (filters.gender.length) {
       const productGenders = Array.isArray(p.gender) ? p.gender : [p.gender];
       const hasMatch = productGenders.some(g => filters.gender.includes(g));
@@ -368,14 +376,24 @@ export default function ShopPage() {
                                 />
                                 <svg className="absolute w-3 h-3 pointer-events-none hidden peer-checked:block text-[#F6D8AB]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                               </div>
+                              {/* <span>{opt} ({getCount(section.id, opt)})</span> */}
                               <span>
                                 {opt} ({
                                   section.id === 'category' 
-                                    ? (opt === 'Bracelets' ? 6 : opt === 'Charms & Pendants' ? 15 : getCount(section.id, opt))
+                                    ? safeProducts.filter(product => {
+                                        const title = product.title.toLowerCase();
+                                        if (opt === 'Bracelets') {
+                                          return title.includes('bracelets') || title.includes('bracelet');
+                                        }
+                                        if (opt === 'Charms & Pendants') {
+                                          // Logic: Include if it contains 'pendants' OR if it does NOT contain 'bracelets'
+                                          return title.includes('pendants') || !title.includes('bracelets') && !title.includes('bracelet');
+                                        }
+                                        return false;
+                                      }).length
                                     : getCount(section.id, opt)
                                 })
                               </span>
-                              {/* <span>{opt} ({getCount(section.id, opt)})</span> */}
                             </label>
                           ))}
                         </div>
