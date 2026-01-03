@@ -41,7 +41,7 @@ export default function Footer() {
               <span className="font-manrope font-normal">
                 Your{' '}
               </span>
-              <span className="font-lora italic font-normal">
+              <span className="font-lora italic font-medium">
                 spiritual journey
               </span>
               <br />
