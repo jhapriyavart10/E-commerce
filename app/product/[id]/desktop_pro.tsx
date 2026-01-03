@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link'; // FIXED: Changed from lucide-react to next/link
 import Header from '@/components/Header';
 import { useCart } from '@/app/context/CartContext';
+import CartDrawer from '@/components/CartDrawer';
 
 // Types for backend integration
 interface Product {
@@ -36,6 +37,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
   const { addToCart } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Logic for Recommended Products Backend
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
@@ -47,6 +49,17 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     { label: 'All ratings', isSearch: false },
     { label: 'With media', isSearch: false },
   ];
+
+  const handleAddToCart = (p: Product) => {
+    addToCart({ 
+      id: p.id, 
+      title: p.title, 
+      variant: "Default", 
+      price: p.price, 
+      image: p.image 
+    });
+    setIsCartOpen(true);
+  };
 
   useEffect(() => {
     async function fetchRecommended() {
@@ -190,7 +203,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
           <div className="w-full h-[35px] bg-[#C38154]" />
           <div className="px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[1920px] mx-auto">
             <div className="flex flex-col lg:grid lg:grid-cols-2 min-h-[400px] lg:min-h-[560px] py-12 lg:py-0">
-              <h2 className="font-lora italic font-bold text-[#F6D8AB] text-[48px] lg:text-[80px] xl:text-[96px] leading-none mb-[237px] lg:mb-0 lg:self-start lg:pt-24">Embrace<br />Spirituality.</h2>
+              <h2 className="font-lora italic font-medium text-[#F6D8AB] text-[48px] lg:text-[80px] xl:text-[96px] leading-[0.95] mb-[237px] lg:mb-0 lg:self-start lg:pt-24">Embrace<br />Spirituality.</h2>
               <p className="font-manrope text-[#F6D8AB] text-[14px] opacity-90 lg:max-w-[22rem] lg:justify-self-end lg:self-end lg:pb-16">Experience the natural energy of our ethically sourced crystals, designed to bring balance and harmony to your space.</p>
             </div>
           </div>
@@ -239,13 +252,23 @@ export default function UnifiedProductPage({ product }: { product: any }) {
            <div className="mt-16">
             <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
 
-            {/* REVIEW FILTERS: 2 COLS ON MOBILE (Search/All Ratings in Col 1), ROW ON DESKTOP */}
+            {/* REVIEW FILTERS: 2 COLS ON MOBILE, ROW ON DESKTOP */}
             <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-8">
               {reviewFilters.map((f, idx) => (
-                <div key={idx} className="flex items-center justify-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:w-[177px] lg:h-[42px]">
-                  {f.isSearch && <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4" />}
+                <div 
+                  key={idx} 
+                  className={`flex items-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:w-[177px] lg:h-[42px] 
+                    ${f.isSearch ? 'lg:w-[280px] justify-start' : 'justify-center'}`}
+                >
+                  {f.isSearch && (
+                    <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4 ml-1" />
+                  )}
+                  
                   <span>{f.label}</span>
-                  {!f.isSearch && <img src="/assets/images/dropdown.svg" alt="v" />}
+
+                  {!f.isSearch && (
+                    <img src="/assets/images/dropdown.svg" alt="v" className="w-4 h-4" />
+                  )}
                 </div>
               ))}
             </div>
@@ -272,58 +295,51 @@ export default function UnifiedProductPage({ product }: { product: any }) {
           </h2>
           
           {isRecLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
-              {/* Changed aspect-ratio to square for skeleton loading */}
-              {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-gray-200" />)}
+            <div className="flex justify-center py-10">
+              <p className="animate-pulse font-lora">Loading recommendations...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
-              {recommendedProducts.slice(0, 4).map((item) => (
-                <div key={item.id} className="group flex flex-col">
-                  {/* Changed aspect-[4/5] to aspect-square */}
-                  <div className="relative aspect-square w-full bg-[#F2EFEA] overflow-hidden mb-4 border">
-                    <Image 
-                      src={item.image} 
-                      alt={item.title} 
-                      fill 
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover object-center transition-transform duration-700 group-hover:scale-110" 
-                    />
-                    
-                    {/* Quick View or Overlay effect */}
-                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-                  
-                  <Link href={`/product/${item.handle}`} className="flex flex-col gap-1 cursor-pointer group/text">
-                    <h3 className="text-sm lg:text-base font-semibold text-[#280F0B] tracking-tight group-hover/text: decoration-1 underline-offset-4">
-                      {item.title}
-                    </h3>
-
-                    {/* Sliding Container */}
-                    <div className="relative h-6 overflow-hidden">
-                      {/* State 1: Price (Visible by default) */}
-                      <p className="text-[13px] font-manrope font-bold text-[#280F0B] transition-all duration-300 ease-in-out transform translate-y-0 group-hover/text:-translate-y-full group-hover/text:opacity-0 flex items-center h-full">
-                        ${item.price.toFixed(2)} <span className="ml-1 text-[13px]">AUD</span>
-                      </p>
-
-                      {/* State 2: Add to Cart (Hidden below, slides up on hover) */}
-                      <button 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation(); // Prevents the link from triggering
-                          addToCart({ ...product, variant: selectedMaterial, quantity })
-                        }}
-                        className="absolute inset-0 w-full h-full text-[13px] font-bold text-[#7f3e2f] uppercase tracking-wider transition-all duration-300 ease-in-out transform translate-y-full group-hover/text:translate-y-0 flex items-center hover:text-[#280F0B]"
-                      >
-                        + Add to Cart
-                      </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {recommendedProducts.map((p) => (
+                <div key={p.id} className="group cursor-pointer">
+                  <Link href={`/product/${p.handle}`}>
+                    <div className="aspect-square relative bg-[#F2EFEA] mb-4 overflow-hidden">
+                      <Image 
+                        src={p.image || '/assets/images/necklace-img.png'} 
+                        alt={p.title} 
+                        fill 
+                        className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                      />
                     </div>
                   </Link>
+                  
+                  <Link href={`/product/${p.handle}`}>
+                    {/* Changed text color to #280F0B to be visible on light background */}
+                    <h4 className="text-[#280F0B] text-[14px] font-semibold mb-1 truncate">{p.title}</h4>
+                  </Link>
+
+                  <div className="relative h-8 overflow-hidden group/btn flex items-center">
+                    {/* Price - Matches ShopPage animation */}
+                    <p className="text-[#280F0B] text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 group-hover:translate-y-[-100%] group-hover:opacity-0 flex items-center h-full">
+                      ${p.price.toFixed(2)} AUD
+                    </p>
+
+                    {/* Add to Cart - Matches ShopPage logic */}
+                    <button 
+                      onClick={() => handleAddToCart(p)}
+                      className="absolute top-0 left-0 w-full h-full text-[#280F0B] text-[13px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 flex items-center hover:text-black"
+                    >
+                      + Add to Cart 
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </section>
+
+      {/* 4. The Cart Drawer Component */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       </main>
     </>
   );

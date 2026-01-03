@@ -1,14 +1,12 @@
 import type { Metadata } from 'next'
-import { Lora, Manrope } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { CartProvider } from './context/CartContext'
 //import Header from '@/components/Header' // Adjust path based on your folder structure
 import Footer from '@/components/Footer' // Adjust path based on your folder structure
 
-const manrope = Manrope({ 
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+const manrope = localFont({
+  src: "../public/assets/font/Manrope-Regular.ttf",
   variable: '--font-manrope',
 })
 const muslone = localFont({
@@ -16,9 +14,8 @@ const muslone = localFont({
   variable: '--font-muslone',
 })
 
-const lora = Lora({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+const lora = localFont({
+  src: "../public/assets/font/Lora-BoldItalic.ttf",
   variable: '--font-lora',
 })
 

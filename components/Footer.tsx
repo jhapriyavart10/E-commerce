@@ -35,13 +35,23 @@ export default function Footer() {
           {/* Tagline & Socials */}
           <div className="flex-1">
             <h2
-              className="font-lora text-[32px] leading-[1.15] text-[#F6D8AB] mb-6"
-              style={{
-                WebkitFontSmoothing: 'antialiased',
-              }}
+              className="text-[32px] leading-[1.15] text-[#F6D8AB] mb-6"
+              style={{ WebkitFontSmoothing: 'antialiased' }}
             >
-              Your <span className="italic font-normal">spiritual journey</span> <br />
-              begins <span className="font-normal text-[#FFC26F]">here</span>.
+              <span className="font-manrope font-normal">
+                Your{' '}
+              </span>
+              <span className="font-lora italic font-normal">
+                spiritual journey
+              </span>
+              <br />
+              <span className="font-manrope font-normal">
+                begins{' '}
+              </span>
+
+              <span className="font-manrope font-normal text-[#FFC26F]">
+                here
+              </span>.
             </h2>
 
             <p className="font-manrope text-[14px] text-white opacity-70 max-w-md mb-8 leading-[1.6]">
