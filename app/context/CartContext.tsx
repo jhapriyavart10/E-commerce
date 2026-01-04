@@ -15,7 +15,7 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   cartId: string | null;
-  addToCart: (item: Omit<CartItem, 'quantity'>) => Promise<void>;
+  addToCart: (item: Omit<CartItem, 'quantity'>, quantity: number) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
@@ -54,14 +54,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('local_cart_items', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = async (item: Omit<CartItem, 'quantity'>) => {
+  const addToCart = async (item: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
     // Update local UI state immediately
     setCartItems(currentItems => {
       const existingItem = currentItems.find(i => i.id === item.id);
       if (existingItem) {
-        return currentItems.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return currentItems.map(i => i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i);
       }
-      return [...currentItems, { ...item, quantity: 1 }];
+      return [...currentItems, { ...item, quantity }];
     });
 
     // Sync with Shopify Backend
@@ -72,7 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({
           cartId: cartId,
           variantId: item.id,
-          quantity: 1
+          quantity: quantity
         })
       });
       

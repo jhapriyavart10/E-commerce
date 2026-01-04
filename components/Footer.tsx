@@ -60,10 +60,16 @@ export default function Footer() {
             </p>
 
             <div className="flex gap-5">
-              {['X', 'insta', 'tiktok', 'facebook'].map((icon) => (
-                <Link key={icon} href="#">
+              {[
+                { name: 'X', href: 'https://x.com/GC_Crystals' },
+                { name: 'insta', href: 'https://www.instagram.com/raw_earth_crystals_store/' },
+                { name: 'pinterest', href: 'https://au.pinterest.com/raw_earth_crystals/' },
+                { name: 'facebook', href: 'https://www.facebook.com/rawearthcrystalsstore' }
+              ].map((social) => (
+                <Link key={social.name} href={social.href} target="_blank" rel="noopener noreferrer">
                   <img
-                    src={`/assets/images/${icon}.svg`}
+                    src={`/assets/images/${social.name}.svg`}
+                    alt={`${social.name} icon`}
                     className="w-5 h-5 invert brightness-0 opacity-90 hover:opacity-70 transition-opacity"
                   />
                 </Link>
@@ -74,7 +80,7 @@ export default function Footer() {
           {/* Links Section */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 lg:gap-16 w-full lg:w-auto">
             <div>
-              <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-[0.2em] mb-4 font-manrope">
+              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0.2em] mb-4 font-manrope">
                 Index
               </h3>
               <ul className="space-y-[6px] text-[15px] font-manrope">
@@ -88,7 +94,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-[0.2em] mb-4 font-manrope">
+              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0.2em] mb-4 font-manrope">
                 Legal
               </h3>
               <ul className="space-y-[6px] text-[15px] font-manrope">
@@ -100,14 +106,14 @@ export default function Footer() {
             </div>
 
             <div className="lg:text-left">
-              <h3 className="text-[#F6D8AB]/50 text-xs uppercase tracking-[0.2em] mb-4 font-manrope">
+              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0.2em] mb-4 font-manrope">
                 Contact
               </h3>
               <a
                 href="mailto:rawearth@crystals.com"
                 className="text-[15px] font-manrope opacity-90 hover:opacity-70 transition-opacity"
               >
-                rawearth@crystals.com
+                hello@rawearthcrystals.com.au
               </a>
             </div>
           </div>

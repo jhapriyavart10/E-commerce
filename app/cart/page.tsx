@@ -22,26 +22,26 @@ export default function CartPage() {
   const tax = subtotal * 0.1; // Example 10% tax calculation
   const total = subtotal + tax;
 
-  const handleCheckout = async () => {
-    if (!cartId) return alert("Cart is empty");
+  // const handleCheckout = async () => {
+  //   if (!cartId) return alert("Cart is empty");
     
-    setIsRedirecting(true);
-    try {
-      const response = await fetch('/api/shopify/checkout', {
-        method: 'POST',
-        body: JSON.stringify({ cartId })
-      });
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url; // Redirect to Shopify
-      } else {
-        throw new Error("No checkout URL returned");
-      }
-    } catch (err) {
-      console.error("Checkout redirect failed", err);
-      setIsRedirecting(false);
-    }
-  };
+  //   setIsRedirecting(true);
+  //   try {
+  //     const response = await fetch('/api/shopify/checkout', {
+  //       method: 'POST',
+  //       body: JSON.stringify({ cartId })
+  //     });
+  //     const { url } = await response.json();
+  //     if (url) {
+  //       window.location.href = url; // Redirect to Shopify
+  //     } else {
+  //       throw new Error("No checkout URL returned");
+  //     }
+  //   } catch (err) {
+  //     console.error("Checkout redirect failed", err);
+  //     setIsRedirecting(false);
+  //   }
+  // };
 
   if (cartItems.length === 0) {
     return (
@@ -193,17 +193,13 @@ export default function CartPage() {
                 </div>
 
               <Link href="/checkout" className="w-full block">
-                <button 
-                  disabled={isRedirecting}
-                  onClick={handleCheckout} 
+                <button  
                   className="w-full mt-auto bg-[#7f3e2f] text-[#fcf3e5] py-4 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 disabled:opacity-50 transition-all uppercase tracking-[1.12px] font-semibold text-sm"
                 >
-                  {isRedirecting ? 'Redirecting...' : 'Proceed to checkout'}
-                  {!isRedirecting && (
-                    <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
-                      <path d={svgPathsDesktop.pdaf5300} fill="#fcf3e5" />
-                    </svg>
-                  )}
+                  Proceed to checkout
+                  <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
+                    <path d={svgPathsDesktop.pdaf5300} fill="#fcf3e5" />
+                  </svg>
                 </button>
               </Link>
               </div>

@@ -196,28 +196,28 @@ export default function CheckoutPage() {
                     placeholder={errors.firstName ? "First Name Required *" : "First name"} 
                     value={formData.firstName}
                     onChange={(e) => { setFormData({...formData, firstName: e.target.value}); if(errors.firstName) setErrors({...errors, firstName: false}); }}
-                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.firstName ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B]'}`} 
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.firstName ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B] placeholder-[#280F0B80]'}`} 
                   />
                   <input 
                     type="text" 
                     placeholder={errors.lastName ? "Last Name Required *" : "Last name"} 
                     value={formData.lastName}
                     onChange={(e) => { setFormData({...formData, lastName: e.target.value}); if(errors.lastName) setErrors({...errors, lastName: false}); }}
-                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.lastName ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B]'}`} 
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.lastName ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B] placeholder-[#280F0B80]'}`} 
                   />
                   <input 
                     type="email" 
                     placeholder={errors.email ? "Valid Email Required *" : "Email Address"} 
                     value={formData.email}
                     onChange={(e) => { setFormData({...formData, email: e.target.value}); if(errors.email) setErrors({...errors, email: false}); }}
-                    className={`w-full bg-transparent border p-4 outline-none transition-colors md:col-span-2 ${errors.email ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B]'}`} 
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors md:col-span-2 ${errors.email ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B] placeholder-[#280F0B80]'}`} 
                   />
                   <input 
                     type="tel" 
                     placeholder="Phone (optional)" 
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B] md:col-span-2" 
+                    className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B] placeholder-[#280F0B80] md:col-span-2" 
                   />
                 </div>
               </div>
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
                     placeholder={errors.streetAddress ? "Street Address Required *" : "Street Address"} 
                     value={formData.streetAddress}
                     onChange={(e) => { setFormData({...formData, streetAddress: e.target.value}); if(errors.streetAddress) setErrors({...errors, streetAddress: false}); }}
-                    className={`w-full bg-transparent border p-4 outline-none ${errors.streetAddress ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66]'}`} 
+                    className={`w-full bg-transparent border p-4 outline-none ${errors.streetAddress ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
                   />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input 
@@ -255,14 +255,14 @@ export default function CheckoutPage() {
                       placeholder={errors.townCity ? "City Required *" : "Town/City"} 
                       value={formData.townCity}
                       onChange={(e) => { setFormData({...formData, townCity: e.target.value}); if(errors.townCity) setErrors({...errors, townCity: false}); }}
-                      className={`w-full bg-transparent border p-4 outline-none ${errors.townCity ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66]'}`} 
+                      className={`w-full bg-transparent border p-4 outline-none ${errors.townCity ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
                     />
                     <input 
                       type="text" 
                       placeholder={errors.pincode ? "Pincode Required *" : "Pincode"} 
                       value={formData.pincode}
                       onChange={(e) => { setFormData({...formData, pincode: e.target.value}); if(errors.pincode) setErrors({...errors, pincode: false}); }}
-                      className={`w-full bg-transparent border p-4 outline-none ${errors.pincode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66]'}`} 
+                      className={`w-full bg-transparent border p-4 outline-none ${errors.pincode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
                     />
                   </div>
                   <div className="relative">

@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/app/context/CartContext'
 import CartDrawer from '@/components/CartDrawer'
-import { Menu, X, Search, ShoppingBag } from 'lucide-react' // Using Lucide for cleaner icons
+import { Menu, X, Search } from 'lucide-react' // Using Lucide for cleaner icons
 
 const BANNER_MESSAGES = [
   "Free Standard Domestic Shipping above $135",
@@ -128,9 +128,15 @@ export default function Header() {
 
             <button 
               onClick={() => setIsCartOpen(true)} 
-              className="p-2 hover:text-gray-300 transition-colors relative"
+              className="p-2 hover:opacity-70 transition-opacity relative flex items-center justify-center"
             >
-              <ShoppingBag size={24} />
+              {/* Replaced ShoppingBag with custom SVG */}
+              <img 
+                src="/assets/images/cart.svg" 
+                alt="Cart" 
+                className="w-6 h-6" 
+              />
+
               {totalItems > 0 && (
                 <span className="absolute top-0 right-0 bg-[#7F3E2F] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                   {totalItems}

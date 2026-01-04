@@ -38,6 +38,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const descriptionRef = useRef<HTMLDivElement>(null);
   const { addToCart } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
 
   // Logic for Recommended Products Backend
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
@@ -51,14 +52,16 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     { label: 'With media', isSearch: false },
   ];
 
-  const handleAddToCart = (p: Product) => {
+  const handleAddToCart = () => {
     addToCart({ 
-      id: p.id, 
-      title: p.title, 
+      id: product.id, 
+      title: product.title, 
       variant: "Default", 
-      price: p.price, 
-      image: p.image 
-    });
+      price: product.price, 
+      image: product.image 
+    }, quantity);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000);
     setIsCartOpen(true);
   };
 
@@ -106,6 +109,18 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
   return (
     <>
+    {showNotification && (
+        <div className="fixed top-5 right-5 z-[200] bg-[#280F0B] text-[#F6D8AB] px-6 py-4 rounded-lg shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 flex items-center gap-3">
+          <div className="bg-green-500 rounded-full p-1">
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="font-bold text-sm uppercase tracking-wide">
+            {quantity} {product.title} added to cart
+          </p>
+        </div>
+      )}
       <Header />
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
         
@@ -180,7 +195,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                   <button className="px-4 py-2" onClick={() => setQuantity(q => q + 1)}>+</button>
                 </div>
                 <button 
-                  onClick={() => addToCart({ ...product, variant: selectedMaterial, quantity })}
+                  onClick={handleAddToCart}
                   className="w-full bg-[#7A3E2E] text-white py-4 uppercase font-semibold tracking-wide mb-3"
                 >
                   Add to cart
@@ -192,7 +207,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                   Buy with <span className="normal">SHOP</span> 
                 </button>
               </div>
-             <div className="flex items-center gap-1 mt-4 opacity-80">
+             <div className="flex items-center gap-1 mt-2 ">
               <Image 
                 src="/assets/images/truck.jpeg" 
                 alt="Truck" 
@@ -367,7 +382,13 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
                     {/* Add to Cart - Matches ShopPage logic */}
                     <button 
-                      onClick={() => handleAddToCart(p)}
+                      onClick={() => addToCart({ 
+                        id: p.id, 
+                        title: p.title, 
+                        variant: "Default", 
+                        price: p.price, 
+                        image: p.image 
+                      }, 1)}
                       className="absolute top-0 left-0 w-full h-full text-[#280F0B] text-[13px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 flex items-center hover:text-black"
                     >
                       + Add to Cart 

@@ -106,7 +106,14 @@ export default function ShopPage() {
   };
 
   const handleAddToCart = (p: Product) => {
-    addToCart({ id: p.id, title: p.title, variant: "Default", price: p.price, image: p.image });
+    addToCart({ 
+      id: p.id, 
+      title: p.title, 
+      variant: "Default", 
+      price: p.price, 
+      image: p.image 
+    }, 1); 
+    
     setIsCartOpen(true);
   };
 
@@ -287,10 +294,19 @@ export default function ShopPage() {
 
                 {/* 2. Sliding Panel */}
                 <div className={`
-                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl overflow-y-auto
-                  transition-transform duration-300 ease-in-out transform
+                  /* 1. Basic Layout */
+                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl overflow-y-auto z-[101]
+                  
+                  /* 2. Mobile Animation: Use specific transition-transform to keep text locked to the box */
+                  transition-transform duration-300 ease-in-out will-change-transform
                   ${showMobileFilters ? 'translate-x-0' : '-translate-x-full'}
+                  
+                  /* 3. Desktop Reset: Remove all fixed positions and kill transitions instantly */
                   lg:static lg:w-full lg:max-w-none lg:translate-x-0 lg:p-0 lg:bg-transparent lg:shadow-none lg:overflow-visible
+                  lg:transition-none lg:transform-none
+                  
+                  /* 4. Rendering Fix: Hardware acceleration forces the browser to move the box as one unit */
+                  transform-gpu backface-hidden
                 `}>
                   
                   {/* Mobile-Only Header inside drawer */}
@@ -416,19 +432,27 @@ export default function ShopPage() {
                     <Link href={`/product/${p.handle}`}>
                       <h4 className="text-[14px] font-semibold mb-1 group-hover: truncate">{p.title}</h4>
                     </Link>
-                    <div className="relative h-8 overflow-hidden group/btn flex items-center">
-                        {/* Price - Moves UP and fades out on hover */}
-                        <p className="text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 group-hover:translate-y-[-100%] group-hover:opacity-0 flex items-center h-full">
-                          ${p.price.toFixed(2)} AUD
-                        </p>
+                    <div className="relative h-8 group/btn flex items-center justify-between overflow-hidden">
+                      {/* Price - Standard on mobile, moves UP and fades on desktop hover */}
+                      <p className="text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 lg:group-hover:translate-y-[-100%] lg:group-hover:opacity-0 flex items-center h-full">
+                        ${p.price.toFixed(2)} AUD
+                      </p>
 
-                        {/* Add to Cart Button - Moves UP from below the container into view */}
-                        <button 
-                          onClick={() => handleAddToCart(p)}
-                          className="absolute top-0 left-0 w-full h-full text-[14px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 flex items-center hover:text-black"
-                        >
-                          + Add to Cart 
-                        </button>
+                      {/* MOBILE BUTTON: Visible only on small/medium screens, hidden on desktop */}
+                      <button 
+                        onClick={() => handleAddToCart(p)}
+                        className="lg:hidden text-[14px] opacity-70 font-medium text-[#7A3E2E] active:opacity-100 transition-opacity"
+                      >
+                        + Add to Cart
+                      </button>
+
+                      {/* DESKTOP BUTTON: Maintained original styling, hidden on mobile */}
+                      <button 
+                        onClick={() => handleAddToCart(p)}
+                        className="hidden lg:flex absolute top-0 left-0 w-full h-full text-[14px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 items-center hover:text-black"
+                      >
+                        + Add to Cart 
+                      </button>
                     </div>
                   </div>
                 ))}
