@@ -80,7 +80,7 @@ export default function Footer() {
           {/* Links Section */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 lg:gap-16 w-full lg:w-auto">
             <div>
-              <h3 className="text-[#F6D8AB]/50 text-xs tracking-tighter mb-4 font-manrope">
+              <h3 className="text-[#F6D8AB]/50 text-xs tracking-normal mb-4 font-manrope">
                 Index
               </h3>
               <ul className="space-y-[6px] text-[15px] font-manrope">
@@ -94,7 +94,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0.2em] mb-4 font-manrope">
+              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0em] mb-4 font-manrope">
                 Legal
               </h3>
               <ul className="space-y-[6px] text-[15px] font-manrope">
@@ -106,7 +106,7 @@ export default function Footer() {
             </div>
 
             <div className="lg:text-left">
-              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0.2em] mb-4 font-manrope">
+              <h3 className="text-[#F6D8AB]/50 text-xs tracking-[0em] mb-4 font-manrope">
                 Contact
               </h3>
               <a

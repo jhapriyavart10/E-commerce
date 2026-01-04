@@ -286,7 +286,7 @@ export default function ShopPage() {
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button
                   onClick={() => setShowMobileFilters(true)}
-                  className="flex items-center gap-2 text-[#280F0B] font-semibold tracking-tighter"
+                  className="flex items-center gap-2 text-[#280F0B] font-semibold tracking-normal"
                 >
                   <Image src="/assets/images/filter.svg" alt="" width={14} height={14} />
                   <span>Filters</span>
