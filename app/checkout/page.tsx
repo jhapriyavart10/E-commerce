@@ -169,7 +169,7 @@ export default function CheckoutPage() {
           </div>
           <div className="flex gap-3 items-center">
             <div className="bg-[#280f0b] flex items-center justify-center rounded-full size-[30px] text-[#f6d8ab] font-bold">2</div>
-            <p className="text-[#280f0b] text-base font-bold">Checkout</p>
+            <p className="text-[#280f0b] text-base ">Checkout</p>
           </div>
           <div className="w-[33px] h-[16px] opacity-40">
             <svg className="w-full h-full" fill="none" viewBox="0 0 33 16"><path d={svgPathsDesktop.p1553ba00} fill="black" /></svg>
@@ -266,15 +266,48 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div className="relative">
+                    {/* The select box now mimics the exact padding and border of your input fields */}
                     <select 
                       value={formData.state} 
-                      onChange={(e) => { setFormData({...formData, state: e.target.value}); if(errors.state) setErrors({...errors, state: false}); }} 
-                      className={`w-full bg-transparent border p-4 outline-none appearance-none cursor-pointer ${errors.state ? 'border-red-600 text-red-600' : 'border-[#280F0B66]'}`}
+                      onChange={(e) => { 
+                        setFormData({...formData, state: e.target.value}); 
+                        if(errors.state) setErrors({...errors, state: false}); 
+                      }} 
+                      className={`w-full bg-transparent border p-4 outline-none appearance-none cursor-pointer transition-colors
+                        ${errors.state 
+                          ? 'border-red-600 text-red-600' 
+                          : 'border-[#280F0B66] text-[#280F0B] focus:border-[#280F0B]'
+                        } 
+                        ${!formData.state ? 'text-[#280F0B80]' : ''}`} // Mimics placeholder color when empty
                     >
                       <option value="" disabled>Select State/Province</option>
-                      {COUNTRY_DATA[formData.country]?.map(state => <option key={state} value={state} className="text-black">{state}</option>)}
+                      {COUNTRY_DATA[formData.country]?.map(state => (
+                        <option key={state} value={state} className="text-black">
+                          {state}
+                        </option>
+                      ))}
                     </select>
-                    {errors.state && <p className="text-red-600 text-xs mt-1 font-bold">Please select a state</p>}
+
+                    {/* Custom dropdown icon positioned at the right corner */}
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <svg 
+                        className={`w-4 h-4 transition-transform ${errors.state ? 'text-red-600' : 'text-[#280F0B]'}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+
+                    {errors.state && (
+                      <p className="text-red-600 text-xs mt-1 font-bold">Please select a state</p>
+                    )}
                   </div>
                 </div>
               </div>

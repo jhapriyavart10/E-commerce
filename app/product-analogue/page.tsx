@@ -219,7 +219,7 @@ export default function ShopPage() {
     </div>
   );
 
-  return (
+   return (
     <>
       <Header />
       <div className="h-[80px] md:h-[150px] w-full bg-[#F6D8AB]" />
@@ -231,6 +231,7 @@ export default function ShopPage() {
                 <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.42-6.446z"/>
               </svg>
             </div>
+
             <div className="flex-1 pr-6">
               <p className="font-lora font-bold text-sm leading-tight mb-1">Added to Cart</p>
               <p className="text-xs opacity-90 line-clamp-2 leading-relaxed">{notification}</p>
@@ -241,22 +242,23 @@ export default function ShopPage() {
             </div>
             <button onClick={() => setNotification(null)} className="absolute top-3 right-3 text-[#F6D8AB] p-1"><svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg></button>
           </div>
+
         )}
+
       </div>
 
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
         <div className="px-5 md:px-12 xl:px-24 2xl:px-32 py-10">
-
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-1">
             <div />
             <h1 className="font-lora text-[40px] leading-tight">All Products</h1>
           </div>
-                
+        
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-6">
             <h2 className="text-xl font-bold border-b border-[#280F0B33] pb-1 flex items-end tracking-[0px]">Filters</h2>
             <div className="flex justify-between items-end border-b border-[#280F0B33] pb-1">
               <p className="text-sm opacity-70 leading-none">{filteredProducts.length} Products</p>
-              <select 
+              <select
                 value={sortBy}
                 onChange={(e) => setBy(e.target.value)}
                 className="bg-transparent border-none font-semibold cursor-pointer outline-none text-sm leading-none"
@@ -282,7 +284,7 @@ export default function ShopPage() {
 
               {/* Mobile Toggle Bar */}
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
-                <button 
+                <button
                   onClick={() => setShowMobileFilters(true)}
                   className="flex items-center gap-2 text-[#280F0B] font-semibold tracking-tighter"
                 >
@@ -290,9 +292,10 @@ export default function ShopPage() {
                   <span>Filters</span>
                 </button>
 
-                <select 
+                <select
                   value={sortBy}
                   onChange={(e) => setBy(e.target.value)}
+                  aria-label="Sort products by"
                   className="bg-transparent border-none font-semibold cursor-pointer outline-none text-xs"
                 >
                   <option>Default Sorting</option>
@@ -305,36 +308,24 @@ export default function ShopPage() {
 
               {/* THE FIXED DRAWER SYSTEM */}
               <div className={`
-                fixed inset-0 z-[100] 
+                fixed inset-0 z-[100]
                 ${showMobileFilters ? 'visible' : 'invisible lg:visible lg:static'}
               `}>
+
                 {/* 1. Backdrop (Mobile only) */}
-                <div 
+                <div
                   className={`absolute inset-0 bg-black/40 transition-opacity duration-300 lg:hidden ${showMobileFilters ? 'opacity-100' : 'opacity-0'}`}
                   onClick={() => setShowMobileFilters(false)}
                 />
 
+                {/* 2. Sliding Panel */}
                 <div className={`
-                  /* 1. Basic Layout */
-                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl z-[101]
-                  
-                  /* 2. Fix: Prevent internal content from shifting/reflowing during slide */
-                  overflow-y-auto overflow-x-hidden
-                  
-                  /* 3. Animation: Force hardware acceleration and layer grouping */
-                  transition-transform duration-300 ease-in-out
+                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl overflow-y-auto
+                  transition-transform duration-300 ease-in-out transform
                   ${showMobileFilters ? 'translate-x-0' : '-translate-x-full'}
-                  
-                  /* 4. THE FIX: Hardware Layering & Containment */
-                  transform-gpu 
-                  will-change-transform 
-                  contain-content
-                  
-                  /* 5. Desktop Reset */
                   lg:static lg:w-full lg:max-w-none lg:translate-x-0 lg:p-0 lg:bg-transparent lg:shadow-none lg:overflow-visible
-                  lg:transition-none lg:transform-none
                 `}>
-                  
+            
                   {/* Mobile-Only Header inside drawer */}
                   <div className="flex justify-between items-center mb-8 lg:hidden">
                     <span className="font-lora text-2xl">Filters</span>
@@ -347,48 +338,55 @@ export default function ShopPage() {
                     <div className="flex gap-3 mb-5 items-center">
                       <div className="relative w-1/2">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
-                        <input 
-                          type="number" 
-                          className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
-                          value={filters.price.min} 
-                          onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Number(e.target.value)}}))} 
+                        <input
+                          type="number"
+                          aria-label="Minimum price"
+                          className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none"
+                          value={filters.price.min}
+                          onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Number(e.target.value)}}))}
                         />
                       </div>
+
                       <span className="text-[#280F0B] opacity-50">—</span>
                       <div className="relative w-1/2">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm opacity-60">$</span>
-                        <input 
-                          type="number" 
-                          className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none" 
-                          value={filters.price.max} 
-                          onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Number(e.target.value)}}))} 
+                        <input
+                          type="number"
+                          aria-label="Maximum price"
+                          className="w-full bg-transparent border border-[#280F0B] pl-6 pr-2 py-1.5 text-sm outline-none"
+                          value={filters.price.max}
+                          onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Number(e.target.value)}}))}
                         />
                       </div>
                     </div>
 
                     {/* Dual Range Sliders */}
-                    <div className="relative h-6 w-full flex items-center px-1"> 
+                    <div className="relative h-6 w-full flex items-center px-1">
                       <div className="absolute h-1.5 bg-[#280F0B33] w-full rounded-full overflow-hidden">
-                        <div 
-                          className="absolute h-full bg-[#725C4B]" 
-                          style={{ 
-                            left: `${(filters.price.min / 150) * 100}%`, 
-                            right: `${100 - (filters.price.max / 150) * 100}%` 
-                          }} 
+                        <div
+                          className="absolute h-full bg-[#725C4B]"
+                          style={{
+                            left: `${(filters.price.min / 150) * 100}%`,
+                            right: `${100 - (filters.price.max / 150) * 100}%`
+                          }}
                         />
                       </div>
-                      <input 
-                        type="range" min="0" max="150" value={filters.price.min} 
+
+                      <input
+                        type="range" min="0" max="150" value={filters.price.min} aria-label="Minimum price range slider"
                         onChange={(e) => setFilters(p => ({...p, price: {...p.price, min: Math.min(Number(e.target.value), filters.price.max)}}))}
                         className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
                       />
-                      <input 
-                        type="range" min="0" max="150" value={filters.price.max} 
+
+                      <input
+                        type="range" min="0" max="150" value={filters.price.max} aria-label="Maximum price range slider"
                         onChange={(e) => setFilters(p => ({...p, price: {...p.price, max: Math.max(Number(e.target.value), filters.price.min)}}))}
                         className="custom-slider absolute w-full pointer-events-none appearance-none bg-transparent"
                       />
                     </div>
                   </div>
+
+
 
                   {/* DYNAMIC CATEGORY SECTIONS */}
                   {[
@@ -399,11 +397,12 @@ export default function ShopPage() {
                     <div key={section.id} className="border-t border-[#280F0B33] pt-3 mt-5">
                       <button onClick={() => toggleSection(section.id)} className="w-full flex justify-between items-center text-[12px] font-bold uppercase tracking-wider mb-2">
                         {section.label}
-                        <Image 
-                            src="/assets/images/dropdown.svg" 
-                            alt="" width={24} height={24} 
-                            className={`transition-transform duration-300 ${openSections[section.id] ? 'rotate-180' : ''}`} 
+                        <Image
+                            src="/assets/images/dropdown.svg"
+                            alt="" width={24} height={24}
+                            className={`transition-transform duration-300 ${openSections[section.id] ? 'rotate-180' : ''}`}
                         />
+
                       </button>
                       <div className={`overflow-hidden transition-all duration-500 ease-in-out ${openSections[section.id] ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
                         <div className="space-y-2 pb-3">

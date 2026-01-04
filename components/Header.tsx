@@ -71,7 +71,7 @@ export default function Header() {
       )}
 
       {/* Main Header */}
-      <header className="bg-[#280F0B] text-white w-full h-[80px] lg:h-[120px] relative z-50">
+      <header className="bg-[#280F0B] text-white w-full h-[80px] lg:h-[120px] relative z-250">
         <div className="w-full max-w-[1440px] mx-auto h-full px-4 lg:px-[72px] flex items-center justify-between relative">
           
           {/* 1. Mobile Hamburger (Left) - Only visible on Mobile */}
@@ -113,7 +113,11 @@ export default function Header() {
               onClick={() => setIsSearchOpen(true)} 
               className="p-2 hover:text-gray-300 transition-colors"
             >
-              <Search size={24} />
+              <img 
+                src="/assets/images/search.svg" 
+                alt="Search" 
+                className="w-6 h-6" 
+              />
             </button>
 
             {/* Profile Icon - Hidden on Mobile (moved to menu) */}
