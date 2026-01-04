@@ -184,8 +184,30 @@ export default function ShopPage() {
 }, [filteredProducts, sortBy]);
 
   if (loading) return (
-    <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center font-lora text-xl">
-      Loading Collection...
+    <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
+      <div className="relative w-32 h-32 animate-glow">
+        <img 
+          src="/assets/images/Logo.png" 
+          alt="Loading..." 
+          className="w-full h-full object-contain"
+        />
+      </div>
+
+      <style jsx>{`
+        @keyframes glow {
+          0%, 100% { 
+            opacity: 0.3; 
+            filter: brightness(0.8);
+          }
+          50% { 
+            opacity: 1; 
+            filter: brightness(1.2);
+          }
+        }
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 
@@ -292,21 +314,25 @@ export default function ShopPage() {
                   onClick={() => setShowMobileFilters(false)}
                 />
 
-                {/* 2. Sliding Panel */}
                 <div className={`
                   /* 1. Basic Layout */
-                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl overflow-y-auto z-[101]
+                  fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-[#F6D8AB] p-6 shadow-xl z-[101]
                   
-                  /* 2. Mobile Animation: Use specific transition-transform to keep text locked to the box */
-                  transition-transform duration-300 ease-in-out will-change-transform
+                  /* 2. Fix: Prevent internal content from shifting/reflowing during slide */
+                  overflow-y-auto overflow-x-hidden
+                  
+                  /* 3. Animation: Force hardware acceleration and layer grouping */
+                  transition-transform duration-300 ease-in-out
                   ${showMobileFilters ? 'translate-x-0' : '-translate-x-full'}
                   
-                  /* 3. Desktop Reset: Remove all fixed positions and kill transitions instantly */
+                  /* 4. THE FIX: Hardware Layering & Containment */
+                  transform-gpu 
+                  will-change-transform 
+                  contain-content
+                  
+                  /* 5. Desktop Reset */
                   lg:static lg:w-full lg:max-w-none lg:translate-x-0 lg:p-0 lg:bg-transparent lg:shadow-none lg:overflow-visible
                   lg:transition-none lg:transform-none
-                  
-                  /* 4. Rendering Fix: Hardware acceleration forces the browser to move the box as one unit */
-                  transform-gpu backface-hidden
                 `}>
                   
                   {/* Mobile-Only Header inside drawer */}
@@ -422,8 +448,8 @@ export default function ShopPage() {
 
             <section className="flex-1 w-full lg:pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-10">
-                {sortedProducts.map((p) => (
-                  <div key={p.id} className="group cursor-pointer">
+                {sortedProducts.map((p, index) => (
+                  <div key={p.id} className="group cursor-pointer animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
                     <Link href={`/product/${p.handle}`}>
                       <div className="aspect-[306/316] relative bg-[#F2EFEA] mb-4 overflow-hidden">
                         <Image src={p.image || '/assets/images/necklace-img.png'} alt={p.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
