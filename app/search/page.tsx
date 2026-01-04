@@ -76,7 +76,7 @@ function SearchContent() {
               <div className="flex justify-between items-center">
                 <p className="text-sm opacity-70">${p.price.toFixed(2)} AUD</p>
                 <button 
-                  onClick={() => addToCart({ id: p.id, title: p.title, price: p.price, image: p.image, variant: "Default" })}
+                  onClick={() => addToCart({ id: p.id, title: p.title, price: p.price, image: p.image, variant: "Default" }, 1)}
                   className="text-xs font-bold uppercase underline hover:text-[#7F3E2F]"
                 >
                   + Quick Add
