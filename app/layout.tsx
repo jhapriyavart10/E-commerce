@@ -3,8 +3,8 @@ import { Manrope } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { CartProvider } from './context/CartContext'
-//import Header from '@/components/Header' // Adjust path based on your folder structure
-import Footer from '@/components/Footer' // Adjust path based on your folder structure
+import Footer from '@/components/Footer' 
+import FloatingChat from '@/components/FloatingChat'
 
 const manrope = Manrope({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-manrope', })
 const muslone = localFont({
@@ -57,6 +57,7 @@ export default function RootLayout({
 
           {/* 4. Footer added here appears on all pages */}
           <Footer />
+          <FloatingChat />
         </CartProvider>
       </body>
     </html>

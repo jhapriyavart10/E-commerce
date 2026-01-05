@@ -386,8 +386,6 @@ export default function ShopPage() {
                     </div>
                   </div>
 
-
-
                   {/* DYNAMIC CATEGORY SECTIONS */}
                   {[
                     { id: 'category' as const, label: 'Product category', options: ['Bracelets', 'Charms & Pendants'] },
