@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link'; // FIXED: Changed from lucide-react to next/link
 import Header from '@/components/Header';
@@ -17,12 +17,38 @@ interface Product {
 }
 
 const materialOptions = [
-  { name: 'Obsidian', img: '/assets/images/obsidian.svg' },
-  { name: 'Tiger Eye', img: '/assets/images/tiger eye.svg' },
-  { name: 'Lapis Lazuli', img: '/assets/images/Lapis Lazuli.svg' },
+  { name: 'Grey Jasper', img: '/assets/images/grey jasper.svg' },
+  { name: 'Blue Goldstone', img: '/assets/images/blue goldstone.svg' },
+  { name: 'Black Onyx', img: '/assets/images/black onyx.svg' },
+  { name: 'White Agate', img: '/assets/images/white agate.svg' },
+  { name: 'Pink Shell', img: '/assets/images/pink shell.svg' },
+  { name: 'White Howlite', img: '/assets/images/white howlite.svg' },
+  { name: 'Blue Howlite', img: '/assets/images/blue howlite.svg' },
+  { name: 'Turquoise Howlite', img: '/assets/images/turquoise howlite.svg' },
+  { name: 'Gold Stone', img: '/assets/images/gold stone.svg' },
+  { name: 'Red Howlite', img: '/assets/images/red howlite.svg' },
+  { name: 'Sodalite', img: '/assets/images/sodalite.svg' },
+  { name: 'Blue Lace Agate', img: '/assets/images/blue lace agate.svg' },
+  { name: 'Opalite', img: '/assets/images/opalite.svg' },
+  { name: 'Green Aventurine', img: '/assets/images/green adventurine.svg' },
+  { name: 'Moonstone', img: '/assets/images/moonstone.svg' },
+  { name: 'Selenite', img: '/assets/images/selenite.svg' },
+  { name: 'Magnetite', img: '/assets/images/magnetite.svg' },
+  { name: 'Blue Tiger Eye', img: '/assets/images/blue tiger eye.svg' },
+  { name: 'Volcanic Stone', img: '/assets/images/volcanic stone.svg' },
+  { name: 'Unakite', img: '/assets/images/unakite.svg' },
+  { name: 'Labradorite', img: '/assets/images/labradorite.svg' },
+  { name: 'Garnet', img: '/assets/images/garnet.svg' },
+  { name: 'Malachite', img: '/assets/images/malachite.svg' },
+  { name: 'Turquoise Stone', img: '/assets/images/turquoise stone.svg' },
+  { name: 'Red Jasper', img: '/assets/images/red jasper.svg' },
+  { name: 'Red Agate', img: '/assets/images/red agate.svg' },
+  { name: 'Lapis Lazuli', img: '/assets/images/lapis lazuli.svg' },
   { name: 'Rose Quartz', img: '/assets/images/rose quartz.svg' },
   { name: 'Clear Quartz', img: '/assets/images/clear quartz.svg' },
-  { name: 'Green Aventurine', img: '/assets/images/green adventurine.svg' },
+  { name: 'Amethyst', img: '/assets/images/amethyst.svg' },
+  { name: 'Tiger Eye', img: '/assets/images/tiger eye.svg' },
+  { name: 'Obsidian', img: '/assets/images/obsidian.svg' }
 ];
 
 export default function UnifiedProductPage({ product }: { product: any }) {
@@ -102,6 +128,26 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     }
   };
 
+  // Extract unique images from variants, filter out nulls, and limit to 6
+const variantThumbnails = useMemo(() => {
+  const images = product.variants
+    ?.map((v: any) => v.image)
+    .filter((img: string | null): img is string => !!img) || [];
+  
+  // If no variant images exist, fallback to the general product images
+  const baseImages = images.length > 0 ? images : (product.images || []);
+  
+  return baseImages.slice(0, 6);
+}, [product.variants, product.images]);
+
+const availableMaterials = useMemo(() => {
+  return materialOptions.filter(option => 
+    product.variants?.some((v: any) => 
+      v.title.toLowerCase().includes(option.name.toLowerCase())
+    )
+  );
+}, [product.variants]);
+
   useEffect(() => {
     async function fetchRecommended() {
       try {
@@ -154,10 +200,17 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                 <Image src={selectedImage} alt="Product" fill className="object-cover" priority />
               </div>
               <div className="grid grid-cols-6 gap-2 w-full lg:max-w-[820px]">
-                {jewelleryImages.map((img: string, index: number) => (
+                {variantThumbnails.map((img: string, index: number) => (
                   <div 
                     key={index} 
-                    onClick={() => setSelectedImage(img)} 
+                    onClick={() => {
+                      setSelectedImage(img);
+                      const matchingVariant = product.variants?.find((v: any) => v.image === img);
+                      if (matchingVariant) {
+                        setSelectedMaterial(matchingVariant.title);
+                        setActiveVariant(matchingVariant);
+                      }
+                    }}
                     className={`aspect-square cursor-pointer transition-all ${selectedImage === img ? 'border-2 border-[#280F0B]' : 'border border-[#280F0B]/30'}`}
                   >
                     <Image src={img} alt={`Thumbnail ${index}`} width={100} height={100} className="w-full h-full object-cover" />
@@ -188,7 +241,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                   </div>
                 </div>
                 <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
-                  {materialOptions.map((option, index) => (
+                  {availableMaterials.map((option, index) => (
                     <div key={option.name} className="flex contents">
                       <button
                         onClick={() => handleMaterialClick(option.name)}
