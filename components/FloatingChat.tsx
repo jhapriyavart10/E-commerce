@@ -6,7 +6,7 @@ import { useCart } from '@/app/context/CartContext';
 import { motion } from 'framer-motion';
 
 export default function FloatingChat() {
-  const { isCartDrawerOpen } = useCart();
+  const { isCartDrawerOpen , isPageLoading } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -63,7 +63,9 @@ export default function FloatingChat() {
               src={isOpen ? "/assets/images/drop.svg" : "/assets/images/chat.svg"}
               alt="chat status icon"
               fill
-              className="object-contain"
+              className={`object-contain transition-transform duration-300 ${
+                isOpen ? "rotate-180" : "rotate-0"
+              }`}
             />
           </div>
         </button>

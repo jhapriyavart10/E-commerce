@@ -17,6 +17,8 @@ interface CartContextType {
   cartId: string | null;
   isCartDrawerOpen: boolean; 
   setIsCartDrawerOpen: (open: boolean) => void;
+  isPageLoading: boolean; // Add this
+  setIsPageLoading: (loading: boolean) => void; 
   addToCart: (item: Omit<CartItem, 'quantity'>, quantity: number) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
@@ -31,6 +33,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string | null>(null);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   // Runs once when the app starts to pull data from the browser's memory
   useEffect(() => {
@@ -121,6 +124,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cartId,
         isCartDrawerOpen, 
         setIsCartDrawerOpen,
+        isPageLoading,
+        setIsPageLoading,
         addToCart,
         updateQuantity,
         removeFromCart,
