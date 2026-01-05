@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import ChatBot from '@/app/chatbot/page'; 
+import ChatBotContent from '@/components/ChatBotContent';;
 
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ export default function FloatingChat() {
               : 'w-[375px] h-[600px]'
             }`}
         >
-          <ChatBot 
+          <ChatBotContent 
             onClose={handleClose} 
             onToggleExpand={() => setIsMaximized(!isMaximized)}
             isMaximized={isMaximized}
