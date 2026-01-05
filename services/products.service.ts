@@ -141,7 +141,10 @@ export async function getProduct(handle: string) {
         title: v.node.title,
         price: Number(v.node.price.amount),
         image: v.node.image?.url || null, 
-        selectedOptions: v.node.selectedOptions
+        selectedOptions: v.node.selectedOptions.reduce((acc: any, opt: any) => {
+      acc[opt.name] = opt.value;
+      return acc;
+    }, {})
       })) || [],
       rating: product.rating?.value ? parseFloat(product.rating.value) : 0,
       reviewCount: product.reviewCount?.value ? parseInt(product.reviewCount.value) : 0,

@@ -62,6 +62,10 @@ export const getProductQuery = `
             price {
               amount
             }
+            selectedOptions {
+              name
+              value
+            }
           }
         }
       }

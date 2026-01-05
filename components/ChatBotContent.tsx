@@ -112,7 +112,7 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
             boxSizing: 'border-box',
           }}
         >
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-8">
             {view !== 'categories' ? (
               <button onClick={handleBack} className="cursor-pointer hover:opacity-70">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#280F0B" strokeWidth="2.5">
@@ -167,7 +167,9 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
         </header>
 
         {/* --- MAIN CONTENT AREA --- */}
-        <main className="flex-1 px-6 pt-6 overflow-y-auto no-scrollbar" ref={scrollRef}>
+        <main className={`flex-1 px-6 pt-6 no-scrollbar ${view === 'categories' ? 'overflow-hidden' : 'overflow-y-auto'}`} 
+          ref={scrollRef}
+        >
           {view === 'categories' ? (
             <>
               <h2 style={{ fontFamily: 'Manrope, sans-serif', fontWeight: '500', fontSize: '16px', color: '#F6D8AB', marginBottom: '12px' }}>
@@ -178,12 +180,12 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
                   <button 
                     key={category.id} 
                     onClick={() => handleCategoryClick(category)}
-                    className="w-full flex items-center justify-between py-3 border-b border-[#F6D8AB]/5 cursor-pointer hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between py-2 border-b border-[#F6D8AB]/5 cursor-pointer hover:bg-white/5 transition-colors group"
                   >
                     <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: '400', fontSize: '14px', color: '#CCB48F' }}>
                       {category.name}
                     </span>
-                    <svg className="w-4 h-4 text-[#CCB48F] opacity-60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[#CCB48F] opacity-60 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                   </button>

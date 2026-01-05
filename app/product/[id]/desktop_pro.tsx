@@ -17,36 +17,36 @@ interface Product {
 }
 
 const materialOptions = [
-  { name: 'Grey Jasper', img: '/assets/images/grey jasper.svg' },
-  { name: 'Blue Goldstone', img: '/assets/images/blue goldstone.svg' },
-  { name: 'Black Onyx', img: '/assets/images/black onyx.svg' },
-  { name: 'White Agate', img: '/assets/images/white agate.svg' },
-  { name: 'Pink Shell', img: '/assets/images/pink shell.svg' },
-  { name: 'White Howlite', img: '/assets/images/white howlite.svg' },
-  { name: 'Blue Howlite', img: '/assets/images/blue howlite.svg' },
-  { name: 'Turquoise Howlite', img: '/assets/images/turquoise howlite.svg' },
-  { name: 'Gold Stone', img: '/assets/images/gold stone.svg' },
-  { name: 'Red Howlite', img: '/assets/images/red howlite.svg' },
-  { name: 'Sodalite', img: '/assets/images/sodalite.svg' },
-  { name: 'Blue Lace Agate', img: '/assets/images/blue lace agate.svg' },
-  { name: 'Opalite', img: '/assets/images/opalite.svg' },
+  { name: 'Grey Jasper', img: '/assets/images/clear quartz.svg' },
+  { name: 'Blue Goldstone', img: '/assets/images/clear quartz.svg' },
+  { name: 'Black Onyx', img: '/assets/images/clear quartz.svg' },
+  { name: 'White Agate', img: '/assets/images/clear quartz.svg' },
+  { name: 'Pink Shell', img: '/assets/images/clear quartz.svg' },
+  { name: 'White Howlite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Blue Howlite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Turquoise Howlite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Gold Stone', img: '/assets/images/clear quartz.svg' },
+  { name: 'Red Howlite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Sodalite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Blue Lace Agate', img: '/assets/images/clear quartz.svg' },
+  { name: 'Opalite', img: '/assets/images/clear quartz.svg' },
   { name: 'Green Aventurine', img: '/assets/images/green adventurine.svg' },
-  { name: 'Moonstone', img: '/assets/images/moonstone.svg' },
-  { name: 'Selenite', img: '/assets/images/selenite.svg' },
-  { name: 'Magnetite', img: '/assets/images/magnetite.svg' },
-  { name: 'Blue Tiger Eye', img: '/assets/images/blue tiger eye.svg' },
-  { name: 'Volcanic Stone', img: '/assets/images/volcanic stone.svg' },
-  { name: 'Unakite', img: '/assets/images/unakite.svg' },
-  { name: 'Labradorite', img: '/assets/images/labradorite.svg' },
-  { name: 'Garnet', img: '/assets/images/garnet.svg' },
-  { name: 'Malachite', img: '/assets/images/malachite.svg' },
-  { name: 'Turquoise Stone', img: '/assets/images/turquoise stone.svg' },
-  { name: 'Red Jasper', img: '/assets/images/red jasper.svg' },
-  { name: 'Red Agate', img: '/assets/images/red agate.svg' },
+  { name: 'Moonstone', img: '/assets/images/clear quartz.svg' },
+  { name: 'Selenite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Magnetite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Blue Tiger Eye', img: '/assets/images/clear quartz.svg' },
+  { name: 'Volcanic Stone', img: '/assets/images/clear quartz.svg' },
+  { name: 'Unakite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Labradorite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Garnet', img: '/assets/images/clear quartz.svg' },
+  { name: 'Malachite', img: '/assets/images/clear quartz.svg' },
+  { name: 'Turquoise Stone', img: '/assets/images/clear quartz.svg' },
+  { name: 'Red Jasper', img: '/assets/images/clear quartz.svg' },
+  { name: 'Red Agate', img: '/assets/images/clear quartz.svg' },
   { name: 'Lapis Lazuli', img: '/assets/images/lapis lazuli.svg' },
   { name: 'Rose Quartz', img: '/assets/images/rose quartz.svg' },
   { name: 'Clear Quartz', img: '/assets/images/clear quartz.svg' },
-  { name: 'Amethyst', img: '/assets/images/amethyst.svg' },
+  { name: 'Amethyst', img: '/assets/images/clear quartz.svg' },
   { name: 'Tiger Eye', img: '/assets/images/tiger eye.svg' },
   { name: 'Obsidian', img: '/assets/images/obsidian.svg' }
 ];
@@ -66,6 +66,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const { addToCart } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  
 
   // Logic for Recommended Products Backend
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
@@ -147,6 +148,24 @@ const availableMaterials = useMemo(() => {
     )
   );
 }, [product.variants]);
+const chainOptions = useMemo(() => {
+  const options = new Set<string>();
+  
+  product.variants?.forEach((variant: any) => {
+    // Check if "Chain Type" exists in the variant's options
+    const chainValue = variant.selectedOptions?.["Chain Type"];
+    if (chainValue) {
+      options.add(chainValue);
+    }
+  });
+
+  return Array.from(options);
+}, [product.variants]);
+
+// Determine if we should show the box at all
+const hasChainOptions = chainOptions.length > 0;
+const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
+
 
   useEffect(() => {
     async function fetchRecommended() {
@@ -167,6 +186,18 @@ const availableMaterials = useMemo(() => {
     }
     fetchRecommended();
   }, [product.id]);
+
+  useEffect(() => {
+    const match = product.variants.find((v: any) => 
+      v.selectedOptions["Jewelry Material"] === selectedMaterial &&
+      v.selectedOptions["Chain Type"] === selectedChain
+    );
+    
+    if (match) {
+      setActiveVariant(match);
+      if (match.image) setSelectedImage(match.image);
+    }
+  }, [selectedMaterial, selectedChain, product.variants]);
 
   return (
     <>
@@ -257,6 +288,27 @@ const availableMaterials = useMemo(() => {
                   ))}
                 </div>
               </div>
+
+            {hasChainOptions && (
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-2">
+                <p className="text-sm font-semibold uppercase tracking-widest mb-4">Chain Type</p>
+                <div className="flex gap-3">
+                  {chainOptions.map((chain) => (
+                    <button
+                      key={chain}
+                      onClick={() => setSelectedChain(chain)}
+                      className={`px-6 py-2 rounded-full border transition-all text-sm ${
+                        selectedChain === chain 
+                          ? 'bg-[#280F0B] text-white' 
+                          : 'bg-transparent text-[#280F0B] border-[#280F0B]'
+                      }`}
+                    >
+                      {chain}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )} 
 
               <div className="w-full">
                 <div className="flex items-center w-fit border border-b-0 border-[#280F0B]">
