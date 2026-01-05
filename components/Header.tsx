@@ -57,7 +57,7 @@ export default function Header() {
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.span
               key={messageIndex}
               initial={{ y: 45, opacity: 0 }}

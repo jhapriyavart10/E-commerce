@@ -216,7 +216,8 @@ export default function CheckoutPage() {
                     type="tel" 
                     placeholder="Phone (optional)" 
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => {const onlyNums = e.target.value.replace(/\D/g, '');
+                      setFormData({...formData, phone: onlyNums})}}
                     className="w-full bg-transparent border border-[#280F0B66] p-4 outline-none focus:border-[#280F0B] placeholder-[#280F0B80] md:col-span-2" 
                   />
                 </div>
@@ -278,11 +279,11 @@ export default function CheckoutPage() {
                           ? 'border-red-600 text-red-600' 
                           : 'border-[#280F0B66] text-[#280F0B80] focus:border-[#280F0B]'
                         } 
-                        ${!formData.state ? 'text-[#280F0B80]' : ''}`} // Mimics placeholder color when empty
+                        ${!formData.state ? 'text-[#280F0B80]' : 'text-[#280F0B]'} `} // Mimics placeholder color when empty
                     >
                       <option value="" disabled>Select State/Province</option>
                       {COUNTRY_DATA[formData.country]?.map(state => (
-                        <option key={state} value={state} className="text-black">
+                        <option key={state} value={state} className="text-[#280F0B]">
                           {state}
                         </option>
                       ))}

@@ -186,7 +186,7 @@ export default function ShopPage() {
 
   if (loading) return (
   <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
-    <div className="relative flex items-center justify-center w-64 h-64">
+    <div className="relative flex items-center justify-center w-48 h-48">
       
       {/* Large Outer Logo */}
       <motion.div
@@ -199,7 +199,7 @@ export default function ShopPage() {
           repeat: Infinity, 
           ease: "easeInOut" 
         }}
-        className="absolute w-48 h-48"
+        className="absolute w-32 h-32"
       >
         <img 
           src="/assets/images/Logo.svg" 
