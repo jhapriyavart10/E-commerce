@@ -180,7 +180,7 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
                   <button 
                     key={category.id} 
                     onClick={() => handleCategoryClick(category)}
-                    className="w-full flex items-center justify-between py-2 border-b border-[#F6D8AB]/5 cursor-pointer hover:bg-white/5 transition-colors group"
+                    className="w-full flex items-center justify-between py-2 border-b border-[#F6D8AB]/5 cursor-pointer hover: transition-colors group"
                   >
                     <span style={{ fontFamily: 'Manrope, sans-serif', fontWeight: '400', fontSize: '14px', color: '#CCB48F' }}>
                       {category.name}

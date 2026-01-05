@@ -290,7 +290,7 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
               </div>
 
             {hasChainOptions && (
-              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-2">
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
                 <p className="text-sm font-semibold uppercase tracking-widest mb-4">Chain Type</p>
                 <div className="flex gap-3">
                   {chainOptions.map((chain) => (
