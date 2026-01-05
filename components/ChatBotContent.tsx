@@ -101,12 +101,13 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
       >
         {/* --- HEADER --- */}
         <header
-          className="relative shrink-0 pt-8 px-6 m-0 flex flex-col"
+          className="relative shrink-0 pt-8 px-6 m-0 flex flex-col overflow-visible"
           style={{
             width: '100%',
             height: view !== 'categories' ? '100px' : '221px',
             background: '#FFC26F',
-            borderBottomLeftRadius: view !== 'categories' ? '0px' : '80px',
+            borderBottomLeftRadius: '0px',
+            borderBottomRightRadius: '0px',
             transition: 'all 0.3s ease-in-out',
             boxSizing: 'border-box',
           }}
@@ -120,13 +121,13 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
               </button>
             ) : (
               <div className="w-12 h-12 relative">
-                <Image src="/assets/images/logo.svg" alt="Logo" fill className="object-contain" priority />
+                <Image src="/assets/images/Logo.svg" alt="Logo" fill className="object-contain" priority />
               </div>
             )}
 
             {view !== 'categories' && (
               <div className="w-10 h-10 relative">
-                <Image src="/assets/images/logo.svg" alt="Logo" fill className="object-contain" />
+                <Image src="/assets/images/Logo.svg" alt="Logo" fill className="object-contain" />
               </div>
             )}
             
@@ -147,10 +148,20 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
 
           {view === 'categories' && (
             <>
-              <h1 style={{ fontFamily: 'Lora, serif', fontWeight: '600', fontSize: '28px', lineHeight: '120%', color: '#280F0B' }}>
+              <h1 className="relative z-10" style={{ fontFamily: 'Lora, serif', fontWeight: '600', fontSize: '28px', lineHeight: '120%', color: '#280F0B' }}>
                 Hello there,<br />How can we assist you?
               </h1>
-              <div className="absolute bottom-0 right-0 w-[80px] h-[80px] bg-[#280F0B]" style={{ borderTopLeftRadius: '80px' }} />
+              <div 
+                className="absolute bottom-0 right-0 w-[80px] h-[80px] overflow-hidden pointer-events-none z-0"
+                style={{ display: view === 'categories' ? 'block' : 'none' }}
+            >
+                <div className="absolute inset-0 bg-[#280F0B]" />
+                {/* The "U" shape circle */}
+                <div 
+                className="absolute inset-0 bg-[#FFC26F]" 
+                style={{ borderBottomRightRadius: '80px' }} 
+                />
+            </div>
             </>
           )}
         </header>

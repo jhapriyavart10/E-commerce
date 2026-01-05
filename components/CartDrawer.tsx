@@ -135,7 +135,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     {/* Quantity Selector */}
                     <div className="flex items-center justify-between border border-[#280f0b] rounded-md px-3 py-1 w-28 mt-4">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => {
+                          if (item.quantity > 1) {
+                            updateQuantity(item.id, item.quantity - 1);
+                          } else {
+                            // If quantity is 1, clicking minus removes the item
+                            removeFromCart(item.id);
+                          }
+                        }}
                         className="text-[#280f0b] hover:opacity-50"
                       >
                         <Minus size={14} />
