@@ -99,7 +99,7 @@ export default function Header() {
           <div className="lg:absolute lg:left-1/2 lg:-translate-x-1/2">
             <Link href="/">
               <Image 
-                src="/assets/images/Logo.png" 
+                src="/assets/images/Logo(REC).svg" 
                 alt="Raw Earth Crystals" 
                 width={186} 
                 height={72} 

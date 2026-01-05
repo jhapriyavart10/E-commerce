@@ -139,7 +139,9 @@ export async function getProduct(handle: string) {
       variants: product.variants?.edges?.map((v: any) => ({
         id: v.node.id,
         title: v.node.title,
-        price: v.node.price.amount,
+        price: Number(v.node.price.amount),
+        image: v.node.image?.url || null, 
+        selectedOptions: v.node.selectedOptions
       })) || [],
       rating: product.rating?.value ? parseFloat(product.rating.value) : 0,
       reviewCount: product.reviewCount?.value ? parseInt(product.reviewCount.value) : 0,

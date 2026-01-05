@@ -55,6 +55,10 @@ export const getProductQuery = `
           node {
             id
             title
+            image {
+              url
+              altText
+            }
             price {
               amount
             }

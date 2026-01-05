@@ -32,7 +32,8 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     : ['/assets/images/necklace-img.png'];
 
   const [selectedImage, setSelectedImage] = useState(product.image || jewelleryImages[0]);
-  const [selectedMaterial, setSelectedMaterial] = useState(materialOptions[0].name);
+  const [selectedMaterial, setSelectedMaterial] = useState("Obsidian");
+  const [activeVariant, setActiveVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
@@ -54,11 +55,11 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
   const handleAddToCart = () => {
     addToCart({ 
-      id: product.id, 
+      id: activeVariant?.id || product.id, 
       title: product.title, 
-      variant: "Default", 
-      price: product.price, 
-      image: product.image 
+      variant: selectedMaterial,
+      price: activeVariant?.price || product.price,
+      image: selectedImage || product.image 
     }, quantity);
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3000);
@@ -84,6 +85,20 @@ export default function UnifiedProductPage({ product }: { product: any }) {
       }
     } catch (error) {
       console.error("Shop Pay redirect failed", error);
+    }
+  };
+  const handleMaterialClick = (materialName: string) => {
+    setSelectedMaterial(materialName);
+    const variantMatch = product.variants?.find((v: any) => 
+      v.title.toLowerCase().includes(materialName.toLowerCase())
+    );
+
+    if (variantMatch) {
+      setActiveVariant(variantMatch);
+      // 3. Update the main image if the variant has a specific one assigned
+      if (variantMatch.image) {
+        setSelectedImage(variantMatch.image);
+      }
     }
   };
 
@@ -163,7 +178,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
               <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
 
-              <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${product.price.toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
+              <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${(activeVariant?.price || product.price).toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
               <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
                 <div className="flex justify-between items-center mb-4">
@@ -176,7 +191,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                   {materialOptions.map((option, index) => (
                     <div key={option.name} className="flex contents">
                       <button
-                        onClick={() => setSelectedMaterial(option.name)}
+                        onClick={() => handleMaterialClick(option.name)}
                         className={`flex items-center gap-1 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
                           selectedMaterial === option.name ? 'bg-[#6C6AE4] text-white border-[#6C6AE4]' : 'bg-transparent text-[#280F0B] border-[#280F0B]'
                         }`}
