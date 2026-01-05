@@ -2,8 +2,11 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import ChatBotContent from '@/components/ChatBotContent';
+import { useCart } from '@/app/context/CartContext';
+import { motion } from 'framer-motion';
 
 export default function FloatingChat() {
+  const { isCartDrawerOpen } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -11,22 +14,27 @@ export default function FloatingChat() {
     setIsOpen(false);
     setIsMaximized(false);
   };
-
+  
+  if (isCartDrawerOpen) return null;
   return (
     <div 
       className={`fixed z-[100] flex flex-col items-end gap-4 transition-all duration-500 
         ${isMaximized 
-          ? 'inset-0 p-6 bg-black/40 backdrop-blur-sm justify-center items-center' 
-          : 'bottom-6 right-6'
+          ? 'inset-0 p-0 sm:p-6 bg-black/40 backdrop-blur-sm justify-center items-center'
+          : 'bottom-4 right-4 min-[410px]:bottom-6 min-[410px]:right-6'
         }`}
     >
       {/* Chatbot Window Container */}
       {isOpen && (
-        <div 
-          className={`shadow-2xl rounded-[24px] overflow-hidden bg-[#280F0B] origin-bottom-right transition-all duration-300 ease-out
+        <motion.div
+          initial={{ opacity: 0, scale: 0, x: 50, y: 50, originX: 1, originY: 1 }}
+          animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+          exit={{ opacity: 0, scale: 0, x: 50, y: 50 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className={`shadow-2xl rounded-[24px] overflow-hidden bg-[#280F0B] 
             ${isMaximized 
-              ? 'w-full max-w-[1200px] h-full' 
-              : 'w-[375px] h-[600px] animate-in fade-in zoom-in-95 slide-in-from-bottom-10'
+              ? 'w-full h-full max-w-[1200px] rounded-none sm:rounded-[24px]'
+              : 'w-[calc(100vw-32px)] min-[410px]:w-[375px] h-[600px] sm:h-[600px] max-h-[90vh]'
             }`}
         >
           <ChatBotContent 
@@ -34,7 +42,7 @@ export default function FloatingChat() {
             onToggleExpand={() => setIsMaximized(!isMaximized)}
             isMaximized={isMaximized}
           />
-        </div>
+        </motion.div>
       )}
 
       {/* Floating Toggle Button */}

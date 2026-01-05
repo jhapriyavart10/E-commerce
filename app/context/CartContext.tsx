@@ -15,6 +15,8 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   cartId: string | null;
+  isCartDrawerOpen: boolean; 
+  setIsCartDrawerOpen: (open: boolean) => void;
   addToCart: (item: Omit<CartItem, 'quantity'>, quantity: number) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
@@ -28,8 +30,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string | null>(null);
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
 
-  // 1. INITIAL LOAD (Hydration)
   // Runs once when the app starts to pull data from the browser's memory
   useEffect(() => {
     const savedCartId = localStorage.getItem('shopify_cart_id');
@@ -117,6 +119,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         cartItems,
         cartId,
+        isCartDrawerOpen, 
+        setIsCartDrawerOpen,
         addToCart,
         updateQuantity,
         removeFromCart,

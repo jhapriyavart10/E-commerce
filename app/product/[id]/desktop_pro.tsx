@@ -131,7 +131,9 @@ export default function UnifiedProductPage({ product }: { product: any }) {
             {/* LEFT COLUMN: Image Gallery */}
             <div className="w-full">
               <p className="text-[12px] lg:text-sm mb-3 lg:mb-4 opacity-70">
-                <strong className="font-bold">Shop</strong> / Pendants / {product.title}
+                <Link href="/product-analogue" className="hover:text-black transition-colors">
+                  <strong className="font-bold">Shop</strong>
+                </Link> / Pendants / {product.title}
               </p>
               <div className="relative aspect-square w-full bg-[#F2EFEA] mb-3 lg:max-w-[820px]">
                 <Image src={selectedImage} alt="Product" fill className="object-cover" priority />
@@ -159,7 +161,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
               <p className="text-[14px] lg:text-[16px] leading-[1.6] opacity-90 mb-3">Harness Universal Energy with a Sphere Crystal Pendulum. The sphere represents wholeness, unity, and the infinite flow of universal energy.</p>
 
-              <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase underline text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
+              <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
 
               <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${product.price.toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
@@ -202,9 +204,17 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                 </button>
                 <button 
                   onClick={handleShopPay}
-                  className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3 flex items-center justify-center gap-2"
+                  className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3 flex items-center justify-center gap-1 transition-all hover:brightness-110 active:scale-[0.98]"
                 >
-                  Buy with <span className="normal">SHOP</span> 
+                  Buy with 
+                  <div className="relative w-[54px] h-[18px]"> {/* Adjust width/height to match your SVG aspect ratio */}
+                    <Image 
+                      src="/assets/images/shop.svg" 
+                      alt="Shop" 
+                      fill 
+                      className="object-contain brightness-0 invert" // Ensures the logo is white to match the text
+                    />
+                  </div>
                 </button>
               </div>
              <div className="flex items-center gap-1 mt-2 ">
@@ -370,26 +380,45 @@ export default function UnifiedProductPage({ product }: { product: any }) {
                   </Link>
                   
                   <Link href={`/product/${p.handle}`}>
-                    {/* Changed text color to #280F0B to be visible on light background */}
                     <h4 className="text-[#280F0B] text-[14px] font-semibold mb-1 truncate">{p.title}</h4>
                   </Link>
 
-                  <div className="relative h-8 overflow-hidden group/btn flex items-center">
-                    {/* Price - Matches ShopPage animation */}
-                    <p className="text-[#280F0B] text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 group-hover:translate-y-[-100%] group-hover:opacity-0 flex items-center h-full">
+                  <div className="relative h-8 overflow-hidden group/btn flex items-center justify-between">
+                    {/* Price - Standard on mobile, moves UP and fades on desktop hover */}
+                    <p className="text-[#280F0B] text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 lg:group-hover:translate-y-[-100%] lg:group-hover:opacity-0 flex items-center h-full">
                       ${p.price.toFixed(2)} AUD
                     </p>
 
-                    {/* Add to Cart - Matches ShopPage logic */}
+                    {/* MOBILE BUTTON: Visible only on small/medium screens, hidden on desktop */}
                     <button 
-                      onClick={() => addToCart({ 
-                        id: p.id, 
-                        title: p.title, 
-                        variant: "Default", 
-                        price: p.price, 
-                        image: p.image 
-                      }, 1)}
-                      className="absolute top-0 left-0 w-full h-full text-[#280F0B] text-[13px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 flex items-center hover:text-black"
+                      onClick={() => {
+                        addToCart({ 
+                          id: p.id, 
+                          title: p.title, 
+                          variant: "Default", 
+                          price: p.price, 
+                          image: p.image 
+                        }, 1);
+                        setIsCartOpen(true);
+                      }}
+                      className="lg:hidden text-[14px] opacity-70 font-medium text-[#7A3E2E] active:opacity-100 transition-opacity"
+                    >
+                      + Add to Cart
+                    </button>
+
+                    {/* DESKTOP BUTTON: Hover animation, hidden on mobile */}
+                    <button 
+                      onClick={() => {
+                        addToCart({ 
+                          id: p.id, 
+                          title: p.title, 
+                          variant: "Default", 
+                          price: p.price, 
+                          image: p.image 
+                        }, 1);
+                        setIsCartOpen(true);
+                      }}
+                      className="hidden lg:flex absolute top-0 left-0 w-full h-full text-[#280F0B] text-[14px] opacity-70 font-medium text-left transition-all duration-300 transform translate-y-[100%] group-hover:translate-y-0 items-center hover:text-black"
                     >
                       + Add to Cart 
                     </button>

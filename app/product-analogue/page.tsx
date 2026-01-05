@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCart } from '@/app/context/CartContext';
 import Link from 'next/link';
 import CartDrawer from '@/components/CartDrawer';
+import { motion } from 'framer-motion';
 /* ---------------- TYPES ---------------- */
 type Product = {
   id: string; 
@@ -184,33 +185,51 @@ export default function ShopPage() {
 }, [filteredProducts, sortBy]);
 
   if (loading) return (
-    <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
-      <div className="relative w-32 h-32 animate-glow">
+  <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
+    <div className="relative flex items-center justify-center w-64 h-64">
+      
+      {/* Large Outer Logo */}
+      <motion.div
+        animate={{ 
+          scale: [0.8, 1.2, 0.8],     // Scales up then back down
+          opacity: [1, 0, 1]           // Fades out while the small one fades in
+        }}
+        transition={{ 
+          duration: 3, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+        className="absolute w-48 h-48"
+      >
         <img 
-          src="/assets/images/Logo.png" 
-          alt="Loading..." 
+          src="/assets/images/Logo.svg" 
+          alt="Loading Large" 
           className="w-full h-full object-contain"
         />
-      </div>
+      </motion.div>
 
-      <style jsx>{`
-        @keyframes glow {
-          0%, 100% { 
-            opacity: 0.3; 
-            filter: brightness(0.8);
-          }
-          50% { 
-            opacity: 1; 
-            filter: brightness(1.2);
-          }
-        }
-        .animate-glow {
-          animation: glow 2s ease-in-out infinite;
-        }
-      `}</style>
+      {/* Small Inner Logo */}
+      <motion.div 
+        animate={{ 
+          scale: [1.2, 0.8, 1.2],  
+          opacity: [0, 1, 0]           
+        }}
+        transition={{ 
+          duration: 3, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+        className="absolute w-24 h-24"
+      >
+        <img 
+          src="/assets/images/Logo.svg" 
+          alt="Loading Small" 
+          className="w-full h-full object-contain opacity-50"
+        />
+      </motion.div>   
     </div>
-  );
-
+  </div>
+);
   if (apiError) return (
     <div className="bg-[#F6D8AB] min-h-screen flex flex-col items-center justify-center p-10 text-center">
       <h2 className="text-2xl font-lora mb-4">Connection Issue</h2>
@@ -446,10 +465,33 @@ export default function ShopPage() {
             <section className="flex-1 w-full lg:pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-10">
                 {sortedProducts.map((p, index) => (
-                  <div key={p.id} className="group cursor-pointer animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <motion.div 
+                    key={p.id}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: index * 0.05, // Staggered "shutter" effect
+                      ease: [0.215, 0.61, 0.355, 1] // Smooth cubic-bezier
+                    }}
+                    className="group cursor-pointer"
+                  >
                     <Link href={`/product/${p.handle}`}>
                       <div className="aspect-[306/316] relative bg-[#F2EFEA] mb-4 overflow-hidden">
-                        <Image src={p.image || '/assets/images/necklace-img.png'} alt={p.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <Image 
+                          src={p.image || '/assets/images/necklace-img.png'} 
+                          alt={p.title} 
+                          fill 
+                          className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                        />
+                        {/* Visual Shutter Overlay (Optional extra polish) */}
+                        <motion.div 
+                          initial={{ scaleY: 1 }}
+                          animate={{ scaleY: 0 }}
+                          transition={{ duration: 0.6, delay: index * 0.05 + 0.2 }}
+                          style={{ originY: 0 }}
+                          className="absolute inset-0 bg-[#F6D8AB] z-10 pointer-events-none"
+                        />
                       </div>
                     </Link>
                     <Link href={`/product/${p.handle}`}>
@@ -477,7 +519,7 @@ export default function ShopPage() {
                         + Add to Cart 
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </section>

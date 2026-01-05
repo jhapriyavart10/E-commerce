@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/app/context/CartContext'
 import CartDrawer from '@/components/CartDrawer'
-import { Menu, X, Search } from 'lucide-react' // Using Lucide for cleaner icons
+import { Menu, X } from 'lucide-react' // Using Lucide for cleaner icons
 
 const BANNER_MESSAGES = [
   "Free Standard Domestic Shipping above $135",
@@ -40,36 +41,37 @@ export default function Header() {
   };
 
   useEffect(() => {
-    if (!showBanner || paused) return;
-    const interval = setInterval(() => {
-      setAnimate(true); 
-      setTimeout(() => {
-        setMessageIndex((prev) => (prev + 1) % BANNER_MESSAGES.length);
-        setNextIndex((prev) => (prev + 2) % BANNER_MESSAGES.length);
-        setAnimate(false); 
-      }, 500);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [showBanner, paused]);
+    if (paused || !showBanner) return;
+    const timer = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % BANNER_MESSAGES.length);
+    }, 5000); // 5-second interval
+    return () => clearInterval(timer);
+  }, [paused, showBanner]);
 
   return (
     <>
       {/* Top Banner */}
       {showBanner && (
-        <div className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative overflow-hidden z-[60]"
+        <div 
+          className="bg-[#7F3E2F] text-white text-center w-full h-[45px] flex items-center justify-center relative overflow-hidden z-[60]"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
-          >  
-          <span className={`text-sm whitespace-nowrap leading-[45px] transition-transform duration-500 ease-in-out ${animate ? '-translate-y-[45px]' : 'translate-y-0'}`}>
-            {BANNER_MESSAGES[messageIndex]}
-          </span>
-          <span className={`absolute text-sm whitespace-nowrap leading-[45px] transition-transform duration-500 ease-in-out ${animate ? 'translate-y-0' : 'translate-y-[45px]'}`}>
-            {BANNER_MESSAGES[nextIndex]}
-          </span>
-          <button onClick={() => setShowBanner(false)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300">✕</button>
+        >
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={messageIndex}
+              initial={{ y: 45, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -45, opacity: 0 }}
+              transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute text-[13px] font-manrope font-medium whitespace-nowrap px-10"
+            >
+              {BANNER_MESSAGES[messageIndex]}
+            </motion.span>
+          </AnimatePresence>
+          <button onClick={() => setShowBanner(false)} className="absolute right-4 top-1/2 -translate-y-1/2">✕</button>
         </div>
       )}
-
       {/* Main Header */}
       <header className="bg-[#280F0B] text-white w-full h-[80px] lg:h-[120px] relative z-250">
         <div className="w-full max-w-[1440px] mx-auto h-full px-4 lg:px-[72px] flex items-center justify-between relative">
@@ -152,17 +154,50 @@ export default function Header() {
           {/* --- Overlay Search Bar --- */}
           {isSearchOpen && (
             <div className="absolute inset-0 bg-[#280F0B] z-[70] flex items-center px-4 lg:px-[72px]">
-              <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-4">
-                <input 
-                  autoFocus
-                  type="text" 
-                  placeholder="Search products..."
-                  className="bg-transparent border-b border-white/30 w-full py-2 outline-none text-lg lg:text-xl font-manrope placeholder:text-white/40"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button type="submit" className="uppercase font-bold text-xs lg:text-sm tracking-widest hover:text-[#f6d8ab]">Search</button>
-                <button type="button" onClick={() => setIsSearchOpen(false)} className="text-white/60 hover:text-white text-xs">CLOSE</button>
+              <form onSubmit={handleSearchSubmit} className="flex-1 relative flex items-center gap-4">
+                <div className="flex-1 relative">
+                  <input 
+                    autoFocus
+                    type="text" 
+                    placeholder="Search products..."
+                    className="bg-transparent w-full py-2 outline-none text-lg lg:text-xl font-manrope placeholder:text-white/40 text-white"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  
+                  {/* Animated Border Base (Static background) */}
+                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/10" />
+                  
+                  {/* Running Border Animation */}
+                  <motion.div 
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.6, ease: "circOut" }}
+                    style={{ originX: 0 }}
+                    className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[#f6d8ab]"
+                  />
+                </div>
+
+                {/* Search SVG Icon Button */}
+                <button type="submit" className="p-2 hover:scale-110 transition-transform">
+                  <div className="relative w-5 h-5 lg:w-6 lg:h-6">
+                    <Image 
+                      src="/assets/images/search.svg" 
+                      alt="Search" 
+                      fill 
+                      className="object-contain brightness-0 invert" 
+                    />
+                  </div>
+                </button>
+
+                {/* Cross Icon Button */}
+                <button 
+                  type="button" 
+                  onClick={() => setIsSearchOpen(false)} 
+                  className="text-white/60 hover:text-white hover:rotate-90 transition-all duration-300"
+                >
+                  <X size={24} strokeWidth={1.5} />
+                </button>
               </form>
             </div>
           )}

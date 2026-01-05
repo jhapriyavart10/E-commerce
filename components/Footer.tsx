@@ -110,7 +110,7 @@ export default function Footer() {
                 Contact
               </h3>
               <a
-                href="mailto:rawearth@crystals.com"
+                href="mailto:hello@rawearthcrystals.com.au"
                 className="text-[15px] font-manrope opacity-90 hover:opacity-70 transition-opacity"
               >
                 hello@rawearthcrystals.com.au

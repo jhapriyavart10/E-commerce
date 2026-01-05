@@ -16,8 +16,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { cartItems, updateQuantity, removeFromCart, cartId, getTotalItems } = useCart();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [couponExpanded, setCouponExpanded] = useState(false);
+  const { setIsCartDrawerOpen } = useCart();
   const router = useRouter();
 
+  useEffect(() => {
+    if (setIsCartDrawerOpen) {
+      setIsCartDrawerOpen(isOpen);
+    }
+  }, [isOpen, setIsCartDrawerOpen]);
   // Calculate subtotal from real context data
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -199,7 +205,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </p>
             </div>
             {/* Set price to 18px and forced no wrap to stay on one line */}
-            <p className="text-[18px] font-bold font-manrope whitespace-nowrap">
+            <p className="text-[15px] min-[370px]:text-[18px] font-bold font-manrope whitespace-nowrap">
               ${subtotal.toFixed(2)} AUD
             </p>
           </div>

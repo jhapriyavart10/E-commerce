@@ -276,7 +276,7 @@ export default function CheckoutPage() {
                       className={`w-full bg-transparent border p-4 outline-none appearance-none cursor-pointer transition-colors
                         ${errors.state 
                           ? 'border-red-600 text-red-600' 
-                          : 'border-[#280F0B66] text-[#280F0B] focus:border-[#280F0B]'
+                          : 'border-[#280F0B66] text-[#280F0B80] focus:border-[#280F0B]'
                         } 
                         ${!formData.state ? 'text-[#280F0B80]' : ''}`} // Mimics placeholder color when empty
                     >
