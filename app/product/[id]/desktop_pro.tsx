@@ -264,8 +264,8 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
 
               <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${(activeVariant?.price || product.price).toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
-              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
-                <div className="flex justify-between items-center mb-4">
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 mb-4 lg:mb-6">
+                <div className="flex justify-between items-center mb-3">
                   <p className="text-sm font-semibold uppercase tracking-widest">Jewellery Material</p>
                   <div className="hidden lg:block">
                     <Image src="/assets/images/book.svg" alt="Material Guide" width={22} height={22} className="cursor-pointer" />
@@ -290,8 +290,8 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
               </div>
 
             {hasChainOptions && (
-              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-6 mb-4 lg:mb-6">
-                <p className="text-sm font-semibold uppercase tracking-widest mb-4">Chain Type</p>
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 mb-4 lg:mb-6">
+                <p className="text-sm font-semibold uppercase tracking-widest mb-3">Chain Type</p>
                 <div className="flex gap-3">
                   {chainOptions.map((chain) => (
                     <button
@@ -318,7 +318,7 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
                 </div>
                 <button 
                   onClick={handleAddToCart}
-                  className="w-full bg-[#7A3E2E] text-white py-4 uppercase font-semibold tracking-wide mb-3"
+                  className="w-full bg-[#280F0B] text-white py-4 uppercase font-semibold tracking-wide mb-3"
                 >
                   Add to cart
                 </button>
