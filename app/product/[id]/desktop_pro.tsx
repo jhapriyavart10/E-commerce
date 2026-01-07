@@ -264,7 +264,7 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
 
               <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${(activeVariant?.price || product.price).toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
-              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 mb-4 lg:mb-6">
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
                 <div className="flex justify-between items-center mb-3">
                   <p className="text-sm font-semibold uppercase tracking-widest">Jewellery Material</p>
                   <div className="hidden lg:block">
@@ -290,7 +290,7 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
               </div>
 
             {hasChainOptions && (
-              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 mb-4 lg:mb-6">
+              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
                 <p className="text-sm font-semibold uppercase tracking-widest mb-3">Chain Type</p>
                 <div className="flex gap-3">
                   {chainOptions.map((chain) => (
