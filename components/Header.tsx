@@ -164,11 +164,8 @@ export default function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  
-                  {/* Animated Border Base (Static background) */}
+                  {/* Animated Border */}
                   <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/10" />
-                  
-                  {/* Running Border Animation */}
                   <motion.div 
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
@@ -178,19 +175,19 @@ export default function Header() {
                   />
                 </div>
 
-                {/* Search SVG Icon Button */}
+                {/* Submit Button (The Search Icon) */}
                 <button type="submit" className="p-2 hover:scale-110 transition-transform">
                   <div className="relative w-5 h-5 lg:w-6 lg:h-6">
                     <Image 
                       src="/assets/images/search.svg" 
-                      alt="Search" 
+                      alt="Submit Search" 
                       fill 
                       className="object-contain brightness-0 invert" 
                     />
                   </div>
                 </button>
 
-                {/* Cross Icon Button */}
+                {/* Close Button */}
                 <button 
                   type="button" 
                   onClick={() => setIsSearchOpen(false)} 
