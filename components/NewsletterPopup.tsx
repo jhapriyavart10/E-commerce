@@ -61,6 +61,13 @@ export default function ImmersiveNewsletter() {
     backgroundClip: 'text'
   };
 
+  const h2Style = { 
+    fontSize: '48px', 
+    lineHeight: '100%', 
+    fontWeight: 500, 
+    letterSpacing: '0px' 
+  };
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -68,9 +75,9 @@ export default function ImmersiveNewsletter() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[500] flex items-center justify-center overflow-hidden bg-black"
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black"
         >
-          {/* Background Layer - Preserved without changes */}
+          {/* Background Layer - Preserved exactly as requested with no filters */}
           <div className="absolute inset-0">
             <Image
               src="/assets/images/newsletter.avif"
@@ -104,8 +111,19 @@ export default function ImmersiveNewsletter() {
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
-                  <h2 className="font-lora text-4xl md:text-5xl text-white mb-2 tracking-wider">Grab a 20% off.</h2>
-                  <p className="font-manrope text-white/90 text-[16px] leading-[24px] mb-6 max-w-xs leading-relaxed">To claim it tell us your primary spiritual focus.</p>
+                  {/* Heading 1: Lora 48px Medium with Gradient */}
+                  <h2 
+                    style={{ ...h2Style, ...gradientTextStyle }}
+                    className="font-lora mb-2 tracking-normal"
+                  >
+                    Grab a 20% off.
+                  </h2>
+
+                  {/* Subheading: Single line (no max-width) */}
+                  <p className="font-manrope text-white/90 text-[16px] leading-[24px] mb-6 whitespace-nowrap">
+                    To claim it tell us your primary spiritual focus.
+                  </p>
+
                   <div className="flex flex-col gap-2 w-full items-center mb-4">
                     {SPIRITUAL_FOCUS_OPTIONS.map((option) => (
                       <button 
@@ -131,46 +149,52 @@ export default function ImmersiveNewsletter() {
               {step === 2 && (
                 <motion.div key="step2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
                   <h2 
-                    style={{ fontSize: '48px', lineHeight: '100%', fontWeight: 500, letterSpacing: '0px' }} 
+                    style={h2Style} 
                     className="font-lora mb-2 tracking-normal"
                   >
                     <span className="text-white">Reveal </span>
                     <span style={gradientTextStyle}>your code!</span>
                   </h2>
-                  <p className="font-manrope text-white/90 text-[16px] leading-[24px] mb-8">Enter your email address & get the code.</p>
+                  <p className="font-manrope text-white/90 text-[16px] leading-[24px] mb-8 whitespace-nowrap">
+                    Enter your email address & get the code.
+                  </p>
                   <div className="flex flex-col gap-2 w-[350px] items-center">
                     <input 
-                      type="email" 
-                      value={email} 
-                      onChange={(e) => { setEmail(e.target.value); setWarning(''); }} 
-                      placeholder="Your email address" 
-                      className="w-full h-[48px] bg-[#280F0B] text-white px-6 focus:outline-none font-manrope text-[16px] leading-[24px]" 
+                        type="email" 
+                        value={email} 
+                        onChange={(e) => { setEmail(e.target.value); setWarning(''); }} 
+                        placeholder="Your email address" 
+                        className="w-full h-[48px] bg-[#280F0B] text-white px-6 focus:outline-none font-manrope text-[16px] leading-[24px]"
                     />
-                    <div className="h-4">
-                      {warning && <p className="text-red-400 text-xs font-manrope">{warning}</p>}
-                    </div>
+
+                    {warning && (
+                        <p className="text-red-400 text-xs font-manrope">
+                        {warning}
+                        </p>
+                    )}
+
                     <button 
-                      onClick={handleViewCode} 
-                      style={{ borderWidth: '1.25px', letterSpacing: '-0.005em' }} 
-                      className="w-full h-[48px] border-white text-white font-manrope font-normal text-[16px] leading-[24px] hover:bg-white hover:text-black transition-all"
+                        onClick={handleViewCode} 
+                        style={{ borderWidth: '1.25px', letterSpacing: '-0.005em' }} 
+                        className="w-full h-[48px] border border-white text-white font-manrope font-normal text-[16px] leading-[24px] hover:bg-white hover:text-black transition-all"
                     >
-                      View code →
+                        View code →
                     </button>
-                  </div>
+                    </div>
                 </motion.div>
               )}
 
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
                   <h2 
-                    style={{ fontSize: '48px', lineHeight: '100%', fontWeight: 500, letterSpacing: '0px' }} 
+                    style={{ ...h2Style, ...gradientTextStyle }} 
                     className="font-lora mb-2 tracking-normal"
                   >
-                    <span style={gradientTextStyle}>Here's your code!</span>
+                    Here's your code!
                   </h2>
                   <p 
                     style={{ letterSpacing: '-0.005em' }}
-                    className="font-manrope text-white/70 text-[16px] leading-[24px] mb-8 font-normal"
+                    className="font-manrope text-white/70 text-[16px] leading-[24px] mb-8 font-normal whitespace-nowrap"
                   >
                     Use this code & get <span className="font-semibold text-white">20% off.</span>
                   </p>
@@ -180,8 +204,7 @@ export default function ImmersiveNewsletter() {
                     style={{
                       width: '350px',
                       height: '44px',
-                      borderStyle: 'dashed',
-                      backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23FEFEFE' stroke-width='1.25' stroke-dasharray='2.5%2c 2.5' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`
+                      backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23FEFEFE' stroke-width='1.25' stroke-dasharray='2.5%2c 2.5' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
                     }}
                     className="flex items-center justify-center gap-[8px] px-[20px] cursor-pointer hover:bg-white/5 transition-colors"
                   >
