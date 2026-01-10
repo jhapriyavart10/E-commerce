@@ -5,6 +5,7 @@ import './globals.css'
 import { CartProvider } from './context/CartContext'
 import Footer from '@/components/Footer' 
 import FloatingChat from '@/components/FloatingChat'
+import NewsletterPopup from '@/components/NewsletterPopup';
 
 const manrope = Manrope({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-manrope', })
 const muslone = localFont({
@@ -57,6 +58,7 @@ export default function RootLayout({
 
           {/* 4. Footer added here appears on all pages */}
           <Footer />
+          <NewsletterPopup />
           <FloatingChat />
         </CartProvider>
       </body>
