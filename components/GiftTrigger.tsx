@@ -19,7 +19,7 @@ export default function GiftTrigger({ onOpen }: GiftTriggerProps) {
       onClick={onOpen}
       initial={false}
       animate={{
-        width: isHovered ? '220px' : '56px', // Animates width from circle to pill
+        width: isHovered ? '178px' : '56px', // Animates width from circle to pill
         backgroundColor: '#7F3E2F', // Deep reddish-brown/rust fill
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
@@ -42,7 +42,7 @@ export default function GiftTrigger({ onOpen }: GiftTriggerProps) {
       </div>
 
       {/* Text Label Section - Only visible when stretched */}
-      <div className="flex items-center pr-6 overflow-hidden">
+      <div className="flex items-center pr-3 overflow-hidden">
         <motion.span 
           initial={{ opacity: 0 }}
           animate={{ opacity: isHovered ? 1 : 0 }}
