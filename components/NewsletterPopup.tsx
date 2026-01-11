@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
 import Image from 'next/image';
+import GiftTrigger from './GiftTrigger';
 
 const SPIRITUAL_FOCUS_OPTIONS = [
   "Inner Peace & Emotional Balance",
@@ -20,6 +21,11 @@ export default function ImmersiveNewsletter() {
   const [email, setEmail] = useState('');
   const [warning, setWarning] = useState('');
   const [copied, setCopied] = useState(false);
+
+  const openPopup = () => {
+    setStep(1); // Reset to first step
+    setIsVisible(true);
+  };
 
   useEffect(() => {
     const hasSeenPopup = sessionStorage.getItem('hasSeenNewsletter');
@@ -69,13 +75,15 @@ export default function ImmersiveNewsletter() {
   };
 
   return (
+    <>
+    <GiftTrigger onOpen={openPopup} />
     <AnimatePresence>
       {isVisible && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black"
+          className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-black"
         >
           {/* Background Layer - Preserved exactly as requested with no filters */}
           <div className="absolute inset-0">
@@ -218,5 +226,6 @@ export default function ImmersiveNewsletter() {
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   );
 }
