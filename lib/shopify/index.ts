@@ -40,3 +40,34 @@ export async function shopifyFetch<T>({
     };
   }
 }
+const customerCreateMutation = `
+  mutation customerCreate($input: CustomerCreateInput!) {
+    customerCreate(input: $input) {
+      customer { id }
+      customerUserErrors { message }
+    }
+  }
+`;
+
+const customerAccessTokenCreateMutation = `
+  mutation customerAccessTokenCreate($input: CustomerAccessTokenCreateInput!) {
+    customerAccessTokenCreate(input: $input) {
+      customerAccessToken { accessToken expiresAt }
+      customerUserErrors { message }
+    }
+  }
+`;
+
+export async function createCustomer(details: any) {
+  return shopifyFetch({
+    query: customerCreateMutation,
+    variables: { input: details }
+  });
+}
+
+export async function loginCustomer(email: string, password: string) {
+  return shopifyFetch({
+    query: customerAccessTokenCreateMutation,
+    variables: { input: { email, password } }
+  });
+}

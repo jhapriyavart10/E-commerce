@@ -7,7 +7,9 @@ import Header from '@/components/Header';
 
 export default function SignInPage() {
   const [activeChakra, setActiveChakra] = useState(1);
+  const [loading, setLoading] = useState(false);
 
+  // Chakra Loop Animation
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveChakra((prev) => (prev === 7 ? 1 : prev + 1));
@@ -15,11 +17,40 @@ export default function SignInPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Login Handler (Moved inside the component)
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: formData.get('email'), // matches name="email"
+          password: formData.get('password'), // matches name="password"
+        }),
+      });
+
+      if (res.ok) {
+        window.location.href = '/account'; 
+      } else {
+        alert('Invalid credentials');
+      }
+    } catch (err) {
+      console.error("Login Error:", err);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Header />
       <div className="flex-grow flex flex-col md:flex-row bg-[#F6D8AB] min-h-[calc(100vh-80px)]">
-        {/* Left Visual Illustration Section - Kept as is */}
+        {/* Left Visual Illustration Section */}
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 relative min-h-[400px]">
           <div className="relative w-full max-w-lg aspect-square flex items-center justify-center">
             <div className="absolute inset-0">
@@ -54,23 +85,23 @@ export default function SignInPage() {
         {/* Right Login Form Section */}
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-16">
           <div className="w-full max-w-md">
-            {/* Header Text */}
             <div>
               <h1 className="font-lora text-4xl md:text-5xl text-[#280F0B] font-medium mb-2">
                 Welcome back!
               </h1>
-              {/* Set margin-bottom to 16px (4rem) to space it from the form */}
               <p className="font-manrope text-[#280F0B]/60 text-base font-medium mb-4">
                 Enter login details to go ahead.
               </p>
             </div>
 
-            {/* Form - Removed space-y-10 to use specific spacing */}
-            <form className="mt-0" onSubmit={(e) => e.preventDefault()}>
+            {/* Form with handleLogin integrated */}
+            <form className="mt-0" onSubmit={handleLogin}>
               <div className="space-y-6">
-                {/* Username Input */}
+                {/* Username/Email Input */}
                 <div className="relative border-b border-[#280F0B]/30 focus-within:border-[#280F0B] transition-colors">
                   <input
+                    required
+                    name="email"
                     type="text"
                     placeholder="Username or Email"
                     className="w-full py-3 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B]"
@@ -80,6 +111,8 @@ export default function SignInPage() {
                 {/* Password Input */}
                 <div className="relative border-b border-[#280F0B]/30 focus-within:border-[#280F0B] transition-colors">
                   <input
+                    required
+                    name="password"
                     type="password"
                     placeholder="Password"
                     className="w-full py-3 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B]"
@@ -87,11 +120,11 @@ export default function SignInPage() {
                 </div>
               </div>
 
-              {/* Spacing between inputs and checkbox set to 32px (mt-8) */}
               <div className="flex items-center gap-3 group cursor-pointer w-fit mt-8">
                 <input
                   type="checkbox"
                   id="remember"
+                  name="remember"
                   className="appearance-none w-4 h-4 border border-[#280F0B]/50 bg-transparent rounded-sm checked:bg-[#280F0B] checked:border-transparent cursor-pointer transition-all relative after:content-[''] after:absolute after:hidden checked:after:block after:left-[4px] after:top-[1px] after:w-[5px] after:h-[9px] after:border-white after:border-r-2 after:border-b-2 after:rotate-45"
                 />
                 <label htmlFor="remember" className="font-manrope text-sm text-[#280F0B]/70 cursor-pointer">
@@ -99,12 +132,12 @@ export default function SignInPage() {
                 </label>
               </div>
 
-              {/* Login Button with spacing from checkbox */}
               <button
+                disabled={loading}
                 type="submit"
-                className="w-full py-3 mt-10 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300"
+                className="w-full py-3 mt-10 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
               >
-                Login
+                {loading ? 'Logging in...' : 'Login'}
               </button>
             </form>
 
