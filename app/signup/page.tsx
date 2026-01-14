@@ -25,7 +25,6 @@ export default function SignUpPage() {
           username: formData.get('Username'),
           firstName: formData.get('First Name'),
           lastName: formData.get('Last Name'),
-          // Ensure your backend handles a default or provided password
           password: "TemporaryPassword123!", 
         }),
       });
@@ -46,45 +45,46 @@ export default function SignUpPage() {
   return (
     <>
       <Header />
-      <div className="flex-grow flex flex-col md:flex-row bg-[#F6D8AB] min-h-[calc(100vh-80px)] overflow-hidden">
+      <div className="flex flex-col-reverse md:flex-row bg-[#F6D8AB] min-h-[calc(100vh-80px)] w-full overflow-x-hidden">
         
-        {/* Left Section: Details (Animate in from left) */}
+        {/* Left Section: Form details */}
         <motion.div 
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full md:w-1/2 flex items-center justify-start py-8 md:py-16 pl-6 lg:pl-[72px]"
+          className="w-full md:w-3/5 lg:w-1/2 flex items-center justify-center md:justify-start py-10 md:py-16 px-6 sm:px-12 lg:pl-[72px]"
         >
-          <div className="w-full">
+          <div className="w-full max-w-2xl">
             {/* Header Text */}
-            <div className="mb-10">
-              <h1 className="font-lora text-4xl md:text-5xl text-[#280F0B] font-medium mb-4">
+            <div className="mb-10 text-left">
+              <h1 className="font-lora text-3xl sm:text-4xl md:text-5xl text-[#280F0B] font-medium mb-4">
                 Register with us.
               </h1>
-              <p className="font-manrope text-[#280F0B]/60 text-base font-medium lg:whitespace-nowrap">
+              <p className="font-manrope text-[#280F0B]/60 text-sm sm:text-base font-medium max-w-prose">
                 Start adding your account details. It will be used for login and billing purposes.
               </p>
               {error && <p className="text-red-600 mt-2 font-manrope text-sm">{error}</p>}
             </div>
 
             {/* Form */}
-            <form className="mt-8 space-y-8" onSubmit={handleRegister}>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-8 lg:gap-x-12">
+            <form className="space-y-8" onSubmit={handleRegister}>
+              {/* Grid: 1 column on mobile/tablet, 2 columns on desktop */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-8 gap-x-4 lg:gap-x-[16px]">
                 {[
                   { label: "Username", type: "text" },
                   { label: "Email Address", type: "email" },
                   { label: "First Name", type: "text" },
                   { label: "Last Name", type: "text" },
                 ].map((field, index) => (
-                  <div key={field.label} className="relative group lg:w-[355px]">
+                  <div key={field.label} className="relative group w-full">
                     <input
                       required
                       name={field.label}
                       type={field.type}
                       placeholder={field.label}
-                      className="w-full lg:w-[355px] py-2 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B] text-[16px]"
+                      className="w-full py-2 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B] text-base"
                     />
-                    {/* Animated Underline tracing from left to right */}
+                    {/* Animated Underline */}
                     <motion.div
                       initial={{ scaleX: 0 }}
                       animate={{ opacity: 1, scaleX: 1 }}
@@ -94,14 +94,14 @@ export default function SignUpPage() {
                         ease: "easeInOut" 
                       }}
                       style={{ originX: 0 }} 
-                      className="absolute bottom-0 left-0 w-full lg:w-[355px] h-[1px] bg-[#280F0B]/30 group-focus-within:bg-[#280F0B] group-focus-within:h-[1.5px] transition-all"
+                      className="absolute bottom-0 left-0 w-full h-[1px] bg-[#280F0B]/30 group-focus-within:bg-[#280F0B] group-focus-within:h-[1.5px] transition-all"
                     />
                   </div>
                 ))}
               </div>
 
               {/* Terms Checkbox */}
-              <div className="flex items-start gap-3 group cursor-pointer w-fit mt-10">
+              <div className="flex items-start gap-3 group cursor-pointer w-full mt-10">
                 <input
                   required
                   type="checkbox"
@@ -113,11 +113,11 @@ export default function SignUpPage() {
                 </label>
               </div>
 
-              {/* Register Button */}
+              {/* Register Button: Spans full width of the grid */}
               <button
                 disabled={loading}
                 type="submit"
-                className="w-full lg:w-[355px] py-3 mt-4 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
+                className="w-full py-3 mt-4 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
               >
                 {loading ? 'REGISTERING...' : 'REGISTER'}
               </button>
@@ -131,19 +131,20 @@ export default function SignUpPage() {
           </div>
         </motion.div>
 
-        {/* Right Section: Mandala Logo (Animate in from bottom) */}
+        {/* Right Section: Illustration */}
         <motion.div 
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-          className="w-full md:w-1/2 flex items-center justify-center p-8 relative bg-[#F6D8AB]"
+          className="w-full md:w-2/5 lg:w-1/2 flex items-center justify-center p-8 sm:p-12 md:p-16 bg-[#F6D8AB]"
         >
-          <div className="relative w-full max-w-[450px] aspect-square">
+          <div className="relative w-full max-w-[280px] sm:max-w-[360px] md:max-w-[400px] lg:max-w-[450px] aspect-square">
             <Image 
               src="/assets/images/Reg_logo.svg" 
               alt="Mandala Illustration" 
               fill 
               className="object-contain"
+              priority
             />
           </div>
         </motion.div>
