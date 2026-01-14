@@ -30,7 +30,7 @@ export async function shopifyFetch<T>({
 
     return {
       status: result.status,
-      body
+      body: body.data
     };
   } catch (e) {
     console.error('Shopify Fetch Error:', e);

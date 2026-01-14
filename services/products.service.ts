@@ -69,7 +69,7 @@ export async function getProducts() {
       variables: { first: 28 },
     });
 
-    const edges = res?.body?.data?.products?.edges;
+    const edges = res?.body?.products?.edges;
     if (!edges) return [];
 
     return edges.map((edge: any) => {
@@ -118,9 +118,9 @@ export async function getProduct(handle: string) {
       query: getProductQuery,
       variables: { handle },
     });
-    console.log('RAW SHOPIFY DATA:', JSON.stringify(res.body.data.product, null, 2));
+    console.log('RAW SHOPIFY DATA:', JSON.stringify(res.body.product, null, 2));
 
-    const product = res?.body?.data?.product;
+    const product = res?.body?.product;
     if (!product) return null;
 
     const variantNode = product.variants?.edges?.[0]?.node;

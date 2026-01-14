@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface FormState {
@@ -74,7 +74,28 @@ const AccountDetails = () => {
     newPass: '',
     confirmPass: '',
   });
+  
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const res = await fetch('/api/auth/customer'); // A route to get current user data
+        if (res.ok) {
+          const data = await res.json();
+          setFormData(prev => ({
+            ...prev,
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.email || '',
+            username: data.email.split('@')[0], // Default username logic
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to auto-load user details", err);
+      }
+    };
 
+    fetchUserDetails();
+  }, []);
   const [errors, setErrors] = useState<Partial<FormState>>({});
 
   const validate = () => {
@@ -114,12 +135,31 @@ const AccountDetails = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      alert('Changes saved successfully!');
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (validate()) {
+    try {
+      const res = await fetch('/api/auth/update-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          password: formData.newPass, // This updates from TemporaryPassword123!
+        }),
+      });
+
+      if (res.ok) {
+        alert('Changes saved successfully!');
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || 'Update failed');
+      }
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
     }
-  };
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl">

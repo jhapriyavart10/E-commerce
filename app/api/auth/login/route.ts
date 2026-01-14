@@ -2,24 +2,33 @@ import { loginCustomer } from '@/lib/shopify';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-interface LoginResponse {
-  data: {
-    customerAccessTokenCreate: {
-      customerAccessToken: {
-        accessToken: string;
-        expiresAt: string;
-      } | null;
-      customerUserErrors: Array<{ message: string }>;
-    };
+interface CustomerAccessTokenCreateData {
+  customerAccessTokenCreate: {
+    customerAccessToken: { accessToken: string; expiresAt: string } | null;
+    customerUserErrors: Array<{ message: string }>;
   };
 }
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
+
+    // 1. Call your shopify library function
     const response = await loginCustomer(email, password);
-    const body = response.body as LoginResponse;
-    const { customerAccessToken, customerUserErrors } = body.data.customerAccessTokenCreate;
+    const responseBody = response.body as CustomerAccessTokenCreateData;
+
+    // Safety check to ensure the payload exists
+    if (!responseBody || !responseBody.customerAccessTokenCreate) {
+      console.error('Unexpected Shopify login response structure:', responseBody);
+      return NextResponse.json(
+        { message: 'Invalid response from login service' },
+        { status: 500 }
+      );
+    }
+
+    const { customerAccessToken, customerUserErrors } = responseBody.customerAccessTokenCreate;
+
+    // 2. Handle Shopify-specific errors (e.g., wrong password)
     if (customerUserErrors && customerUserErrors.length > 0) {
       return NextResponse.json(
         { message: customerUserErrors[0].message }, 
@@ -27,13 +36,14 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!customerAccessToken) {
+    if (!customerAccessToken?.accessToken) {
       return NextResponse.json(
-        { message: 'Failed to create access token.' }, 
+        { message: 'Invalid credentials' }, 
         { status: 401 }
       );
     }
 
+    // 3. Set the cookie securely
     cookies().set('customerAccessToken', customerAccessToken.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -44,8 +54,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Login Route Error:', error);
-    
+    console.error('Login Route Exception:', error);
     return NextResponse.json(
       { message: error.message || 'Internal Server Error' }, 
       { status: 500 }
