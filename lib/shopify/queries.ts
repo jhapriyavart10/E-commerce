@@ -7,15 +7,24 @@ export const getProductQuery = `
       productType
       descriptionHtml
 
-      # Fetch Review Rating (Example namespace: "reviews")
+      # Functional Metafields for Product Specifications
+      careInstructions: metafield(namespace: "custom", key: "care_instructions") {
+        value
+      }
+      productDetails: metafield(namespace: "custom", key: "product_details") {
+        value
+      }
+      howToUse: metafield(namespace: "custom", key: "how_to_use") {
+        value
+      }
+
+      # Existing Review & Rating Metafields
       rating: metafield(namespace: "reviews", key: "rating") {
         value
       }
-      # Fetch Review Count
       reviewCount: metafield(namespace: "reviews", key: "rating_count") {
         value
       }
-      # Fetch actual review list if stored as a JSON metafield
       reviewList: metafield(namespace: "reviews", key: "list") {
         value
       }
@@ -82,15 +91,26 @@ export const getProductsQuery = `
           handle
           title
           productType
+          descriptionHtml
           
-          # 1. Gender check
+          # Added Specifications to Bulk Query
+          careInstructions: metafield(namespace: "custom", key: "care_instructions") {
+            value
+          }
+          productDetails: metafield(namespace: "custom", key: "product_details") {
+            value
+          }
+          howToUse: metafield(namespace: "custom", key: "how_to_use") {
+            value
+          }
+
           gender: metafield(namespace: "shopify", key: "target-gender") {
             references(first: 5) {
               edges {
                 node {
                   ... on Metaobject {
                     handle
-                    field(key: "label") { # Directly get the 'For Him' label
+                    field(key: "label") {
                       value
                     }
                   }
@@ -99,18 +119,17 @@ export const getProductsQuery = `
             }
           }
 
-          # 2. Material check (using references plural because it's a list)
-         material: metafield(namespace: "shopify", key: "jewelry-material") {
-          references(first: 5) {
-            edges {
-              node {
-                ... on Metaobject {
-                  field(key: "label") { value } # Or key: "name"
+          material: metafield(namespace: "shopify", key: "jewelry-material") {
+            references(first: 5) {
+              edges {
+                node {
+                  ... on Metaobject {
+                    field(key: "label") { value }
+                  }
                 }
               }
             }
           }
-        }
 
           images(first: 1) {
             edges { node { url } }

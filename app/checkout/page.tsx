@@ -22,7 +22,7 @@ type FormErrors = {
   email?: boolean;
   streetAddress?: boolean;
   townCity?: boolean;
-  pincode?: boolean;
+  postcode?: boolean;
   state?: boolean;
 };
 
@@ -55,6 +55,24 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setIsHydrated(true);
+    const saved = localStorage.getItem('user_addresses');
+    if (saved) {
+      const addresses = JSON.parse(saved);
+      if (addresses.length > 0) {
+        const primary = addresses[addresses.length - 1]; // Use latest saved address
+        setFormData(prev => ({
+          ...prev,
+          firstName: primary.firstName || '',
+          lastName: primary.lastName || '',
+          country: primary.country || 'Australia',
+          streetAddress: primary.address1 || '',
+          apartment: primary.address2 || '',
+          townCity: primary.city || '',
+          state: primary.state || '',
+          phone: primary.phone || ''
+        }));
+      }
+    }
   }, []);
 
   // Calculations
@@ -86,7 +104,7 @@ export default function CheckoutPage() {
     if (!formData.email.trim() || !formData.email.includes('@')) newErrors.email = true;
     if (!formData.streetAddress.trim()) newErrors.streetAddress = true;
     if (!formData.townCity.trim()) newErrors.townCity = true;
-    if (!formData.pincode.trim()) newErrors.pincode = true;
+    if (!formData.pincode.trim()) newErrors.postcode = true;
     if (!formData.state) newErrors.state = true;
 
     setErrors(newErrors);
@@ -187,6 +205,43 @@ export default function CheckoutPage() {
             </h1>
             
             <section className="space-y-8 mt-8">
+              {isHydrated && localStorage.getItem('user_addresses') && (
+                <div className="mb-12 pb-8 border-b border-[#280F0B1A]">
+                  <h3 className="text-lg font-bold mb-4 tracking-wider uppercase flex items-center gap-2">
+                    <Image src="/assets/images/home.svg" alt="Address" width={24} height={24} />
+                    Ship to a Saved Address
+                  </h3>
+                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                    {JSON.parse(localStorage.getItem('user_addresses') || '[]').map((addr: any) => (
+                      <div 
+                        key={addr.id}
+                        onClick={() => setFormData({
+                          ...formData,
+                          firstName: addr.firstName,
+                          lastName: addr.lastName,
+                          streetAddress: addr.address1,
+                          apartment: addr.address2 || '',
+                          townCity: addr.city,
+                          state: addr.state,
+                          pincode: addr.pincode || addr.postcode,
+                          phone: addr.phone || ''
+                        })}
+                        className={`min-w-[280px] p-5 border cursor-pointer transition-all rounded-sm 
+                          ${formData.streetAddress === addr.address1 
+                            ? 'border-[#7F3E2F] bg-[#7F3E2F0D] ring-1 ring-[#7F3E2F]' 
+                            : 'border-[#280F0B33] bg-transparent hover:border-[#280F0B]'}`}
+                      >
+                        <p className="font-bold text-sm">{addr.firstName} {addr.lastName}</p>
+                        <p className="text-xs opacity-70 mt-1 truncate">{addr.address1}</p>
+                        <p className="text-xs opacity-70">{addr.city}, {addr.state}</p>
+                        {formData.streetAddress === addr.address1 && (
+                          <p className="text-[10px] font-bold text-[#7F3E2F] mt-3 uppercase tracking-widest">Selected</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {/* Contact Information */}
               <div>
                 <h3 className="text-lg font-bold mb-4 tracking-wider uppercase">Contact</h3>
@@ -260,10 +315,10 @@ export default function CheckoutPage() {
                     />
                     <input 
                       type="text" 
-                      placeholder={errors.pincode ? "Pincode Required *" : "Pincode"} 
+                      placeholder={errors.postcode ? "Postcode Required *" : "Postcode"} 
                       value={formData.pincode}
-                      onChange={(e) => { setFormData({...formData, pincode: e.target.value}); if(errors.pincode) setErrors({...errors, pincode: false}); }}
-                      className={`w-full bg-transparent border p-4 outline-none ${errors.pincode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
+                      onChange={(e) => { setFormData({...formData, pincode: e.target.value}); if(errors.postcode) setErrors({...errors, postcode: false}); }}
+                      className={`w-full bg-transparent border p-4 outline-none ${errors.postcode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
                     />
                   </div>
                   <div className="relative">

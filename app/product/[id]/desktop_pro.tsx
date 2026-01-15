@@ -6,6 +6,7 @@ import Link from 'next/link'; // FIXED: Changed from lucide-react to next/link
 import Header from '@/components/Header';
 import { useCart } from '@/app/context/CartContext';
 import CartDrawer from '@/components/CartDrawer';
+import { title } from 'process';
 
 // Types for backend integration
 interface Product {
@@ -172,6 +173,24 @@ const chainOptions = useMemo(() => {
 const hasChainOptions = chainOptions.length > 0;
 const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
 
+const specificSections = [
+  { 
+    title: 'Description', 
+    content: product.descriptionHtml || product.description 
+  },
+  { 
+    title: 'How to use', 
+    content: product.howToUse || "Follow your intuition or use during meditation to connect with the crystal's energy." 
+  },
+  { 
+    title: 'Product Details', 
+    content: product.productDetails || "Ethically sourced natural crystal jewelry." 
+  },
+  { 
+    title: 'Care Instructions', 
+    content: product.careInstructions || "Handle gently and cleanse regularly with sage, moonlight, or sound." 
+  }
+];
 
   useEffect(() => {
     async function fetchRecommended() {
@@ -279,7 +298,7 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
                 </div>
                 <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
                   {availableMaterials.map((option, index) => (
-                    <div key={option.name} className="flex contents">
+                    <div key={option.name} className="contents">
                       <button
                         onClick={() => handleMaterialClick(option.name)}
                         className={`flex items-center gap-1 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
@@ -357,19 +376,40 @@ const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
             </div>
 
               {/* Accordions */}
-
               <div className="mt-8">
-                {['Description', 'How to use', 'Product Details', 'Ideal for'].map((title) => {
-                  const isOpen = openAccordion === title;
+                {specificSections.map((section) => {
+                  const isOpen = openAccordion === section.title;
+                  
+                  // Check if content looks like HTML (has tags) or is plain text
+                  const isHtml = typeof section.content === 'string' && section.content.includes('<');
+
                   return (
-                    <div key={title} ref={title === 'Description' ? descriptionRef : null} className="border-b border-[#280F0B]/30 py-4">
-                      <button onClick={() => setOpenAccordion(isOpen ? null : title)} className="w-full flex justify-between items-center text-left font-semibold text-[18px] lg:text-[18px] bg-transparent border-none p-0">
-                        {title}
-                        <span className={`text-xl transition-transform ${isOpen ? 'rotate-45' : ''}`}>+</span>
+                    <div key={section.title} className="border-b border-[#280F0B]/30 py-4">
+                      <button 
+                        onClick={() => setOpenAccordion(isOpen ? null : section.title)} 
+                        className="w-full flex justify-between items-center text-left font-semibold text-[18px] bg-transparent border-none p-0 outline-none"
+                      >
+                        <span className="text-[#280F0B]">{section.title}</span>
+                        <span className={`text-[#280F0B] transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`}>
+                          +
+                        </span>
                       </button>
 
-                      <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 mt-3 opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <p className="text-[14px] opacity-80 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }}></p>
+                      <div 
+                        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                          isOpen ? 'max-h-[1000px] mt-4 opacity-100' : 'max-h-0 opacity-0'
+                        }`}
+                      >
+                        {isHtml ? (
+                          <div 
+                            className="text-[14px] text-[#280F0B] opacity-80 leading-relaxed space-y-2" 
+                            dangerouslySetInnerHTML={{ __html: section.content }} 
+                          />
+                        ) : (
+                          <p className="text-[14px] text-[#280F0B] opacity-80 leading-relaxed whitespace-pre-line">
+                            {section.content}
+                          </p>
+                        )}
                       </div>
                     </div>
                   );

@@ -57,6 +57,14 @@ const customerAccessTokenCreateMutation = `
     }
   }
 `;
+const customerUpdateMutation = `
+  mutation customerUpdate($customerAccessToken: String!, $customer: CustomerUpdateInput!) {
+    customerUpdate(customerAccessToken: $customerAccessToken, customer: $customer) {
+      customer { id }
+      customerUserErrors { message }
+    }
+  }
+`;
 
 export async function createCustomer(details: any) {
   return shopifyFetch({
@@ -69,5 +77,16 @@ export async function loginCustomer(email: string, password: string) {
   return shopifyFetch({
     query: customerAccessTokenCreateMutation,
     variables: { input: { email, password } }
+  });
+}
+
+export async function updateCustomer(accessToken: string, customerData: any) {
+  return shopifyFetch<any>({
+    query: customerUpdateMutation,
+    variables: { 
+      customerAccessToken: accessToken,
+      customer: customerData 
+    },
+    cache: 'no-store'
   });
 }
