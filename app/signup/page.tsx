@@ -41,6 +41,17 @@ export default function SignUpPage() {
       setLoading(false);
     }
   };
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    // In a real production app, you would use a library like NextAuth.js 
+    // or Firebase. Here is the implementation for a custom backend route:
+    try {
+      window.location.href = '/api/auth/google?prompt=select_account'; 
+    } catch (err) {
+      setError('Google Sign up failed. Please try again.');
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -68,38 +79,30 @@ export default function SignUpPage() {
 
             {/* Form */}
             <form className="space-y-8" onSubmit={handleRegister}>
-              {/* Grid: 1 column on mobile/tablet, 2 columns on desktop */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-8 gap-x-4 lg:gap-x-[16px]">
                 {[
                   { label: "Username", type: "text" },
                   { label: "Email Address", type: "email" },
                   { label: "First Name", type: "text" },
                   { label: "Last Name", type: "text" },
-                ].map((field, index) => (
+                ].map((field) => (
                   <div key={field.label} className="relative group w-full">
                     <input
                       required
                       name={field.label}
                       type={field.type}
                       placeholder={field.label}
-                      className="w-full py-2 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B] text-base"
+                      className="peer w-full py-2 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B] text-base"
                     />
-                    {/* Animated Underline */}
-                    <motion.div
-                      initial={{ scaleX: 0 }}
-                      animate={{ opacity: 1, scaleX: 1 }}
-                      transition={{ 
-                        duration: 0.8, 
-                        delay: 0.6 + index * 0.1, 
-                        ease: "easeInOut" 
-                      }}
-                      style={{ originX: 0 }} 
-                      className="absolute bottom-0 left-0 w-full h-[1px] bg-[#280F0B]/30 group-focus-within:bg-[#280F0B] group-focus-within:h-[1.5px] transition-all"
+                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-[#280F0B]/30" />
+                    <span
+                      className="absolute left-0 bottom-0 h-[1.5px] w-full bg-[#280F0B]/30
+                                scale-x-0 origin-left transition-transform duration-300
+                                peer-focus:scale-x-100 peer-focus:bg-[#280F0B]"
                     />
                   </div>
                 ))}
               </div>
-
               {/* Terms Checkbox */}
               <div className="flex items-start gap-3 group cursor-pointer w-full mt-10">
                 <input
@@ -120,6 +123,20 @@ export default function SignUpPage() {
                 className="w-full py-3 mt-4 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
               >
                 {loading ? 'REGISTERING...' : 'REGISTER'}
+              </button>
+              <div className="relative flex items-center py-5">
+                <div className="flex-grow border-t border-[#280F0B]/20"></div>
+                <span className="flex-shrink mx-4 text-[#280F0B]/40 text-sm">OR</span>
+                <div className="flex-grow border-t border-[#280F0B]/20"></div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleSignUp}
+                className="w-full py-3 flex items-center justify-center gap-3 border border-[#280F0B]/20 text-[#280F0B] font-manrope font-semibold hover:bg-[#280F0B]/5 transition-all duration-300"
+              >
+                <Image src="/assets/images/google-icon.png" alt="Google" width={40} height={60} />
+                CONTINUE WITH GOOGLE
               </button>
             </form>
 
