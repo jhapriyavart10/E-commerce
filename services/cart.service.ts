@@ -30,7 +30,7 @@ export const CartService = {
       cache: 'no-store' 
     });
     
-    return res.body.data.cartCreate.cart;
+    return res.body?.cartCreate?.cart;
   },
 
   async addToCart(cartId: string, variantId: string) {
@@ -55,6 +55,6 @@ export const CartService = {
       cache: 'no-store' 
     });
 
-    return res.body.data.cartLinesAdd.cart;
+    return res.body?.cartLinesAdd?.cart;
   }
 };

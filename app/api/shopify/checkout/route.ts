@@ -18,10 +18,11 @@ export async function POST(req: Request) {
       `;
       const response: any = await shopifyFetch({
         query: createCartMutation,
-        variables: { input: { lines: [{ variantId, quantity: quantity || 1 }] } }
+        variables: { input: { lines: [{ merchandiseId: variantId, quantity: quantity || 1 }] } },
+        cache: 'no-store'
       });
       
-      const cart = response.body.data?.cartCreate?.cart;
+      const cart = response.body?.cartCreate?.cart;
       if (cart) return NextResponse.json({ url: cart.checkoutUrl });
       return NextResponse.json({ error: "Could not create cart" }, { status: 400 });
     }
@@ -32,8 +33,8 @@ export async function POST(req: Request) {
         cart(id: $id) { checkoutUrl }
       }
     `;
-    const data: any = await shopifyFetch({ query: cartQuery, variables: { id: cartId } });
-    const cart = data?.body?.data?.cart;
+    const data: any = await shopifyFetch({ query: cartQuery, variables: { id: cartId }, cache: 'no-store' });
+    const cart = data?.body?.cart;
 
     // 3. Stale ID Protection: If Shopify returns null, the ID is from the OLD store
     if (!cart) {
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: cart.checkoutUrl });
 
   } catch (error: any) {
-    console.error('Checkout Error:', error.message);
+    console.error('Checkout Error:', error.error?.message || error.message || error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
