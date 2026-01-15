@@ -133,7 +133,7 @@ export default function SignUpPage() {
               <button
                 type="button"
                 onClick={handleGoogleSignUp}
-                className="w-full py-3 flex items-center justify-center gap-3 border border-[#280F0B]/20 text-[#280F0B] font-manrope font-semibold hover:bg-[#280F0B]/5 transition-all duration-300"
+                className="w-full py-3 flex items-center justify-center gap-3 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
               >
                 <Image src="/assets/images/google-icon.png" alt="Google" width={40} height={60} />
                 CONTINUE WITH GOOGLE

@@ -94,26 +94,32 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   };
 
   const handleShopPay = async () => {
-    const variantId = product.variants?.[0]?.id || product.id; 
+    if (!activeVariant?.id) return;
+
     try {
       const response = await fetch('/api/shopify/checkout', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          variantId: variantId, 
+          variantId: activeVariant.id, // Corrected field name
           quantity: quantity
         })
       });
       
       const data = await response.json();
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
+      
+      // Updated to match the key "url" returned by your API
+      if (response.ok &&data.url) {
+        window.location.href = data.url;
       } else {
-        console.error("No checkout URL returned:", data);
+        console.error("Checkout Redirect Error:", data.error || "Unknown Error");
+        alert(data.error || "Failed to initiate checkout. Please try again.");
       }
     } catch (error) {
-      console.error("Shop Pay redirect failed", error);
+      console.error("Redirect failed", error);
     }
   };
+
   const handleMaterialClick = (materialName: string) => {
     setSelectedMaterial(materialName);
     const variantMatch = product.variants?.find((v: any) => 
