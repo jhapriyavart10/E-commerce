@@ -39,6 +39,12 @@ export default function CheckoutPage() {
   // Error state for validation
   const [errors, setErrors] = useState<FormErrors>({});
   
+  const [checkoutData, setCheckoutData] = useState<{
+    totalPrice: {
+      amount: string;
+    };
+  } | null>(null);
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -76,12 +82,13 @@ export default function CheckoutPage() {
   }, []);
 
   // Calculations
+  const [discountAmount, setDiscountAmount] = useState(0);
   const subtotal = useMemo(() => 
     cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
   , [cartItems]);
   
   const tax = subtotal * 0.1;
-  const total = subtotal + tax;
+  const total = subtotal + tax - discountAmount;
 
   const filteredCountries = useMemo(() => {
     return Object.keys(COUNTRY_DATA).filter(c => 
@@ -148,6 +155,40 @@ export default function CheckoutPage() {
     } 
     finally {
       setIsProcessing(false);
+    }
+  };
+
+  const [couponCode, setCouponCode] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
+  const [couponMessage, setCouponMessage] = useState({ text: '', type: '' });
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setIsApplying(true);
+    setCouponMessage({ text: '', type: '' });
+
+    try {
+      const res = await fetch('/api/shopify/apply-discount', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          checkoutId: cartId,
+          discountCode: couponCode 
+        })
+      });
+      
+      const result = await res.json();
+
+      if (result.success) {
+        setCouponMessage({ text: 'Discount applied!', type: 'success' });
+        const newDiscount = (subtotal + tax) - Number(result.newTotal);
+        setDiscountAmount(newDiscount);
+      } else {
+        setCouponMessage({ text: result.error || 'Invalid code', type: 'error' });
+      }
+    } catch (err) {
+      setCouponMessage({ text: 'System error. Try again.', type: 'error' });
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -378,6 +419,12 @@ export default function CheckoutPage() {
                   <span className="text-base lg:text-lg">Subtotal</span>
                   <span className="font-semibold text-base lg:text-lg">${subtotal.toFixed(2)}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between items-center text-[#280f0b] font-bold">
+                    <span>Discount</span>
+                    <span>-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Tax</span>
                   <span className="font-semibold text-base lg:text-lg">${tax.toFixed(2)}</span>
@@ -403,8 +450,20 @@ export default function CheckoutPage() {
                   </button>
                   <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-20 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
                     <div className="flex gap-2">
-                      <input type="text" placeholder="Enter code" className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm outline-none" />
-                      <button className="bg-[#280F0B] text-[#F6D8AB] px-4 rounded text-xs font-bold uppercase hover:bg-black">Apply</button>
+                      <input 
+                        type="text" 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        placeholder="Enter code" 
+                        className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm outline-none" 
+                      />
+                      <button 
+                        onClick={handleApplyCoupon}
+                        disabled={isApplying}
+                        className="bg-[#280F0B] text-[#F6D8AB] px-4 rounded text-xs font-bold uppercase hover:bg-black disabled:opacity-50"
+                      >
+                        {isApplying ? '...' : 'Apply'}
+                      </button>
                     </div>
                   </div>
                 </div>

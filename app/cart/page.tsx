@@ -16,32 +16,48 @@ export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartId, getTotalItems } = useCart();
   const [couponExpanded, setCouponExpanded] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
+  const [couponMessage, setCouponMessage] = useState({ text: '', type: '' });
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   // Dynamic calculations based on real Cart state
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const tax = subtotal * 0.1; // Example 10% tax calculation
-  const total = subtotal + tax;
+  const total = subtotal + tax - discountAmount;
 
-  // const handleCheckout = async () => {
-  //   if (!cartId) return alert("Cart is empty");
-    
-  //   setIsRedirecting(true);
-  //   try {
-  //     const response = await fetch('/api/shopify/checkout', {
-  //       method: 'POST',
-  //       body: JSON.stringify({ cartId })
-  //     });
-  //     const { url } = await response.json();
-  //     if (url) {
-  //       window.location.href = url; // Redirect to Shopify
-  //     } else {
-  //       throw new Error("No checkout URL returned");
-  //     }
-  //   } catch (err) {
-  //     console.error("Checkout redirect failed", err);
-  //     setIsRedirecting(false);
-  //   }
-  // };
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setIsApplying(true);
+    setCouponMessage({ text: '', type: '' });
+
+    try {
+      // Note: Ensure your API route handles cartId specifically if using Shopify's Cart API
+      const res = await fetch('/api/shopify/apply-discount', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          checkoutId: cartId, 
+          discountCode: couponCode 
+        })
+      });
+      
+      const result = await res.json();
+
+      if (result.success) {
+        setCouponMessage({ text: 'Discount applied!', type: 'success' });
+        // Calculate how much was saved
+        const savings = (subtotal + tax) - Number(result.newTotal);
+        setDiscountAmount(savings);
+      } else {
+        setCouponMessage({ text: result.error || 'Invalid code', type: 'error' });
+        setDiscountAmount(0);
+      }
+    } catch (err) {
+      setCouponMessage({ text: 'System error. Try again.', type: 'error' });
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -156,6 +172,12 @@ export default function CartPage() {
                   <span className="text-base lg:text-lg">Subtotal</span>
                   <span className="font-semibold text-base lg:text-lg">${subtotal.toFixed(2)}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between items-center text-[#280f0b] font-bold">
+                    <span className="text-base lg:text-lg">Discount</span>
+                    <span className="text-base lg:text-lg">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Tax</span>
                   <span className="font-semibold text-base lg:text-lg">${tax.toFixed(2)}</span>
@@ -172,15 +194,45 @@ export default function CartPage() {
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
 
                 <div className="px-6 lg:px-10 py-6">
-                  <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group">
+                  <button 
+                    onClick={() => setCouponExpanded(!couponExpanded)} 
+                    className="flex items-center gap-4 w-full group outline-none"
+                  >
                     <div className="size-6 relative shrink-0">
                       <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
                     </div>
-                    <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">Have a coupon code?</span>
-                    <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">
+                      Have a coupon code?
+                    </span>
+                    <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="#280f0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                   </button>
-                  <div className={`overflow-hidden transition-all ${couponExpanded ? 'max-h-20 mt-4' : 'max-h-0'}`}>
-                     <input type="text" placeholder="Enter code" className="w-full bg-transparent border border-black/20 p-2 rounded text-sm outline-none" />
+                  
+                  <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-32 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        placeholder="Enter code" 
+                        className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/50 outline-none focus:border-[#280f0b]" 
+                      />
+                      <button 
+                        onClick={handleApplyCoupon}
+                        disabled={isApplying}
+                        className="bg-[#280F0B] text-[#F6D8AB] px-6 rounded text-xs font-bold uppercase hover:bg-black transition-colors disabled:opacity-50"
+                      >
+                        {isApplying ? '...' : 'Apply'}
+                      </button>
+                    </div>
+                    
+                    {/* Status Message: Uses existing text size and bold uppercase styling */}
+                    {couponMessage.text && (
+                      <p className={`mt-3 text-[11px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-green-800'}`}>
+                        {couponMessage.text}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="w-full border-b border-dashed border-black/40" />
