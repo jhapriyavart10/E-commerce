@@ -27,7 +27,7 @@ type FormErrors = {
 };
 
 export default function CheckoutPage() {
-  const { cartItems, cartId, getTotalItems } = useCart();
+  const { cartItems, cartId, getTotalItems, applyCoupon, removeCoupon, appliedCoupon, discountAmount } = useCart();
   
   // States
   const [isHydrated, setIsHydrated] = useState(false);
@@ -80,15 +80,6 @@ export default function CheckoutPage() {
       }
     }
   }, []);
-
-  // Calculations
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const subtotal = useMemo(() => 
-    cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
-  , [cartItems]);
-  
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax - discountAmount;
 
   const filteredCountries = useMemo(() => {
     return Object.keys(COUNTRY_DATA).filter(c => 
@@ -161,35 +152,19 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [couponMessage, setCouponMessage] = useState({ text: '', type: '' });
+  const subtotal = useMemo(() => 
+    cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+  , [cartItems]);
+  
+  const tax = subtotal * 0.1;
+  const total = subtotal + tax - discountAmount;
 
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
     setIsApplying(true);
-    setCouponMessage({ text: '', type: '' });
-
-    try {
-      const res = await fetch('/api/shopify/apply-discount', {
-        method: 'POST',
-        body: JSON.stringify({ 
-          checkoutId: cartId,
-          discountCode: couponCode 
-        })
-      });
-      
-      const result = await res.json();
-
-      if (result.success) {
-        setCouponMessage({ text: 'Discount applied!', type: 'success' });
-        const newDiscount = (subtotal + tax) - Number(result.newTotal);
-        setDiscountAmount(newDiscount);
-      } else {
-        setCouponMessage({ text: result.error || 'Invalid code', type: 'error' });
-      }
-    } catch (err) {
-      setCouponMessage({ text: 'System error. Try again.', type: 'error' });
-    } finally {
-      setIsApplying(false);
-    }
+    const result = await applyCoupon(couponCode);
+    setCouponMessage({ text: result.message, type: result.success ? 'success' : 'error' });
+    setIsApplying(false);
   };
 
   if (!isHydrated) {
@@ -414,17 +389,22 @@ export default function CheckoutPage() {
           {/* Right Column: Dynamic Summary Card */}
           <div className="relative w-full max-w-[526px] mx-auto lg:mx-0 order-2">
             <div className="bg-[#FFC26F] rounded-[20px] overflow-hidden relative flex flex-col shadow-sm">
+              
+              {/* Price Breakdown Section */}
               <div className="p-6 lg:p-10 flex flex-col gap-4">
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Subtotal</span>
                   <span className="font-semibold text-base lg:text-lg">${subtotal.toFixed(2)}</span>
                 </div>
+
+                {/* Persistent Discount Row from Context */}
                 {discountAmount > 0 && (
-                  <div className="flex justify-between items-center text-[#280f0b] font-bold">
-                    <span>Discount</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
+                  <div className="flex justify-between items-center text-[#280F0B] ">
+                    <span className="text-base lg:text-lg tracking-tight">Discount Applied</span>
+                    <span className="font-semibold text-base lg:text-lg">-${discountAmount.toFixed(2)}</span>
                   </div>
                 )}
+
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Tax</span>
                   <span className="font-semibold text-base lg:text-lg">${tax.toFixed(2)}</span>
@@ -435,43 +415,81 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Coupon Section */}
+              {/* Coupon Section with rounded cutouts */}
               <div className="relative">
                 <div className="w-full border-t border-dashed border-black/40" />
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10"  />
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
+
                 <div className="px-6 lg:px-10 py-6">
-                  <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group">
-                    <div className="size-6 relative shrink-0">
-                      <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
-                    </div>
-                    <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">Have a coupon code?</span>
-                    <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                  </button>
-                  <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-20 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text" 
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        placeholder="Enter code" 
-                        className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm outline-none" 
-                      />
+                  {/* Conditional Rendering: Input vs Applied State */}
+                  {!appliedCoupon ? (
+                    <>
                       <button 
-                        onClick={handleApplyCoupon}
-                        disabled={isApplying}
-                        className="bg-[#280F0B] text-[#F6D8AB] px-4 rounded text-xs font-bold uppercase hover:bg-black disabled:opacity-50"
+                        onClick={() => setCouponExpanded(!couponExpanded)} 
+                        className="flex items-center gap-4 w-full group outline-none"
                       >
-                        {isApplying ? '...' : 'Apply'}
+                        <div className="size-6 relative shrink-0">
+                          <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
+                        </div>
+                        <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">
+                          Have a coupon code?
+                        </span>
+                        <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="#280f0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </button>
+                      
+                      <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-32 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            placeholder="Enter code" 
+                            className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/50 outline-none focus:border-[#280f0b]" 
+                          />
+                          <button 
+                            onClick={handleApplyCoupon}
+                            disabled={isApplying}
+                            className="bg-[#280F0B] text-[#F6D8AB] px-6 rounded text-xs font-bold uppercase hover:bg-black transition-colors disabled:opacity-50"
+                          >
+                            {isApplying ? '...' : 'Apply'}
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* Applied Coupon View matching Cart Page */
+                    <div className="flex justify-between items-center py-2">
+                      <div className="flex items-center gap-3">
+                        <Image src="/assets/images/coupon.png" alt="Coupon" width={20} height={20} className="object-contain" />
+                        <p className="text-[12px] font-bold text-[#280F0B] tracking-wider">
+                          CODE: {appliedCoupon} APPLIED
+                        </p>
+                      </div>
+                      <button 
+                        onClick={removeCoupon} 
+                        className="text-[11px] underline font-bold uppercase text-[#280f0b] hover:text-red-700 transition-colors"
+                      >
+                        Remove
                       </button>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Status Message styling from Cart Page */}
+                  {couponMessage.text && (
+                    <p className={`mt-3 text-[11px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-green-800'}`}>
+                      {couponMessage.text}
+                    </p>
+                  )}
                 </div>
                 <div className="w-full border-b border-dashed border-black/40" />
               </div>
 
+              {/* Final Total Section */}
               <div className="p-6 lg:p-10 flex flex-col">
-                <div className="flex justify-between items-center mb-10">
+                <div className="flex justify-between items-center mb-10 text-[#280f0b]">
                   <span className="text-2xl font-bold">Total</span>
                   <span className="text-2xl font-bold">${total.toFixed(2)} AUD</span>
                 </div>
@@ -483,13 +501,18 @@ export default function CheckoutPage() {
                 >
                   {isProcessing ? (
                     <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
                       Redirecting...
                     </span>
                   ) : (
                     <>
                       Complete Payment
-                      <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none"><path d="M12 1L17 6L12 11M1 6H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
+                        <path d="M12 1L17 6L12 11M1 6H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </>
                   )}
                 </button>

@@ -13,10 +13,24 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { cartItems, updateQuantity, removeFromCart, cartId, getTotalItems } = useCart();
+  const { 
+    cartItems, 
+    updateQuantity, 
+    removeFromCart, 
+    cartId, 
+    getTotalItems,
+    setIsCartDrawerOpen,
+    appliedCoupon,
+    discountAmount,
+    applyCoupon,
+    removeCoupon
+  } = useCart(); // Centralized state
+
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [couponExpanded, setCouponExpanded] = useState(false);
-  const { setIsCartDrawerOpen } = useCart();
+  const [couponCode, setCouponCode] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
+  const [couponMessage, setCouponMessage] = useState({ text: '', type: '' });
   const router = useRouter();
 
   useEffect(() => {
@@ -24,34 +38,30 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       setIsCartDrawerOpen(isOpen);
     }
   }, [isOpen, setIsCartDrawerOpen]);
-  // Calculate subtotal from real context data
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  const handleCheckout = async () => {
-    if (!cartId) return alert("Cart is empty");
-    setIsRedirecting(true);
-    try {
-      const response = await fetch('/api/shopify/checkout', {
-        method: 'POST',
-        body: JSON.stringify({ cartId })
-      });
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
-    } catch (err) {
-      console.error("Checkout redirect failed", err);
-      setIsRedirecting(false);
-    }
+  // Drawer Price Calculations
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const tax = subtotal * 0.1;
+  const finalTotal = (subtotal + tax) - discountAmount;
+
+  const handleApply = async () => {
+    if (!couponCode) return;
+    setIsApplying(true);
+    setCouponMessage({ text: '', type: '' });
+
+    const result = await applyCoupon(couponCode); //
+    setCouponMessage({ 
+      text: result.message, 
+      type: result.success ? 'success' : 'error' 
+    });
+    
+    if (result.success) setCouponCode('');
+    setIsApplying(false);
   };
 
-  //if (!isOpen) return null;
-
   const goToCheckout = () => {
-    onClose(); // Close the drawer first
-    router.push('/checkout'); // Navigate to your local checkout page
+    onClose();
+    router.push('/checkout');
   };
 
   return (
@@ -91,7 +101,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <Link 
                 href="/product-analogue" 
                 onClick={onClose} 
-                className="mt-4 underline font-bold inline-block"
+                className="mt-4 underline font-bold inline-block text-[#280f0b]"
               >
                 Continue Shopping
               </Link>
@@ -109,11 +119,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         className="object-cover"
                       />
                     </div>
-                    
-                    {/* CROSS REMOVE BUTTON (Top Left) */}
                     <button 
                       onClick={() => removeFromCart(item.id)}
-                      //className="absolute -top-2 -left-2 z-10 bg-white rounded-full text-[#280f0b] hover:text-red-600 shadow-sm transition-colors"
                       className="absolute -top-2 -left-2 z-10 bg-white rounded-full text-[#280f0b] hover:text-red-600 shadow-sm transition-all opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
                       title="Remove item"
                     >
@@ -123,7 +130,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
                   <div className="flex flex-1 flex-col justify-between py-1">
                     <div className="flex justify-between items-start gap-4">
-                      <div className="min-w-0"> {/* min-w-0 allows text truncation/wrapping within flex */}
+                      <div className="min-w-0">
                         <h3 className="font-manrope font-semibold text-[#280f0b] leading-tight break-words">
                           {item.title}
                         </h3>
@@ -131,21 +138,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           <p className="text-xs text-[#7f3e2f] mt-1 uppercase tracking-wider">{item.variant}</p>
                         )}
                       </div>
-                      
-                      {/* PRICE FIX: Added whitespace-nowrap and shrink-0 to prevent line breaks */}
                       <p className="font-manrope text-[13px] text-[#280f0b] whitespace-nowrap flex-shrink-0">
                         ${(item.price * item.quantity).toFixed(2)} <span className="text-[13px]">AUD</span>
                       </p>
                     </div>
 
-                    {/* Quantity Selector */}
                     <div className="flex items-center justify-between border border-[#280f0b] rounded-md px-3 py-1 w-28 mt-4">
                       <button 
                         onClick={() => {
                           if (item.quantity > 1) {
                             updateQuantity(item.id, item.quantity - 1);
                           } else {
-                            // If quantity is 1, clicking minus removes the item
                             removeFromCart(item.id);
                           }
                         }}
@@ -153,7 +156,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       >
                         <Minus size={14} />
                       </button>
-                      <span className="text-sm font-bold">{item.quantity}</span>
+                      <span className="text-sm font-bold text-[#280f0b]">{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="text-[#280f0b] hover:opacity-50"
@@ -170,47 +173,98 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
         {/* Coupon Section (Dashed Border Style) */}
         <div className="border-t border-dashed border-[#280f0b]/30">
-          <button 
-            onClick={() => setCouponExpanded(!couponExpanded)}
-            className="flex w-full items-center justify-between px-6 py-5 hover:bg-black/5 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="relative size-5">
-                <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
+          {!appliedCoupon ? (
+            <>
+              <button 
+                onClick={() => setCouponExpanded(!couponExpanded)}
+                className="flex w-full items-center justify-between px-6 py-5 hover:bg-black/5 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative size-5">
+                    <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
+                  </div>
+                  <span className="font-manrope font-medium text-[#280f0b]">Have a coupon code?</span>
+                </div>
+                <ChevronDown className={`transition-transform text-[#280f0b] ${couponExpanded ? 'rotate-180' : ''}`} size={20} />
+              </button>
+              {couponExpanded && (
+                <div className="px-6 pb-6 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      placeholder="Enter code" 
+                      className="flex-1 bg-white/50 border border-[#280f0b]/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/40 focus:outline-none"
+                    />
+                    <button 
+                      onClick={handleApply}
+                      disabled={isApplying}
+                      className="bg-[#280F0B] text-[#F6D8AB] px-4 rounded text-xs font-bold uppercase hover:bg-black transition-all disabled:opacity-50"
+                    >
+                      {isApplying ? '...' : 'Apply'}
+                    </button>
+                  </div>
+                  {couponMessage.text && (
+                    <p className={`mt-2 text-[10px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-green-800'}`}>
+                      {couponMessage.text}
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="px-6 py-5 flex items-center justify-between bg-green-800/5">
+              <div className="flex items-center gap-3">
+                <Image src="/assets/images/coupon.png" alt="Coupon" width={18} height={18} />
+                <span className="text-[11px] font-bold text-[#280f0b] tracking-widest">
+                  {appliedCoupon} APPLIED
+                </span>
               </div>
-              <span className="font-manrope font-medium text-[#280f0b]">Have a coupon code?</span>
-            </div>
-            <ChevronDown className={`transition-transform ${couponExpanded ? 'rotate-180' : ''}`} size={20} />
-          </button>
-          {couponExpanded && (
-            <div className="px-6 pb-4">
-              <input 
-                type="text" 
-                placeholder="Enter discount code" 
-                className="w-full bg-white/50 border border-[#280f0b]/20 p-3 rounded text-sm focus:outline-none focus:border-[#280f0b]"
-              />
+              <button 
+                onClick={removeCoupon}
+                className="text-[#280f0b] opacity-50 hover:opacity-100 transition-opacity"
+              >
+                <X size={16} />
+              </button>
             </div>
           )}
         </div>
 
         {/* Summary Footer */}
         <div className="bg-[#280f0b] p-8 text-[#f6d8ab]">
-          <div className="flex items-end justify-between mb-2">
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between items-center text-sm">
+              <p className="opacity-70">Subtotal</p>
+              <p className="font-bold">${subtotal.toFixed(2)} AUD</p>
+            </div>
+            
+            {discountAmount > 0 && (
+              <div className="flex justify-between items-center text-sm ">
+                <p className="opacity-70">Discount</p>
+                <p className="font-semibold">-${discountAmount.toFixed(2)} AUD</p>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center text-sm">
+              <p className="opacity-70">Estimated Tax (10%)</p>
+              <p className="font-bold">${tax.toFixed(2)} AUD</p>
+            </div>
+          </div>
+
+          <div className="flex items-end justify-between mb-8 border-t border-[#f6d8ab]/10 pt-4">
             <div className="flex-1 mr-4">
-              {/* Reduced label to 18px */}
-              <p className="text-[18px] font-bold font-lora">Subtotal</p>
-              {/* Reduced disclaimer for better fit on mobile */}
-              <p className="text-[11px] md:text-[13px] opacity-60 mt-1 tracking-tight whitespace-nowrap">
-                Tax included. Shipping calculated at checkout.
+              <p className="text-[18px] font-bold font-lora">Total</p>
+              <p className="text-[11px] md:text-[13px] opacity-60 mt-1 tracking-tight">
+                Shipping calculated at checkout.
               </p>
             </div>
-            {/* Set price to 18px and forced no wrap to stay on one line */}
-            <p className="text-[15px] min-[370px]:text-[18px] font-bold font-manrope whitespace-nowrap">
-              ${subtotal.toFixed(2)} AUD
+            <p className="text-[15px] min-[370px]:text-[22px] font-bold font-manrope whitespace-nowrap">
+              ${finalTotal.toFixed(2)} AUD
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <Link 
               href="/cart"
               onClick={onClose}
