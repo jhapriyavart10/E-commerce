@@ -27,7 +27,7 @@ export async function GET() {
       cache: 'no-store'
     });
 
-    const customer = response.body.data?.customer;
+    const customer = response.body?.customer;
     if (!customer) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }

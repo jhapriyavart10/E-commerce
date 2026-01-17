@@ -221,7 +221,7 @@ export default function CheckoutPage() {
             </h1>
             
             <section className="space-y-8 mt-8">
-              {isHydrated && localStorage.getItem('user_addresses') && (
+              {isHydrated && JSON.parse (localStorage.getItem('user_addresses') || '[]').length > 0 && (
                 <div className="mb-12 pb-8 border-b border-[#280F0B1A]">
                   <h3 className="text-lg font-bold mb-4 tracking-wider uppercase flex items-center gap-2">
                     <Image src="/assets/images/home.svg" alt="Address" width={24} height={24} />

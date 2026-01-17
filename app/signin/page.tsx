@@ -103,8 +103,8 @@ export default function SignInPage() {
                   <input
                     required
                     name="email"
-                    type="text"
-                    placeholder="Username or Email"
+                    type="email"
+                    placeholder="Email"
                     className="w-full py-3 bg-transparent font-manrope outline-none placeholder:text-[#280F0B]/40 text-[#280F0B]"
                   />
                 </div>

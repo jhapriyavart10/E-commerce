@@ -305,7 +305,7 @@ const specificSections = [
                           selectedMaterial === option.name ? 'bg-[#6C6AE4] text-white border-[#6C6AE4]' : 'bg-transparent text-[#280F0B] border-[#280F0B]'
                         }`}
                       >
-                        <Image src={option.img} alt={option.name} width={20} height={20} className={`object-contain ${selectedMaterial === option.name ? 'brightness-0 invert' : ''}`} />
+                        <Image src={option.img} alt={option.name} width={20} height={24} className={`object-contain ${selectedMaterial === option.name ? 'brightness-0 invert' : ''}`} />
                         <span className="whitespace-nowrap font-normal">{option.name}</span>
                       </button>
                       {(index + 1) % 3 === 0 && <div className="hidden lg:block w-full h-0" />}

@@ -41,16 +41,26 @@ export default function SignUpPage() {
       setLoading(false);
     }
   };
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignUp = () => {
     setLoading(true);
-    // In a real production app, you would use a library like NextAuth.js 
-    // or Firebase. Here is the implementation for a custom backend route:
-    try {
-      window.location.href = '/api/auth/google?prompt=select_account'; 
-    } catch (err) {
-      setError('Google Sign up failed. Please try again.');
-      setLoading(false);
-    }
+    
+    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+    
+    const options = {
+      // Uses the NEXT_PUBLIC prefixed variables from your .env
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+      redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI || '',
+      response_type: 'code',
+      scope: [
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email',
+      ].join(' '),
+      prompt: 'select_account',
+      access_type: 'offline',
+    };
+
+    const queryString = new URLSearchParams(options).toString();
+    window.location.href = `${rootUrl}?${queryString}`;
   };
 
   return (
