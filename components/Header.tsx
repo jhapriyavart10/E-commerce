@@ -30,6 +30,7 @@ export default function Header() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useState<any>(null);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +40,23 @@ export default function Header() {
       setSearchQuery('');
     }
   };
+  
+  useEffect(() => {
+    async function checkUser() {
+      try {
+        const res = await fetch('/api/auth/customer');
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      }
+    }
+    checkUser();
+  }, []);
 
   useEffect(() => {
     if (paused || !showBanner) return;
@@ -88,7 +106,7 @@ export default function Header() {
           {/* 2. Desktop Nav (Left) - Hidden on Mobile */}
           <nav className="hidden lg:flex items-center gap-[40px]">
             <Link href="/product-analogue" className="hover:text-gray-300 transition-colors text-base font-manrope">Shop</Link>
-            <Link href="/plans" className="hover:text-gray-300 transition-colors text-base font-manrope">Plans</Link>
+            <Link href="/" className="hover:text-gray-300 transition-colors text-base font-manrope">Plans</Link>
             <Link href="https://azure-takeaways-956863.framer.app/blogs" className="text-base transition-colors hover:text-gray-300 font-manrope">
               Raw Earth Dojo
             </Link>
@@ -123,13 +141,16 @@ export default function Header() {
             </button>
 
             {/* Profile Icon - Hidden on Mobile (moved to menu) */}
-            <Link href="/profile" className="hidden lg:block p-2 hover:opacity-80 transition-opacity">
-              <Image 
-                src="/assets/images/profile.svg" 
-                alt="Profile" 
-                width={24} 
-                height={24} 
-              />
+            <Link href={user ? '/profile' : '/signup'}>
+              <div className="flex flex-col items-center cursor-pointer group">
+                <Image 
+                  src="/assets/images/profile.svg" 
+                  alt="Profile" 
+                  width={24} 
+                  height={24} 
+                  className="group-hover:opacity-70 transition-opacity"
+                />
+              </div>
             </Link>
 
             <button 

@@ -43,11 +43,9 @@ export default function SignUpPage() {
   };
   const handleGoogleSignUp = () => {
     setLoading(true);
-    
     const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
-    
     const options = {
-      // Uses the NEXT_PUBLIC prefixed variables from your .env
+      // These must match your Vercel environment variables exactly
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
       redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI || '',
       response_type: 'code',
@@ -60,6 +58,8 @@ export default function SignUpPage() {
     };
 
     const queryString = new URLSearchParams(options).toString();
+    
+    // This sends the user to Google with the required redirect_uri parameter
     window.location.href = `${rootUrl}?${queryString}`;
   };
 

@@ -6,6 +6,6 @@ import { redirect } from 'next/navigation';
 
 export default function RootPage() {
   // This will automatically trigger a redirect when the user hits "/"
-  redirect('/signup');
+  redirect('/product-analogue');
 }
 

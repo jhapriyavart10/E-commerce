@@ -53,6 +53,10 @@ const materialOptions = [
 ];
 
 export default function UnifiedProductPage({ product }: { product: any }) {
+  const numericProductId = useMemo(() => {
+    if (!product.id) return '';
+    return product.id.split('/').pop();
+  }, [product.id]);
   // Logic for the main product gallery
   const jewelleryImages = product.images && product.images.length > 0 
     ? product.images 
@@ -80,6 +84,19 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     { label: 'All ratings', isSearch: false },
     { label: 'With media', isSearch: false },
   ];
+  const productRating = parseFloat(product.rating?.value || "0");
+  const productReviewCount = parseInt(product.reviewCount?.value || "0");
+
+  const handleWriteReview = () => {
+    // Scroll to the review widget
+    const reviewSection = document.getElementById('klaviyo-reviews-all');
+    if (reviewSection) {
+      reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // If the widget is loaded, we can try to trigger its internal form button
+      const writeButton = reviewSection.querySelector('button') as HTMLElement;
+      if (writeButton) writeButton.click();
+    }
+  };
 
   const handleAddToCart = () => {
     addToCart({ 
@@ -431,92 +448,85 @@ const specificSections = [
         </section>
 
         {/* SECTION 3 – REVIEWS */}
-        <section id="reviews-section" className="py-16 px-6 lg:px-12 xl:px-24 max-w-[2500px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+        <section id="reviews-section" className="py-16 px-6 lg:px-12 xl:px-24 max-w-[2500px] mx-auto border-t border-[#280F0B10] mt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-16">
+            {/* Left Side: Dynamic Review Summary from Shopify Metafields */}
             <div>
               <h2 className="text-[28px] lg:text-[40px] font-bold mb-6">Customer Reviews</h2>
               <div className="flex items-center gap-6 mb-8">
-                {/* Replace 4.8 with dynamic rating */}
                 <span className="text-[48px] lg:text-[64px] font-bold">
                   {product.rating > 0 ? product.rating.toFixed(1) : "0.0"}
                 </span>
                 <div>
                   <div className="text-[#F5B301] text-lg">
-                    {/* Simple star logic */}
-                    {"★".repeat(Math.round(product.rating))}{"☆".repeat(5 - Math.round(product.rating))}
+                    {"★".repeat(Math.round(product.rating))}
+                    {"☆".repeat(5 - Math.round(product.rating))}
                   </div>
-                  {/* Replace 7 Ratings with dynamic count */}
                   <p className="text-sm opacity-70">Based on {product.reviewCount} Ratings</p>
                 </div>
               </div>
+              
+              {/* Visual Rating Breakdown */}
               <div className="space-y-2 max-w-[820px]">
                 {[5, 4, 3, 2, 1].map((star) => (
                   <div key={star} className="flex items-center gap-3">
-                    <span className="text-sm min-w-[30px] flex items-center gap-1"><span className="text-[#F5B301]">★</span>{star}</span>
-                    <div className="flex-1 h-2 bg-[#5A4A1A] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#F5B301]" style={{ width: star === 5 ? '90%' : star === 4 ? '10%' : '0%' }} />
+                    <span className="text-sm min-w-[30px] flex items-center gap-1">
+                      <span className="text-[#F5B301]">★</span>{star}
+                    </span>
+                    <div className="flex-1 h-2 bg-[#5A4A1A]/20 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-[#F5B301]" 
+                        style={{ 
+                          // Placeholder logic: In production, map this to actual review distributions
+                          width: star === 5 ? '85%' : star === 4 ? '10%' : '2%' 
+                        }} 
+                      />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Right Side: Write a Review Action */}
             <div className="w-full lg:max-w-[820px] lg:border lg:border-dashed border-[#280F0B] p-0 lg:p-12 flex flex-col items-center justify-center text-center">
               <h3 className="text-lg lg:text-xl font-semibold mb-2 hidden lg:block">Review this product</h3>
               <p className="text-sm opacity-80 mb-6 hidden lg:block">Share your feedback with other customers</p>
-              <button className="w-full max-w-[820px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3">
+              
+              {/* Functional Button: Scrolls to and triggers the Klaviyo Form */}
+              <button 
+                onClick={() => {
+                  const mainWidget = document.getElementById('klaviyo-reviews-all');
+                  if (mainWidget) {
+                    mainWidget.scrollIntoView({ behavior: 'smooth' });
+                    // Attempt to trigger the internal Klaviyo "Write a Review" button if loaded
+                    const internalBtn = mainWidget.querySelector('button') as HTMLElement;
+                    if (internalBtn) internalBtn.click();
+                  }
+                }}
+                className="w-full max-w-[820px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 hover:bg-[#280F0B] transition-all"
+              >
                 <Image src="/assets/images/write.svg" alt="write" width={20} height={20} />
                 Write a review
               </button>
             </div>
           </div>
-           <div className="mt-16">
+
+          {/* Main Klaviyo Widget Integration */}
+          <div className="mt-16 border-t border-[#280F0B10] pt-16">
             <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
-
-            {/* REVIEW FILTERS: 2 COLS ON MOBILE, ROW ON DESKTOP */}
-            <div className="grid grid-cols-2 lg:flex lg:flex-wrap gap-3 mb-8">
-              {reviewFilters.map((f, idx) => {
-                const containerClasses = `flex items-center gap-2 px-4 py-2 bg-[#7F3E2F33] rounded-full text-sm lg:h-[42px] transition-all
-                  ${f.isSearch 
-                    ? 'lg:w-[450px] justify-start border border-transparent focus-within:border-[#280F0B66] focus-within:bg-[#7F3E2F4D]' 
-                    : 'lg:w-[177px] justify-center cursor-pointer hover:bg-[#7F3E2F4D]'}`;
-
-                return (
-                  <div key={idx} className={containerClasses}>
-                    {f.isSearch ? (
-                      <>
-                        <img src="/assets/images/search-icon.png" alt="search" className="w-4 h-4 ml-1 opacity-70" />
-                        <input
-                          type="text"
-                          placeholder={f.label}
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="bg-transparent border-none outline-none w-full text-[#280F0B] placeholder-[#280F0B80] text-sm"
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <span>{f.label}</span>
-                        <img src="/assets/images/dropdown.svg" alt="v" className="w-4 h-4" />
-                      </>
-                    )}
-                  </div>
-                );
-              })}
+            
+            {/* This ID container is where the actual Klaviyo reviews will be injected.
+                The data-id must be the numeric Product ID extracted from the Shopify GID.
+            */}
+            <div 
+              id="klaviyo-reviews-all" 
+              data-id={numericProductId} 
+              className="klaviyo-reviews-all-container"
+            >
+              {/* Optional: Keep your custom filter UI if you want to overlay it, 
+                  but Klaviyo usually provides its own sorting/filtering.
+              */}
             </div>
-
-            {[1, 2].map(i => (
-              <div key={i} className="bg-[#FDC77B] p-6 mb-6">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold">Raman S.</span>
-                  <img src="/assets/images/verified.png" alt="v" className="w-4 h-4" />
-                  <span className="text-sm font-normal">Verified Buyer</span>
-                </div>
-
-                <p className="text-[12px] opacity-60 mb-3">18 days ago</p>
-                <p className="text-sm leading-relaxed">I bought the black Ball Crystal Pendulum for my wife and she says it has a steady, smooth swing and feels very responsive...</p>
-              </div>
-            ))}
           </div>
         </section>
 

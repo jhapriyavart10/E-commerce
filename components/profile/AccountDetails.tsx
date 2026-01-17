@@ -1,7 +1,9 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
+// 1. Fixed Interface: Removed the trailing "| null" syntax error
 interface FormState {
   firstName: string;
   lastName: string;
@@ -10,6 +12,10 @@ interface FormState {
   currentPass: string;
   newPass: string;
   confirmPass: string;
+}
+
+interface AccountDetailsProps {
+  user: any; // Accept the user prop passed from the parent page
 }
 
 const InputField = ({ 
@@ -31,7 +37,6 @@ const InputField = ({
   const isPasswordField = type === "password";
 
   return (
-    // min-h-[82px] ensures the layout stays stable even when the 20px error text appears
     <div className="w-full flex flex-col gap-1 min-h-[82px]">
       <div className="relative w-full">
         <input
@@ -39,7 +44,6 @@ const InputField = ({
           placeholder={label}
           value={value}
           onChange={(e) => onChange(field, e.target.value)}
-          // Added placeholder:text-[#280F0B80] for the specific color requirement
           className={`w-full bg-transparent border p-4 pr-12 outline-none transition-all duration-300
             placeholder:text-[#280F0B80]
             ${error ? 'border-red-500' : 'border-[#280F0B33] focus:border-[#280F0B]'} 
@@ -56,7 +60,6 @@ const InputField = ({
           </button>
         )}
       </div>
-      {/* Error message is absolute positioned to avoid pushing the layout down */}
       <div className="h-5 relative">
         {error && <span className="text-red-500 text-[10px] absolute top-0 left-0 animate-in fade-in slide-in-from-top-1">{error}</span>}
       </div>
@@ -64,7 +67,8 @@ const InputField = ({
   );
 };
 
-const AccountDetails = () => {
+// 2. Accept 'user' as a prop
+const AccountDetails = ({ user }: AccountDetailsProps) => {
   const [formData, setFormData] = useState<FormState>({
     firstName: '',
     lastName: '',
@@ -74,53 +78,44 @@ const AccountDetails = () => {
     newPass: '',
     confirmPass: '',
   });
-  
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const res = await fetch('/api/auth/customer'); // A route to get current user data
-        if (res.ok) {
-          const data = await res.json();
-          setFormData(prev => ({
-            ...prev,
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-            email: data.email || '',
-            username: data.email.split('@')[0], // Default username logic
-          }));
-        }
-      } catch (err) {
-        console.error("Failed to auto-load user details", err);
-      }
-    };
 
-    fetchUserDetails();
-  }, []);
   const [errors, setErrors] = useState<Partial<FormState>>({});
+
+  // 3. Sync form data with the user prop when it loads
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        username: user.email ? user.email.split('@')[0] : '',
+      }));
+    }
+  }, [user]);
 
   const validate = () => {
     const newErrors: Partial<FormState> = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Check if any field is empty (Mandatory check)
-    (Object.keys(formData) as Array<keyof FormState>).forEach((key) => {
+    // Only validate password fields if the user is trying to change them
+    const fieldsToValidate: Array<keyof FormState> = ['firstName', 'lastName', 'username', 'email'];
+    
+    fieldsToValidate.forEach((key) => {
       if (!formData[key].trim()) {
-        newErrors[key] = `${key.charAt(0).toUpperCase() + key.slice(1).replace(/Pass/g, ' password')} is required`;
+        newErrors[key] = `${key.charAt(0).toUpperCase() + key.slice(1)} is required`;
       }
     });
 
-    // Specific logic checks (only if fields aren't empty)
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
     
-    // Check if passwords match
-    if (formData.newPass && formData.confirmPass && formData.newPass !== formData.confirmPass) {
-      newErrors.confirmPass = 'Passwords do not match';
-    }
-
-    if (formData.newPass && formData.newPass.length < 8) {
-      newErrors.newPass = 'Password must be at least 8 characters';
+    // Password validation (only if a new password is being entered)
+    if (formData.newPass || formData.currentPass) {
+      if (!formData.currentPass) newErrors.currentPass = 'Current password required to make changes';
+      if (formData.newPass.length < 8) newErrors.newPass = 'New password must be at least 8 characters';
+      if (formData.newPass !== formData.confirmPass) newErrors.confirmPass = 'Passwords do not match';
     }
 
     setErrors(newErrors);
@@ -129,37 +124,36 @@ const AccountDetails = () => {
 
   const handleInputChange = (field: keyof FormState, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error for that specific field as the user types
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (validate()) {
-    try {
-      const res = await fetch('/api/auth/update-customer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          password: formData.newPass, // This updates from TemporaryPassword123!
-        }),
-      });
+    e.preventDefault();
+    if (validate()) {
+      try {
+        const res = await fetch('/api/auth/update-customer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            password: formData.newPass || undefined, 
+          }),
+        });
 
-      if (res.ok) {
-        alert('Changes saved successfully!');
-      } else {
-        const errorData = await res.json();
-        alert(errorData.message || 'Update failed');
+        if (res.ok) {
+          alert('Changes saved successfully!');
+        } else {
+          const errorData = await res.json();
+          alert(errorData.message || 'Update failed');
+        }
+      } catch (err) {
+        alert('Something went wrong. Please try again.');
       }
-    } catch (err) {
-      alert('Something went wrong. Please try again.');
     }
-  }
-};
+  };
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl">
