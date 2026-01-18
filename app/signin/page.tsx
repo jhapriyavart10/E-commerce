@@ -10,7 +10,16 @@ export default function SignInPage() {
   const [activeChakra, setActiveChakra] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const [email, setEmail] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+ 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
   // Chakra Loop Animation
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,6 +35,8 @@ export default function SignInPage() {
     setErrorMessage(null); // Clear previous errors
 
     const formData = new FormData(e.currentTarget);
+    const currentEmail = formData.get('email') as string;
+    const isRememberChecked = formData.get('remember') === 'on';
     
     try {
       const res = await fetch('/api/auth/login', {
@@ -37,6 +48,12 @@ export default function SignInPage() {
       });
 
       if (res.ok) {
+        // Save or remove email from local storage based on checkbox
+        if (isRememberChecked) {
+          localStorage.setItem('rememberedEmail', currentEmail);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+        }
         window.location.href = '/product-analogue'; 
       } else {
         const data = await res.json();
@@ -121,8 +138,15 @@ export default function SignInPage() {
               </div>
 
               <div className="flex items-center gap-3 group cursor-pointer w-fit mt-8">
-                <input type="checkbox" id="remember" name="remember" className="appearance-none w-4 h-4 border border-[#280F0B]/50 bg-transparent rounded-sm checked:bg-[#280F0B] checked:border-transparent cursor-pointer transition-all relative after:content-[''] after:absolute after:hidden checked:after:block after:left-[4px] after:top-[1px] after:w-[5px] after:h-[9px] after:border-white after:border-r-2 after:border-b-2 after:rotate-45" />
-                <label htmlFor="remember" className="font-manrope text-sm text-[#280F0B]/70 cursor-pointer">Remember me</label>
+                  <input 
+                    type="checkbox" 
+                    id="remember" 
+                    name="remember" 
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="appearance-none w-4 h-4 border border-[#280F0B]/50 bg-transparent rounded-sm checked:bg-[#280F0B] checked:border-transparent cursor-pointer transition-all relative after:content-[''] after:absolute after:hidden checked:after:block after:left-[4px] after:top-[1px] after:w-[5px] after:h-[9px] after:border-white after:border-r-2 after:border-b-2 after:rotate-45" 
+                  />
+                  <label htmlFor="remember" className="font-manrope text-sm text-[#280F0B]/70 cursor-pointer">Remember me</label>
               </div>
 
               <button

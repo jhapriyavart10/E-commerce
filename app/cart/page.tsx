@@ -178,7 +178,7 @@ export default function CartPage() {
                   <>
                     <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group outline-none">
                       <div className="size-6 relative shrink-0">
-                        <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
+                        <Image src="/assets/images/coupon.svg" alt="Coupon" fill className="object-contain" />
                       </div>
                       <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">Have a coupon code?</span>
                       <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="#280f0b" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -206,7 +206,7 @@ export default function CartPage() {
                   /* Applied Coupon Message with Remove button */
                   <div className="flex justify-between items-center py-2">
                     <div className="flex items-center gap-3">
-                      <Image src="/assets/images/coupon.png" alt="Coupon" width={20} height={20} className="object-contain" />
+                      <Image src="/assets/images/coupon.svg" alt="Coupon" width={20} height={20} className="object-contain" />
                       <p className="text-[12px] font-bold text-[#280F0B] tracking-wider">CODE: {appliedCoupon} APPLIED</p>
                     </div>
                     <button onClick={removeCoupon} className="text-[11px] underline font-bold uppercase hover:text-red-700">Remove</button>

@@ -9,6 +9,7 @@ const AddAddressForm = ({ onCancel, onSave }: { onCancel: () => void, onSave: (a
     address2: '',
     city: '',
     state: '',
+    postcode: '', // Added to state for consistency
     phone: ''
   });
   
@@ -16,9 +17,18 @@ const AddAddressForm = ({ onCancel, onSave }: { onCancel: () => void, onSave: (a
   const [warning, setWarning] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: false });
+    const { name, value } = e.target;
+    
+    // Logic to only allow digits in the phone field
+    if (name === 'phone') {
+      const digitOnlyValue = value.replace(/\D/g, '');
+      setFormData({ ...formData, [name]: digitOnlyValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: false });
     }
   };
 
@@ -26,8 +36,8 @@ const AddAddressForm = ({ onCancel, onSave }: { onCancel: () => void, onSave: (a
     e.preventDefault();
     const newErrors: Record<string, boolean> = {};
     
-    // Validate all required fields (excluding address2 and phone which were marked optional)
-    const requiredFields = ['firstName', 'lastName', 'country', 'address1', 'city', 'state'];
+    // Validate required fields
+    const requiredFields = ['firstName', 'lastName', 'country', 'address1', 'city', 'state', 'postcode'];
     requiredFields.forEach(field => {
       if (!formData[field as keyof typeof formData]) {
         newErrors[field] = true;
@@ -41,16 +51,13 @@ const AddAddressForm = ({ onCancel, onSave }: { onCancel: () => void, onSave: (a
     }
 
     setWarning('');
-    // Save to local storage so it can be retrieved during checkout
     const savedAddresses = JSON.parse(localStorage.getItem('user_addresses') || '[]');
     const updatedAddresses = [...savedAddresses, { ...formData, id: Date.now() }];
-    localStorage.getItem('user_addresses');
     localStorage.setItem('user_addresses', JSON.stringify(updatedAddresses));
     
     onSave(formData);
   };
 
-  // Helper function to apply your specific styling logic
   const getInputClass = (fieldName: string) => `
     w-full bg-transparent border p-4 outline-none transition-colors 
     ${errors[fieldName] 
@@ -71,24 +78,37 @@ const AddAddressForm = ({ onCancel, onSave }: { onCancel: () => void, onSave: (a
         </div>
       )}
 
+      {/* Parent form uses space-y-6, providing uniform vertical spacing for direct children */}
       <form onSubmit={handleSave} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input name="firstName" placeholder="First name" className={getInputClass('firstName')} onChange={handleChange} />
-          <input name="lastName" placeholder="Last name" className={getInputClass('lastName')} onChange={handleChange} />
+          <input name="firstName" placeholder="First name" value={formData.firstName} className={getInputClass('firstName')} onChange={handleChange} />
+          <input name="lastName" placeholder="Last name" value={formData.lastName} className={getInputClass('lastName')} onChange={handleChange} />
         </div>
 
         <select name="country" className={getInputClass('country')} onChange={handleChange} value={formData.country}>
           <option value="Australia">Australia</option>
         </select>
 
-        <div className="space-y-2">
-          <input name="address1" placeholder="House number and street name" className={getInputClass('address1')} onChange={handleChange} />
-          <input name="address2" placeholder="Apartment, suite, unit, etc. (optional)" className={getInputClass('address2')} onChange={handleChange} />
-        </div>
+        {/* Address fields are now separate direct children of the form to get uniform vertical spacing */}
+        <input 
+          name="address1" 
+          placeholder="House number and street name" 
+          value={formData.address1}
+          className={getInputClass('address1')} 
+          onChange={handleChange} 
+        />
+        
+        <input 
+          name="address2" 
+          placeholder="Apartment, suite, unit, etc. (optional)" 
+          value={formData.address2}
+          className={getInputClass('address2')} 
+          onChange={handleChange} 
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input name="city" placeholder="Town / City" className={getInputClass('city')} onChange={handleChange} />
-          <select name="state" className={getInputClass('state')} onChange={handleChange}>
+          <input name="city" placeholder="Town / City" value={formData.city} className={getInputClass('city')} onChange={handleChange} />
+          <select name="state" className={getInputClass('state')} onChange={handleChange} value={formData.state}>
             <option value="">Choose a state</option>
             <option value="NSW">New South Wales</option>
             <option value="VIC">Victoria</option>
@@ -98,8 +118,17 @@ const AddAddressForm = ({ onCancel, onSave }: { onCancel: () => void, onSave: (a
             <option value="TAS">Tasmania</option>
           </select>
         </div>
-        <input name="postcode" placeholder="Postcode" className={getInputClass('postcode')} onChange={handleChange} />
-        <input name="phone" placeholder="Phone (optional)" className={getInputClass('phone')} onChange={handleChange} />
+
+        <input name="postcode" placeholder="Postcode" value={formData.postcode} className={getInputClass('postcode')} onChange={handleChange} />
+        
+        <input 
+          name="phone" 
+          placeholder="Phone (optional)" 
+          value={formData.phone}
+          className={getInputClass('phone')} 
+          onChange={handleChange} 
+          inputMode="numeric"
+        />
 
         <div className="flex flex-col md:flex-row gap-4 pt-4">
           <button type="submit" className="bg-[#7F3E2F] text-[#FCF3E5] px-12 py-5 font-bold tracking-[1.12px] hover:brightness-110 transition-all uppercase text-sm">

@@ -181,7 +181,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               >
                 <div className="flex items-center gap-3">
                   <div className="relative size-5">
-                    <Image src="/assets/images/coupon.png" alt="Coupon" fill className="object-contain" />
+                    <Image src="/assets/images/coupon.svg" alt="Coupon" fill className="object-contain" />
                   </div>
                   <span className="font-manrope font-medium text-[#280f0b]">Have a coupon code?</span>
                 </div>
@@ -216,7 +216,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           ) : (
             <div className="px-6 py-5 flex items-center justify-between bg-green-800/5">
               <div className="flex items-center gap-3">
-                <Image src="/assets/images/coupon.png" alt="Coupon" width={18} height={18} />
+                <Image src="/assets/images/coupon.svg" alt="Coupon" width={18} height={18} />
                 <span className="text-[11px] font-bold text-[#280f0b] tracking-widest">
                   {appliedCoupon} APPLIED
                 </span>

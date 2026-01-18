@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       }
     });
 
-    const { customerUserErrors } = response.body.data.customerUpdate;
+    const { customerUserErrors } = response.body.customerUpdate;
 
     if (customerUserErrors.length > 0) {
       return NextResponse.json({ message: customerUserErrors[0].message }, { status: 400 });

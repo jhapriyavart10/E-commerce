@@ -92,7 +92,7 @@ export default function Header() {
       )}
       {/* Main Header */}
       <header className="bg-[#280F0B] text-white w-full h-[80px] lg:h-[120px] relative z-250">
-        <div className="w-full max-w-[1440px] mx-auto h-full px-4 lg:px-[72px] flex items-center justify-between relative">
+        <div className="w-full lg:max-w-[85vw] mx-auto h-full px-4 lg:px-5 flex items-center justify-between relative">
           
           {/* 1. Mobile Hamburger (Left) - Only visible on Mobile */}
           <button 
@@ -141,7 +141,7 @@ export default function Header() {
             </button>
 
             {/* Profile Icon - Hidden on Mobile (moved to menu) */}
-            <Link href={user ? '/profile' : '/signup'}>
+            <Link href={user ? '/profile' : '/signup'} className="hidden lg:flex">
               <div className="flex flex-col items-center cursor-pointer group">
                 <Image 
                   src="/assets/images/profile.svg" 

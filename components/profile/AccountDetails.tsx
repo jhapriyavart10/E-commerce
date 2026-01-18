@@ -80,6 +80,7 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
   });
 
   const [errors, setErrors] = useState<Partial<FormState>>({});
+  const isPasswordSectionFilled = formData.currentPass.trim().length > 0 && formData.newPass.length > 0 && formData.confirmPass.length > 0;
 
   // 3. Sync form data with the user prop when it loads
   useEffect(() => {
@@ -184,7 +185,11 @@ const AccountDetails = ({ user }: AccountDetailsProps) => {
 
       <button 
         type="submit"
-        className="bg-[#B68D73] text-white px-12 py-3 font-medium tracking-[0.1em] hover:bg-[#7F3E2F] transition-all uppercase text-sm w-full md:w-auto mt-4"
+        disabled={!isPasswordSectionFilled}
+        className={`text-white px-12 py-3 font-medium tracking-[0.1em] transition-all duration-300 uppercase text-sm w-full md:w-auto mt-4
+          ${isPasswordSectionFilled 
+            ? 'bg-[#7F3E2F] cursor-pointer' 
+            : 'bg-[#B68D73] cursor-not-allowed opacity-80'}`}
       >
         Save Changes
       </button>

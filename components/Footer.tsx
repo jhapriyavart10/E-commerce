@@ -102,6 +102,7 @@ export default function Footer() {
                 <li><Link href="/policies/terms">Terms of service</Link></li>
                 <li><Link href="/policies/refund">Refund policy</Link></li>
                 <li><Link href="/policies/shipping">Shipping policy</Link></li>
+                <li><Link href="/signup">Sign up</Link></li>
               </ul>
             </div>
 

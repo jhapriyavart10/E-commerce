@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Desktop_pro from './desktop_pro';
 import Header from '@/components/Header';
+import { motion } from 'framer-motion';
 
 export default function ProductPage() {
   const params = useParams();
@@ -41,9 +42,18 @@ export default function ProductPage() {
     return (
       <div className="bg-[#F6D8AB] min-h-screen">
         <Header />
-        <div className="flex items-center justify-center h-[60vh] font-lora text-2xl text-[#280F0B]">
-          Loading Product Details...
+        if (loading) return (
+        <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
+          <div className="relative flex items-center justify-center w-48 h-48">
+            <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [1, 0, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute w-32 h-32">
+              <img src="/assets/images/Logo.svg" alt="Loading" className="w-full h-full object-contain" />
+            </motion.div>
+            <motion.div animate={{ scale: [1.2, 0.8, 1.2], opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute w-24 h-24">
+              <img src="/assets/images/Logo.svg" alt="Loading" className="w-full h-full object-contain opacity-50" />
+            </motion.div>
+          </div>
         </div>
+      );
       </div>
     );
   }

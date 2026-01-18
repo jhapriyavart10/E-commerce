@@ -30,7 +30,7 @@ const materialOptions = [
   { name: 'Red Howlite', img: '/assets/images/white howlite.svg' },
   { name: 'Sodalite', img: '/assets/images/clear quartz.svg' },
   { name: 'Blue Lace Agate', img: '/assets/images/clear quartz.svg' },
-  { name: 'Opalite', img: '/assets/images/blue opalite.svg' },
+  { name: 'Opalite', img: '/assets/images/Blue opalite.svg' },
   { name: 'Green Aventurine', img: '/assets/images/green adventurine.svg' },
   { name: 'Moonstone', img: '/assets/images/clear quartz.svg' },
   { name: 'Selenite', img: '/assets/images/clear quartz.svg' },
@@ -41,10 +41,10 @@ const materialOptions = [
   { name: 'Labradorite', img: '/assets/images/labradorite.svg' },
   { name: 'Garnet', img: '/assets/images/garnet.svg' },
   { name: 'Malachite', img: '/assets/images/malachite.svg' },
-  { name: 'Turquoise Stone', img: '/assets/images/turquoise stone.svg' },
+  { name: 'Turquoise Stone', img: '/assets/images/Turquoise stone.svg' },
   { name: 'Red Jasper', img: '/assets/images/white howlite.svg' },
   { name: 'Red Agate', img: '/assets/images/red agate.svg' },
-  { name: 'Lapis Lazuli', img: '/assets/images/lapis lazuli.svg' },
+  { name: 'Lapis Lazuli', img: '/assets/images/Lapis Lazuli.svg' },
   { name: 'Rose Quartz', img: '/assets/images/rose quartz.svg' },
   { name: 'Clear Quartz', img: '/assets/images/clear quartz.svg' },
   { name: 'Amethyst', img: '/assets/images/Amethyst.svg' },
@@ -244,7 +244,7 @@ const specificSections = [
   return (
     <>
     {showNotification && (
-        <div className="fixed top-5 right-5 z-[200] bg-[#280F0B] text-[#F6D8AB] px-6 py-4 rounded-lg shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 flex items-center gap-3">
+        <div className="fixed top-5 right-5 z-[200] bg-[#280F0B] text-[#F6D8AB] px-5 py-4 rounded-lg shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 flex items-center gap-3">
           <div className="bg-green-500 rounded-full p-1">
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
