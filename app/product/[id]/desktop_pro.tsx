@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { useCart } from '@/app/context/CartContext';
 import CartDrawer from '@/components/CartDrawer';
 import { title } from 'process';
+import Script from 'next/script'
 
 // Types for backend integration
 interface Product {
@@ -450,19 +451,23 @@ const specificSections = [
         {/* SECTION 3 – REVIEWS */}
         <section id="reviews-section" className="py-16 px-6 lg:px-12 xl:px-24 max-w-[2500px] mx-auto border-t border-[#280F0B10] mt-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-16">
-            {/* Left Side: Dynamic Review Summary from Shopify Metafields */}
+            
+            {/* Left Side: Review Summary */}
             <div>
               <h2 className="text-[28px] lg:text-[40px] font-bold mb-6">Customer Reviews</h2>
               <div className="flex items-center gap-6 mb-8">
                 <span className="text-[48px] lg:text-[64px] font-bold">
-                  {product.rating > 0 ? product.rating.toFixed(1) : "0.0"}
+                  {/* FIX: Use parsed 'productRating' number instead of raw product object */}
+                  {productRating > 0 ? productRating.toFixed(1) : "0.0"}
                 </span>
                 <div>
                   <div className="text-[#F5B301] text-lg">
-                    {"★".repeat(Math.round(product.rating))}
-                    {"☆".repeat(5 - Math.round(product.rating))}
+                    {/* FIX: Use parsed 'productRating' and add safety fallback */}
+                    {"★".repeat(Math.round(productRating) || 0)}
+                    {"☆".repeat(5 - (Math.round(productRating) || 0))}
                   </div>
-                  <p className="text-sm opacity-70">Based on {product.reviewCount} Ratings</p>
+                  {/* FIX: Use parsed 'productReviewCount' */}
+                  <p className="text-sm opacity-70">Based on {productReviewCount} Ratings</p>
                 </div>
               </div>
               
@@ -477,7 +482,6 @@ const specificSections = [
                       <div 
                         className="h-full bg-[#F5B301]" 
                         style={{ 
-                          // Placeholder logic: In production, map this to actual review distributions
                           width: star === 5 ? '85%' : star === 4 ? '10%' : '2%' 
                         }} 
                       />
@@ -492,17 +496,8 @@ const specificSections = [
               <h3 className="text-lg lg:text-xl font-semibold mb-2 hidden lg:block">Review this product</h3>
               <p className="text-sm opacity-80 mb-6 hidden lg:block">Share your feedback with other customers</p>
               
-              {/* Functional Button: Scrolls to and triggers the Klaviyo Form */}
               <button 
-                onClick={() => {
-                  const mainWidget = document.getElementById('klaviyo-reviews-all');
-                  if (mainWidget) {
-                    mainWidget.scrollIntoView({ behavior: 'smooth' });
-                    // Attempt to trigger the internal Klaviyo "Write a Review" button if loaded
-                    const internalBtn = mainWidget.querySelector('button') as HTMLElement;
-                    if (internalBtn) internalBtn.click();
-                  }
-                }}
+                onClick={handleWriteReview}
                 className="w-full max-w-[820px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 hover:bg-[#280F0B] transition-all"
               >
                 <Image src="/assets/images/write.svg" alt="write" width={20} height={20} />
@@ -515,18 +510,23 @@ const specificSections = [
           <div className="mt-16 border-t border-[#280F0B10] pt-16">
             <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
             
-            {/* This ID container is where the actual Klaviyo reviews will be injected.
-                The data-id must be the numeric Product ID extracted from the Shopify GID.
+            {/* FIX: 
+                Added mandatory attributes (data-url, data-image-url, data-description) 
+                to ensure Klaviyo's internal 'reduce' function has the data it expects.
             */}
-            <div 
-              id="klaviyo-reviews-all" 
-              data-id={numericProductId} 
-              className="klaviyo-reviews-all-container"
-            >
-              {/* Optional: Keep your custom filter UI if you want to overlay it, 
-                  but Klaviyo usually provides its own sorting/filtering.
-              */}
-            </div>
+            {numericProductId && (
+              <div 
+                key={numericProductId}
+                id="klaviyo-reviews-all" 
+                data-id={numericProductId} 
+                data-product-title={product.title}
+                data-product-type={product.type || "Jewelry"}
+                data-url={`https://rawearthcrystals.com/product/${product.handle}`}
+                data-image-url={selectedImage || product.image}
+                data-description={product.description?.substring(0, 200)}
+                className="klaviyo-reviews-all-container"
+              />
+            )}
           </div>
         </section>
 
