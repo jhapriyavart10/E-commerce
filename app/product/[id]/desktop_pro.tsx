@@ -7,7 +7,6 @@ import Header from '@/components/Header';
 import { useCart } from '@/app/context/CartContext';
 import CartDrawer from '@/components/CartDrawer';
 import { title } from 'process';
-import Script from 'next/script'
 
 // Types for backend integration
 interface Product {
@@ -55,9 +54,13 @@ const materialOptions = [
 
 export default function UnifiedProductPage({ product }: { product: any }) {
   const numericProductId = useMemo(() => {
-    if (!product.id) return '';
-    return product.id.split('/').pop();
-  }, [product.id]);
+    const idToUse = product.productId || (product.id.includes('ProductVariant') ? null : product.id); 
+    if (!idToUse){
+      console.error("Klaviyo Error: No parent Product ID found. Check your API response.");
+      return '';
+    } 
+    return idToUse.split('/').pop();
+  }, [product.productId, product.id]);
   // Logic for the main product gallery
   const jewelleryImages = product.images && product.images.length > 0 
     ? product.images 
@@ -78,6 +81,9 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [isRecLoading, setIsRecLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isReviewsLoading, setIsReviewsLoading] = useState(true);
+  const [klaviyoData, setKlaviyoData] = useState<any>(null);
 
   const reviewFilters = [
     { label: 'Search reviews', isSearch: true },
@@ -85,8 +91,8 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     { label: 'All ratings', isSearch: false },
     { label: 'With media', isSearch: false },
   ];
-  const productRating = parseFloat(product.rating?.value || "0");
-  const productReviewCount = parseInt(product.reviewCount?.value || "0");
+  const productRating = parseFloat(product.rating || "0");
+  const productReviewCount = parseInt(product.reviewCount || "0");
 
   const handleWriteReview = () => {
     // Scroll to the review widget
@@ -166,26 +172,26 @@ const variantThumbnails = useMemo(() => {
   return baseImages.slice(0, 6);
 }, [product.variants, product.images]);
 
-const availableMaterials = useMemo(() => {
-  return materialOptions.filter(option => 
-    product.variants?.some((v: any) => 
-      v.title.toLowerCase().includes(option.name.toLowerCase())
-    )
-  );
-}, [product.variants]);
-const chainOptions = useMemo(() => {
-  const options = new Set<string>();
-  
-  product.variants?.forEach((variant: any) => {
-    // Check if "Chain Type" exists in the variant's options
-    const chainValue = variant.selectedOptions?.["Chain Type"];
-    if (chainValue) {
-      options.add(chainValue);
-    }
-  });
+  const availableMaterials = useMemo(() => {
+    return materialOptions.filter(option => 
+      product.variants?.some((v: any) => 
+        v.title.toLowerCase().includes(option.name.toLowerCase())
+      )
+    );
+  }, [product.variants]);
+  const chainOptions = useMemo(() => {
+    const options = new Set<string>();
+    
+    product.variants?.forEach((variant: any) => {
+      // Check if "Chain Type" exists in the variant's options
+      const chainValue = variant.selectedOptions?.["Chain Type"];
+      if (chainValue) {
+        options.add(chainValue);
+      }
+    });
 
-  return Array.from(options);
-}, [product.variants]);
+    return Array.from(options);
+  }, [product.variants]);
 
 // Determine if we should show the box at all
 const hasChainOptions = chainOptions.length > 0;
@@ -230,6 +236,27 @@ const specificSections = [
     fetchRecommended();
   }, [product.id]);
 
+  // Fetch reviews from Klaviyo
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        if (!numericProductId) return;
+        
+        const response = await fetch(`/api/reviews/fetch?productId=${numericProductId}`);
+        const data = await response.json();
+        
+        if (data.reviews) {
+          setReviews(data.reviews);
+        }
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      } finally {
+        setIsReviewsLoading(false);
+      }
+    }
+    fetchReviews();
+  }, [numericProductId]);
+
   useEffect(() => {
     const match = product.variants.find((v: any) => 
       v.selectedOptions["Jewelry Material"] === selectedMaterial &&
@@ -241,6 +268,82 @@ const specificSections = [
       if (match.image) setSelectedImage(match.image);
     }
   }, [selectedMaterial, selectedChain, product.variants]);
+
+  // ADD: Manual render trigger for Klaviyo (Essential for Next.js)
+  useEffect(() => {
+    if (!numericProductId) return;
+  const checkForKlaviyoData = () => {
+      // Access the internal data Klaviyo has fetched
+      const reviewsInstance = (window as any).KlaviyoReviews;
+      if (reviewsInstance && reviewsInstance.getReviews) {
+        const data = reviewsInstance.getReviews(numericProductId);
+        if (data) {
+          setKlaviyoData(data);
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Poll for the data since it loads asynchronously
+    const interval = setInterval(() => {
+      if (checkForKlaviyoData()) clearInterval(interval);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [numericProductId]);
+
+  // Prepared variables for the widget
+  const absoluteProductUrl = useMemo(() => 
+    `${typeof window !== 'undefined' ? window.location.origin : ''}/product/${product.handle}`, 
+    [product.handle]
+  );
+
+  const absoluteImageUrl = useMemo(() => {
+    const img = selectedImage || product.image || '/assets/images/necklace-img.png';
+    return img.startsWith('http') ? img : `${typeof window !== 'undefined' ? window.location.origin : ''}${img}`;
+  }, [selectedImage, product.image]);
+
+  const safeDescription = useMemo(() => 
+    (product.description || product.title || "")
+      .replace(/<[^>]*>?/gm, '') // Strip HTML tags
+      .substring(0, 250),
+    [product.description, product.title]
+  );
+
+  const reviewStats = useMemo(() => {
+    if (!reviews || reviews.length === 0) {
+      return {
+        average: 0,
+        total: 0,
+        distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+        percentages: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+      };
+    }
+
+    const total = reviews.length;
+    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+
+    reviews.forEach((r: any) => {
+      const rating = Math.round(r.rating) as keyof typeof distribution;
+      if (distribution[rating] !== undefined) {
+        distribution[rating]++;
+        sum += r.rating;
+      }
+    });
+
+    const average = sum / total;
+    const percentages = {
+      5: (distribution[5] / total) * 100,
+      4: (distribution[4] / total) * 100,
+      3: (distribution[3] / total) * 100,
+      2: (distribution[2] / total) * 100,
+      1: (distribution[1] / total) * 100,
+    };
+
+    return { average, total, distribution, percentages };
+  }, [reviews]);
 
   return (
     <>
@@ -457,21 +560,19 @@ const specificSections = [
               <h2 className="text-[28px] lg:text-[40px] font-bold mb-6">Customer Reviews</h2>
               <div className="flex items-center gap-6 mb-8">
                 <span className="text-[48px] lg:text-[64px] font-bold">
-                  {/* FIX: Use parsed 'productRating' number instead of raw product object */}
-                  {productRating > 0 ? productRating.toFixed(1) : "0.0"}
+                  {/* Use the calculated average */}
+                  {reviewStats.average > 0 ? reviewStats.average.toFixed(1) : "0.0"}
                 </span>
                 <div>
                   <div className="text-[#F5B301] text-lg">
-                    {/* FIX: Use parsed 'productRating' and add safety fallback */}
-                    {"★".repeat(Math.round(productRating) || 0)}
-                    {"☆".repeat(5 - (Math.round(productRating) || 0))}
+                    {"★".repeat(Math.round(reviewStats.average))}
+                    {"☆".repeat(5 - Math.round(reviewStats.average))}
                   </div>
-                  {/* FIX: Use parsed 'productReviewCount' */}
-                  <p className="text-sm opacity-70">Based on {productReviewCount} Ratings</p>
+                  <p className="text-sm opacity-70">Based on {reviewStats.total} Ratings</p>
                 </div>
               </div>
               
-              {/* Visual Rating Breakdown */}
+              {/* Visual Rating Breakdown - NOW FUNCTIONAL */}
               <div className="space-y-2 max-w-[820px]">
                 {[5, 4, 3, 2, 1].map((star) => (
                   <div key={star} className="flex items-center gap-3">
@@ -480,24 +581,42 @@ const specificSections = [
                     </span>
                     <div className="flex-1 h-2 bg-[#5A4A1A]/20 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-[#F5B301]" 
+                        className="h-full bg-[#F5B301] transition-all duration-500" 
                         style={{ 
-                          width: star === 5 ? '85%' : star === 4 ? '10%' : '2%' 
+                          // Use the calculated percentage for this specific star level
+                          width: `${reviewStats.percentages[star as keyof typeof reviewStats.percentages]}%` 
                         }} 
                       />
                     </div>
+                    <span className="text-xs opacity-50 min-w-[30px]">
+                      {reviewStats.distribution[star as keyof typeof reviewStats.distribution]}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right Side: Write a Review Action */}
+            {/* Right Side: Primary Write a Review Action */}
             <div className="w-full lg:max-w-[820px] lg:border lg:border-dashed border-[#280F0B] p-0 lg:p-12 flex flex-col items-center justify-center text-center">
               <h3 className="text-lg lg:text-xl font-semibold mb-2 hidden lg:block">Review this product</h3>
               <p className="text-sm opacity-80 mb-6 hidden lg:block">Share your feedback with other customers</p>
               
+              {/* Functional Write Review Button */}
               <button 
-                onClick={handleWriteReview}
+                onClick={() => {
+                  const widgetContainer = document.getElementById('klaviyo-reviews-all');
+                  
+                  if (widgetContainer) {
+                    const internalButton = widgetContainer.querySelector('button') as HTMLElement;
+                    
+                    if (internalButton) {
+                      internalButton.click();
+                    } else {
+                      window.dispatchEvent(new CustomEvent('klaviyo-reviews-open-form'));
+                      widgetContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }
+                }}
                 className="w-full max-w-[820px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 hover:bg-[#280F0B] transition-all"
               >
                 <Image src="/assets/images/write.svg" alt="write" width={20} height={20} />
@@ -506,28 +625,55 @@ const specificSections = [
             </div>
           </div>
 
-          {/* Main Klaviyo Widget Integration */}
-          <div className="mt-16 border-t border-[#280F0B10] pt-16">
-            <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
-            
-            {/* FIX: 
-                Added mandatory attributes (data-url, data-image-url, data-description) 
-                to ensure Klaviyo's internal 'reduce' function has the data it expects.
-            */}
-            {numericProductId && (
-              <div 
-                key={numericProductId}
-                id="klaviyo-reviews-all" 
-                data-id={numericProductId} 
-                data-product-title={product.title}
-                data-product-type={product.type || "Jewelry"}
-                data-url={`https://rawearthcrystals.com/product/${product.handle}`}
-                data-image-url={selectedImage || product.image}
-                data-description={product.description?.substring(0, 200)}
-                className="klaviyo-reviews-all-container"
-              />
-            )}
-          </div>
+          {/* Top Reviews Section - Only displayed if reviews exist */}
+          {reviews.length > 0 && (
+            <div className="mt-16 border-t border-[#280F0B10] pt-16">
+              <h3 className="text-xl font-semibold underline underline-offset-8 mb-8">Top reviews</h3>
+              
+              <div className="space-y-6">
+                {reviews.slice(0, 6).map((review: any, index: number) => (
+                  /* Container with Muddy Yellow Background */
+                  <div key={index} className="bg-[#FFC26F] p-6 lg:p-8 rounded-sm shadow-sm border border-[#280F0B05]">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <p className="font-semibold text-[#280F0B]">{review.reviewer_name || 'Verified Buyer'}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[#F5B301] text-sm">
+                            {'★'.repeat(review.rating || 0)}{'☆'.repeat(5 - (review.rating || 0))}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs opacity-60 font-medium">
+                        {new Date(review.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    </div>
+
+                    {review.title && (
+                      <p className="font-bold text-[#280F0B] mb-2 uppercase tracking-tight">{review.title}</p>
+                    )}
+
+                    <p className="text-[15px] text-[#280F0B] leading-relaxed mb-4">
+                      {review.content || review.body}
+                    </p>
+
+                    {/* Review Media */}
+                    {review.images && review.images.length > 0 && (
+                      <div className="flex gap-3 mt-4">
+                        {review.images.map((img: any, i: number) => (
+                          <div key={i} className="relative w-24 h-24 rounded-sm border border-[#280F0B10] overflow-hidden">
+                            <Image src={img.image || img} alt="Review" fill className="object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Klaviyo standard widget (Keep this for the script to hook into) */}
+          <div id="klaviyo-reviews-all" className="hidden" data-id={numericProductId} />
         </section>
 
         {/* SECTION 4 – RECOMMENDED FOR YOU (Dynamic Backend Data) */}

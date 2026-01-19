@@ -42,6 +42,7 @@ export async function getProducts() {
 
       return {
         id: variantNode?.id || product.id,
+        productId: product.id,
         title: product.title,
         handle: product.handle,
         price: Number(variantNode?.price?.amount || 0),

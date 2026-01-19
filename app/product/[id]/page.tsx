@@ -42,7 +42,7 @@ export default function ProductPage() {
     return (
       <div className="bg-[#F6D8AB] min-h-screen">
         <Header />
-        if (loading) return (
+        (
         <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
           <div className="relative flex items-center justify-center w-48 h-48">
             <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [1, 0, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute w-32 h-32">
