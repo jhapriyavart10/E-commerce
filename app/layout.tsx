@@ -53,11 +53,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${lora.variable} ${manrope.variable} ${muslone.variable} flex flex-col min-h-screen`}>
-        {/* 2. Inject Klaviyo On-site Script for Reviews and Tracking */}
-        <Script
-          strategy="afterInteractive"
-          src={`https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=${process.env.NEXT_PUBLIC_KLAVIYO_PUBLIC_API_KEY}`}
-        />
 
         <CartProvider>
           {/* flex-grow ensures this area takes up all available space, pushing footer down */}

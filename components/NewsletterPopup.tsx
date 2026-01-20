@@ -6,26 +6,49 @@ import { X, Copy, Check } from 'lucide-react';
 import Image from 'next/image';
 import GiftTrigger from './GiftTrigger';
 
-const SPIRITUAL_FOCUS_OPTIONS = [
-  "Inner Peace & Emotional Balance",
-  "Energy Cleansing & Protection",
-  "Spiritual Growth & Intuition",
-  "Manifestation & Abundance",
-  "Love, Self-Worth & Relationships",
-  "Purpose, Clarity & Life Direction"
-];
-
 export default function ImmersiveNewsletter() {
   const [isVisible, setIsVisible] = useState(false);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [warning, setWarning] = useState('');
   const [copied, setCopied] = useState(false);
+  
+  const [newsletterData, setNewsletterData] = useState({
+    title: "Grab a 20% off.",
+    subheading: "To claim it tell us your primary spiritual focus.",
+    options: [
+      "Inner Peace & Emotional Balance",
+      "Energy Cleansing & Protection",
+      "Spiritual Growth & Intuition",
+      "Manifestation & Abundance",
+      "Love, Self-Worth & Relationships",
+      "Purpose, Clarity & Life Direction"
+    ]
+  });
 
   const openPopup = () => {
-    setStep(1); // Reset to first step
+    setStep(1); 
     setIsVisible(true);
   };
+
+  // NEW: Fetch details from your /api/newsletter/details route
+  useEffect(() => {
+    async function fetchDetails() {
+      try {
+        const res = await fetch('/api/newsletter/details');
+        const data = await res.json();
+        if (data.name) {
+          setNewsletterData(prev => ({
+            ...prev,
+            title: `Join ${data.name}`, 
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch newsletter details:", err);
+      }
+    }
+    fetchDetails();
+  }, []);
 
   useEffect(() => {
     const hasSeenPopup = sessionStorage.getItem('hasSeenNewsletter');
@@ -40,7 +63,7 @@ export default function ImmersiveNewsletter() {
     sessionStorage.setItem('hasSeenNewsletter', 'true');
   };
 
-  const handleViewCode = () => {
+  const handleViewCode = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setWarning('Please enter your email address.');
@@ -50,8 +73,24 @@ export default function ImmersiveNewsletter() {
       setWarning('Please enter a valid email address.');
       return;
     }
-    setWarning('');
-    setStep(3);
+
+    try {
+      // NEW: Actually subscribe the user to Klaviyo via your API
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (response.ok) {
+        setWarning('');
+        setStep(3);
+      } else {
+        setWarning('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      setWarning('Failed to connect. Please check your internet.');
+    }
   };
 
   const copyToClipboard = () => {
@@ -85,7 +124,6 @@ export default function ImmersiveNewsletter() {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-black"
         >
-          {/* Background Layer - Preserved exactly as requested with no filters */}
           <div className="absolute inset-0">
             <Image
               src="/assets/images/newsletter.avif"
@@ -96,44 +134,27 @@ export default function ImmersiveNewsletter() {
             />
           </div>
 
-          {/* Close Button */}
-          <button 
-            onClick={closePopup}
-            className="absolute top-8 right-8 z-[110] w-10 h-10 flex items-center justify-center rounded-full bg-[#5D1F1F] text-white transition-transform hover:scale-110"
-          >
+          <button onClick={closePopup} className="absolute top-8 right-8 z-[110] w-10 h-10 flex items-center justify-center rounded-full bg-[#5D1F1F] text-white transition-transform hover:scale-110">
             <X className="w-6 h-6" />
           </button>
 
           <div className={`relative z-[105] w-full flex flex-col items-center text-center ${step > 1 ? '-mt-12' : ''}`}>
-            {/* Logo */}
             <div className="mb-6 w-[240px] h-[120px] relative">
-              <Image 
-                src="/assets/images/Logo(REC).svg" 
-                alt="Logo" 
-                fill
-                style={{ filter: 'brightness(0) invert(1)' }} 
-                className="object-contain" 
-              />
+              <Image src="/assets/images/Logo(REC).svg" alt="Logo" fill style={{ filter: 'brightness(0) invert(1)' }} className="object-contain" />
             </div>
 
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
-                  {/* Heading 1: Lora 48px Medium with Gradient */}
-                  <h2 
-                    style={{ ...h2Style, ...gradientTextStyle }}
-                    className="font-lora mb-2 tracking-normal"
-                  >
-                    Grab a 20% off.
+                  <h2 style={{ ...h2Style, ...gradientTextStyle }} className="font-lora mb-2 tracking-normal">
+                    {newsletterData.title}
                   </h2>
-
-                  {/* Subheading: Single line (no max-width) */}
                   <p className="font-manrope text-white/90 text-[16px] leading-[24px] mb-6 whitespace-nowrap">
-                    To claim it tell us your primary spiritual focus.
+                    {newsletterData.subheading}
                   </p>
 
                   <div className="flex flex-col gap-2 w-full items-center mb-4">
-                    {SPIRITUAL_FOCUS_OPTIONS.map((option) => (
+                    {newsletterData.options.map((option) => (
                       <button 
                         key={option} 
                         onClick={() => setStep(2)} 
@@ -144,11 +165,7 @@ export default function ImmersiveNewsletter() {
                       </button>
                     ))}
                   </div>
-                  <button 
-                    onClick={closePopup} 
-                    style={{ letterSpacing: '-0.005em' }} 
-                    className="font-manrope font-normal text-[16px] leading-[24px] text-white/70 hover:text-white underline underline-offset-4"
-                  >
+                  <button onClick={closePopup} className="font-manrope font-normal text-[16px] leading-[24px] text-white/70 hover:text-white underline underline-offset-4">
                     I don’t want a discount
                   </button>
                 </motion.div>
@@ -156,10 +173,7 @@ export default function ImmersiveNewsletter() {
 
               {step === 2 && (
                 <motion.div key="step2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
-                  <h2 
-                    style={h2Style} 
-                    className="font-lora mb-2 tracking-normal"
-                  >
+                  <h2 style={h2Style} className="font-lora mb-2 tracking-normal">
                     <span className="text-white">Reveal </span>
                     <span style={gradientTextStyle}>your code!</span>
                   </h2>
@@ -174,39 +188,22 @@ export default function ImmersiveNewsletter() {
                         placeholder="Your email address" 
                         className="w-full h-[48px] bg-[#280F0B] text-white px-6 focus:outline-none font-manrope text-[16px] leading-[24px]"
                     />
-
-                    {warning && (
-                        <p className="text-red-400 text-xs font-manrope">
-                        {warning}
-                        </p>
-                    )}
-
-                    <button 
-                        onClick={handleViewCode} 
-                        style={{ borderWidth: '1.25px', letterSpacing: '-0.005em' }} 
-                        className="w-full h-[48px] border border-white text-white font-manrope font-normal text-[16px] leading-[24px] hover:bg-white hover:text-black transition-all"
-                    >
+                    {warning && <p className="text-red-400 text-xs font-manrope">{warning}</p>}
+                    <button onClick={handleViewCode} className="w-full h-[48px] border border-white text-white font-manrope font-normal text-[16px] leading-[24px] hover:bg-white hover:text-black transition-all">
                         View code →
                     </button>
-                    </div>
+                  </div>
                 </motion.div>
               )}
 
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
-                  <h2 
-                    style={{ ...h2Style, ...gradientTextStyle }} 
-                    className="font-lora mb-2 tracking-normal"
-                  >
-                    Here's your code!
+                  <h2 style={{ ...h2Style, ...gradientTextStyle }} className="font-lora mb-2 tracking-normal">
+                    Success! Check your inbox.
                   </h2>
-                  <p 
-                    style={{ letterSpacing: '-0.005em' }}
-                    className="font-manrope text-white/70 text-[16px] leading-[24px] mb-8 font-normal whitespace-nowrap"
-                  >
+                  <p className="font-manrope text-white/70 text-[16px] leading-[24px] mb-8 font-normal whitespace-nowrap">
                     Use this code & get <span className="font-semibold text-white">20% off.</span>
                   </p>
-                  
                   <div 
                     onClick={copyToClipboard}
                     style={{
