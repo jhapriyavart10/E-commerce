@@ -1,10 +1,15 @@
 import { createCustomer } from '@/lib/shopify';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
-/**
- * Define the GraphQL response shape based on the logged Shopify output.
- * Your logs show the payload is directly in 'response.body'.
- */
+// 1. Define the Validation Schema
+const RegisterSchema = z.object({
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters long" })
+});
+
 interface CustomerCreateData {
   customerCreate: {
     customer: { id: string } | null;
@@ -14,9 +19,32 @@ interface CustomerCreateData {
 
 export async function POST(req: Request) {
   try {
-    const { email, password, firstName, lastName } = await req.json();
+    // 2. Safely parse the JSON body
+    let body;
+    try {
+      body = await req.json();
+    } catch (e) {
+      return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+    }
 
-    // Call the shopify library function
+    // 3. Validate input with Zod
+    const validation = RegisterSchema.safeParse(body);
+
+    if (!validation.success) {
+      // Return specific field errors (e.g., { email: ["Invalid email address"] })
+      return NextResponse.json(
+        { 
+          message: "Validation Error", 
+          errors: validation.error.flatten().fieldErrors 
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. Extract validated data
+    const { email, password, firstName, lastName } = validation.data;
+
+    // 5. Call Shopify API (Existing Logic)
     const response = await createCustomer({
       email,
       password,
@@ -27,7 +55,6 @@ export async function POST(req: Request) {
 
     const responseBody = response.body as CustomerCreateData;
     
-    // Safety check to ensure the payload exists before destructuring
     if (!responseBody || !responseBody.customerCreate) {
       console.error('Unexpected Shopify structure or empty response:', responseBody);
       return NextResponse.json(
@@ -38,7 +65,6 @@ export async function POST(req: Request) {
 
     const { customer, customerUserErrors } = responseBody.customerCreate;
 
-    // Handle Shopify-specific validation errors (e.g., email already taken)
     if (customerUserErrors && customerUserErrors.length > 0) {
       return NextResponse.json(
         { message: customerUserErrors[0].message },
@@ -46,7 +72,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Handle cases where no customer object is returned despite no errors
     if (!customer) {
       return NextResponse.json(
         { message: 'Customer creation succeeded but no data was returned.' },
@@ -54,16 +79,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Success response
     return NextResponse.json({ 
       success: true, 
       customerId: customer.id 
     });
 
   } catch (error: any) {
-    // Log the full exception to your server terminal for debugging
     console.error('Registration Route Exception:', error);
-    
     return NextResponse.json(
       { message: error.message || 'Internal Server Error' },
       { status: 500 }

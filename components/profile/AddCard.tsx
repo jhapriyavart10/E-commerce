@@ -155,7 +155,6 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
               value={formData.country}
               style={{ backgroundImage: arrowIcon }}
             >
-              <option value="India">India</option>
               <option value="Australia">Australia</option>
             </select>
           </div>

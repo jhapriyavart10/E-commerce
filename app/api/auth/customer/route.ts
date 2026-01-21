@@ -8,6 +8,9 @@ const getCustomerQuery = `
       firstName
       lastName
       email
+      cards: metafield(namespace: "custom", key: "saved_card") {
+        value
+      }
     }
   }
 `;

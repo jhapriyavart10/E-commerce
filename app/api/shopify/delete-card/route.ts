@@ -14,13 +14,14 @@ const getExistingCardsQuery = `
 
 export async function POST(req: Request) {
   try {
-    const { last4, brand, expiry } = await req.json();
+    const { cardId } = await req.json();
     const accessToken = cookies().get('customerAccessToken')?.value;
 
     if (!accessToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 1. Fetch existing cards
     const existingData = await shopifyFetch<any>({
       query: getExistingCardsQuery,
       variables: { customerAccessToken: accessToken },
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
 
     let currentCards: any[] = [];
     const existingValue = existingData.body?.customer?.cards?.value;
-    
+
     if (existingValue) {
       try {
         currentCards = JSON.parse(existingValue);
@@ -39,17 +40,10 @@ export async function POST(req: Request) {
       }
     }
 
-    const newCard = {
-      id: Date.now(),
-      cardNumber: `************${last4}`, // Store in format expected by UI
-      brand,
-      expiry
-    };
+    // 2. Filter out the card to be deleted
+    const updatedCards = currentCards.filter((card: any) => card.id !== cardId);
 
-    // 3. Append to list
-    const updatedCards = [...currentCards, newCard];
-
-    // 4. Save back to Shopify
+    // 3. Save the updated list back to Shopify
     await updateCustomer(accessToken, {
       metafields: [
         {
@@ -61,9 +55,9 @@ export async function POST(req: Request) {
       ]
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, cards: updatedCards });
   } catch (error: any) {
-    console.error("Save Card Error:", error);
+    console.error("Delete Card Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
