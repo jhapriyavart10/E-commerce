@@ -2,13 +2,28 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { z } from 'zod';
+
+// 1. Define strict Card Schema
+const CardSchema = z.object({
+  cardNumber: z.string()
+    .regex(/^\d{16}$/, "Card number must be exactly 16 digits"),
+  
+  expiry: z.string()
+    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry must be MM/YY (e.g., 12/25)"),
+  
+  cvc: z.string()
+    .regex(/^\d{3,4}$/, "CVC must be 3 or 4 digits"),
+    
+  country: z.string().min(1, "Country is required")
+});
 
 const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: any) => void }) => {
   const [formData, setFormData] = useState({
     cardNumber: '',
     expiry: '',
     cvc: '',
-    country: 'India'
+    country: 'Australia'
   });
 
   const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -18,6 +33,8 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    // Clear error for this field immediately when user types
     if (errors[name]) {
       setErrors({ ...errors, [name]: false });
     }
@@ -25,35 +42,52 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors: Record<string, boolean> = {};
-    
-    // Validation for required fields
-    if (!formData.cardNumber.trim()) newErrors.cardNumber = true;
-    if (!formData.expiry.trim()) newErrors.expiry = true;
-    if (!formData.cvc.trim()) newErrors.cvc = true;
+    setWarning('');
 
-    if (Object.keys(newErrors).length > 0) {
+    const dataToValidate = {
+      cardNumber: formData.cardNumber.replace(/\s/g, ''),
+      expiry: formData.expiry,
+      cvc: formData.cvc,
+      country: formData.country
+    };
+
+    // 3. Run Zod Validation
+    const validation = CardSchema.safeParse(dataToValidate);
+
+    if (!validation.success) {
+      const fieldErrors = validation.error.flatten().fieldErrors;
+      
+      // Update errors state to highlight invalid fields in red
+      const newErrors: Record<string, boolean> = {};
+      if (fieldErrors.cardNumber) newErrors.cardNumber = true;
+      if (fieldErrors.expiry) newErrors.expiry = true;
+      if (fieldErrors.cvc) newErrors.cvc = true;
+      if (fieldErrors.country) newErrors.country = true;
+      
       setErrors(newErrors);
-      setWarning('Please fill in all card details correctly.');
+      
+      // Show the first human-readable error message
+      const firstErrorMessage = Object.values(fieldErrors)[0]?.[0];
+      setWarning(firstErrorMessage || 'Please fill in all card details correctly.');
       return;
     }
 
-    setWarning('');
+    // 4. If valid, proceed to API
     setIsSubmitting(true);
 
     try {
-      // Functional Integration: Save card metadata to Shopify metafields
       const response = await fetch('/api/shopify/save-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          last4: formData.cardNumber.replace(/\s?/g, '').slice(-4),
+          last4: dataToValidate.cardNumber.slice(-4), // Use the validated, clean data
           brand: 'Card', 
-          expiry: formData.expiry
+          expiry: dataToValidate.expiry
         }),
       });
 
       if (response.ok) {
+        // Pass the original formData (or validated data) back to parent
         onSave(formData);
       } else {
         const errorData = await response.json();
@@ -66,7 +100,7 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
     }
   };
 
-  // Your exact styling logic for placeholders and borders
+  // Styling logic
   const getInputClass = (fieldName: string) => `
     w-full bg-transparent border p-4 outline-none transition-colors text-sm
     ${errors[fieldName] 
@@ -75,6 +109,7 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
     }
   `;
 
+  // Specific style for Select to include custom arrow
   const getSelectClass = (fieldName: string) => `
     ${getInputClass(fieldName)}
     appearance-none
@@ -82,6 +117,7 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
     bg-[length:16px]
     bg-[right_16px_center]
   `;
+  
   const arrowIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23280F0B'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`;
   return (
     <div className="w-full max-w-2xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-left font-manrope">
