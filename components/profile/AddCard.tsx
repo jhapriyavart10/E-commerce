@@ -75,6 +75,14 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
     }
   `;
 
+  const getSelectClass = (fieldName: string) => `
+    ${getInputClass(fieldName)}
+    appearance-none
+    bg-no-repeat
+    bg-[length:16px]
+    bg-[right_16px_center]
+  `;
+  const arrowIcon = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23280F0B'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`;
   return (
     <div className="w-full max-w-2xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-500 text-left font-manrope">
       <div className="flex justify-between items-center mb-8 border-b border-[#280F0B]/10 pb-4">
@@ -139,15 +147,18 @@ const AddCard = ({ onCancel, onSave }: { onCancel: () => void, onSave: (card: an
         {/* Row 2 — Country selector */}
         <div className="flex flex-col gap-2">
           <label className="text-[10px] uppercase font-bold tracking-widest text-[#280F0B]">Country</label>
-          <select 
-            name="country" 
-            className={getInputClass('country')} 
-            onChange={handleChange} 
-            value={formData.country}
-          >
-            <option value="India">India</option>
-            <option value="Australia">Australia</option>
-          </select>
+          <div className="relative">
+            <select 
+              name="country" 
+              className={getSelectClass('country')} 
+              onChange={handleChange} 
+              value={formData.country}
+              style={{ backgroundImage: arrowIcon }}
+            >
+              <option value="India">India</option>
+              <option value="Australia">Australia</option>
+            </select>
+          </div>
         </div>
 
         {/* Informational Text */}

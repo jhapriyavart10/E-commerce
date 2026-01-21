@@ -37,18 +37,6 @@ const PaymentMethods = () => {
 
   return (
     <div className="w-full py-8 animate-in fade-in duration-500">
-      <div className="flex justify-between items-center mb-8 border-b border-[#280F0B1A] pb-4">
-        <h2 className="text-3xl font-bold font-manrope text-[#280F0B]">Payment Methods</h2>
-        {cards.length > 0 && (
-          <button 
-            onClick={() => setShowForm(true)}
-            className="text-sm font-bold text-[#7F3E2F] uppercase tracking-widest hover:underline"
-          >
-            + Add New Card
-          </button>
-        )}
-      </div>
-
       {cards.length === 0 ? (
         /* 3. Empty State (Modified to be functional) */
         <div className="flex flex-col items-center text-center py-12">
@@ -69,7 +57,17 @@ const PaymentMethods = () => {
           </button>
         </div>
       ) : (
-        /* 4. Card List View */
+        <>
+        <div className="flex justify-between items-center mb-8 border-b border-[#280F0B1A] pb-4">
+          <h2 className="text-3xl font-bold font-manrope text-[#280F0B]">Payment Methods</h2>
+          <button 
+            onClick={() => setShowForm(true)}
+            className="text-sm font-bold text-[#7F3E2F] uppercase tracking-widest hover:underline"
+          >
+            + Add New Card
+          </button>
+        </div>
+        {/* 4. Card List View */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {cards.map((card) => (
             <div key={card.id} className="border border-[#280F0B1A] p-6 rounded-sm bg-white/50 relative group flex flex-col justify-between min-h-[160px]">
@@ -101,6 +99,7 @@ const PaymentMethods = () => {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   );
