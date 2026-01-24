@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Category, 
   Question, 
@@ -89,15 +90,17 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      <div
-        className="flex flex-col overflow-hidden relative w-full h-full"
-        style={{
+      <motion.div
+        layout // This automatically animates size changes
+        initial={false}
+        animate={{
           width: isMaximized ? '100%' : '375px',
           height: isMaximized ? '100%' : '600px',
           borderRadius: isMaximized ? '0px' : '24px',
-          background: '#280F0B',
-          boxSizing: 'border-box',
         }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="flex flex-col overflow-hidden relative shadow-2xl"
+        style={{ background: '#280F0B', boxSizing: 'border-box' }}
       >
         {/* --- HEADER --- */}
         <header
@@ -132,19 +135,25 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
             )}
             
             <div className="flex gap-4 text-[#280F0B]">
-              <button onClick={onToggleExpand} className="hover:opacity-60 transition-opacity cursor-pointer">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <polyline points={isMaximized ? "4 14 10 14 10 20" : "15 3 21 3 21 9"} />
-                    <polyline points={isMaximized ? "20 10 14 10 14 4" : "9 21 3 21 3 15"} />
-                    <line x1={isMaximized ? "14" : "21"} y1={isMaximized ? "10" : "3"} x2={isMaximized ? "21" : "14"} y2={isMaximized ? "3" : "10"} />
-                    <line x1={isMaximized ? "10" : "3"} y1={isMaximized ? "14" : "21"} x2={isMaximized ? "3" : "10"} y2={isMaximized ? "21" : "14"} />
-                </svg>
-              </button>
-              <button onClick={onClose} className="hover:opacity-60 transition-opacity cursor-pointer">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
-            </div>
+            {/* 3. Updated Expand Button with Framer Motion Icon */}
+            <button 
+              onClick={onToggleExpand} 
+              className="hover:bg-[#280F0B]/10 p-1.5 rounded-full transition-colors cursor-pointer"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d={isMaximized ? "M4 14h6v6M20 10h-6V4" : "M15 3h6v6M9 21H3v-6"} />
+                <path d={isMaximized ? "M14 10l7-7M10 14l-7 7" : "M21 3l-7 7M3 21l7-7"} />
+              </svg>
+            </button>
+            
+            <button onClick={onClose} className="hover:bg-[#280F0B]/10 p-1.5 rounded-full transition-colors cursor-pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
+        </div>
 
           {view === 'categories' && (
             <>
@@ -263,7 +272,7 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
             </button>
           </div>
         </footer>
-      </div>
+      </motion.div>
     </>
   );
 }

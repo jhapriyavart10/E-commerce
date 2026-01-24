@@ -92,8 +92,8 @@ export default function SignUpPage() {
                 <h1 className="font-lora text-3xl sm:text-4xl md:text-5xl text-[#280F0B] font-medium mb-4">
                   Register with us.
                 </h1>
-                <p className="font-manrope text-[#280F0B]/60 text-sm sm:text-base font-medium max-w-prose">
-                  Start adding your account details. It will be used for login and billing purposes.
+                <p className="font-manrope text-sm text-[#280F0B]/60">
+                  Already have an account? <Link href="/signin" className="underline hover:text-[#280F0B] font-medium">Login</Link>
                 </p>
                 {error && <p className="text-red-600 mt-2 font-manrope text-sm">{error}</p>}
               </div>
@@ -199,16 +199,16 @@ export default function SignUpPage() {
                   onClick={handleGoogleSignUp}
                   className="w-full py-3 flex items-center justify-center gap-3 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
                 >
-                  <Image src="/assets/images/google-icon.png" alt="Google" width={40} height={60} />
+                  <Image src="/assets/images/google-logo.svg" alt="Google" width={20} height={20} />
                   CONTINUE WITH GOOGLE
                 </button>
               </form>
 
-              <div className="mt-6 text-left">
+              {/* <div className="mt-6 text-left">
                 <p className="font-manrope text-sm text-[#280F0B]/60">
                   Already have an account? <Link href="/signin" className="underline hover:text-[#280F0B] font-medium">Login</Link>
                 </p>
-              </div>
+              </div> */}
             </div>
           </motion.div>
 
