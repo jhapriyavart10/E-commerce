@@ -319,7 +319,7 @@ export default function CheckoutPage() {
                     placeholder={errors.streetAddress ? "Street Address Required *" : "Street Address"} 
                     value={formData.streetAddress}
                     onChange={(e) => { setFormData({...formData, streetAddress: e.target.value}); if(errors.streetAddress) setErrors({...errors, streetAddress: false}); }}
-                    className={`w-full bg-transparent border p-4 outline-none ${errors.streetAddress ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
+                    className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.streetAddress ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B] placeholder-[#280F0B80]'}`} 
                   />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input 
@@ -327,14 +327,14 @@ export default function CheckoutPage() {
                       placeholder={errors.townCity ? "City Required *" : "Town/City"} 
                       value={formData.townCity}
                       onChange={(e) => { setFormData({...formData, townCity: e.target.value}); if(errors.townCity) setErrors({...errors, townCity: false}); }}
-                      className={`w-full bg-transparent border p-4 outline-none ${errors.townCity ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
+                      className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.townCity ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B] placeholder-[#280F0B80]'}`} 
                     />
                     <input 
                       type="text" 
                       placeholder={errors.postcode ? "Postcode Required *" : "Postcode"} 
                       value={formData.pincode}
                       onChange={(e) => { setFormData({...formData, pincode: e.target.value}); if(errors.postcode) setErrors({...errors, postcode: false}); }}
-                      className={`w-full bg-transparent border p-4 outline-none ${errors.postcode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] placeholder-[#280F0B80]'}`} 
+                      className={`w-full bg-transparent border p-4 outline-none transition-colors ${errors.postcode ? 'border-red-600 placeholder-red-600' : 'border-[#280F0B66] focus:border-[#280F0B] placeholder-[#280F0B80]'}`} 
                     />
                   </div>
                   <div className="relative">

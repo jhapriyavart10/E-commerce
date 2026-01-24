@@ -30,7 +30,7 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
   const [view, setView] = useState<'categories' | 'questions' | 'chat'>('categories');
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
-  const [isTyping, setIsTyping] = useState<boolean>(false); // Added missing state
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,16 +91,27 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
       `}</style>
 
       <motion.div
-        layout // This automatically animates size changes
+        layout // Animates the layout change of the container and its children
         initial={false}
         animate={{
           width: isMaximized ? '100%' : '375px',
           height: isMaximized ? '100%' : '600px',
           borderRadius: isMaximized ? '0px' : '24px',
         }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        /* Updated transition for a "liquid" smooth feel */
+        transition={{ 
+          type: "tween", 
+          ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for a premium slide
+          duration: 0.45 
+        }}
         className="flex flex-col overflow-hidden relative shadow-2xl"
-        style={{ background: '#280F0B', boxSizing: 'border-box' }}
+        style={{ 
+          background: '#280F0B', 
+          boxSizing: 'border-box',
+          position: isMaximized ? 'fixed' : 'relative',
+          inset: isMaximized ? 0 : 'auto',
+          zIndex: 50
+        }}
       >
         {/* --- HEADER --- */}
         <header
@@ -135,7 +146,6 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
             )}
             
             <div className="flex gap-4 text-[#280F0B]">
-            {/* 3. Updated Expand Button with Framer Motion Icon */}
             <button 
               onClick={onToggleExpand} 
               className="hover:bg-[#280F0B]/10 p-1.5 rounded-full transition-colors cursor-pointer"
@@ -165,7 +175,6 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
                 style={{ display: view === 'categories' ? 'block' : 'none' }}
             >
                 <div className="absolute inset-0 bg-[#280F0B]" />
-                {/* The "U" shape circle */}
                 <div 
                 className="absolute inset-0 bg-[#FFC26F]" 
                 style={{ borderBottomRightRadius: '80px' }} 
