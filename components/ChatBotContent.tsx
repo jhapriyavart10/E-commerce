@@ -110,7 +110,7 @@ export default function ChatBot({ onClose, onToggleExpand, isMaximized }: ChatBo
           boxSizing: 'border-box',
           position: isMaximized ? 'fixed' : 'relative',
           inset: isMaximized ? 0 : 'auto',
-          zIndex: 50
+          zIndex: 610
         }}
       >
         {/* --- HEADER --- */}

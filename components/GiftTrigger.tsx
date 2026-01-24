@@ -29,7 +29,7 @@ export default function GiftTrigger({ onOpen }: GiftTriggerProps) {
 
   return (
     <motion.div 
-      className="fixed bottom-6 left-6 z-[101] cursor-pointer flex items-center overflow-hidden shadow-2xl"
+      className="fixed bottom-6 left-6 z-[50] cursor-pointer flex items-center overflow-hidden shadow-2xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onOpen}
