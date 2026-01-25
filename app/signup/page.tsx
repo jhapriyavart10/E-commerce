@@ -188,7 +188,7 @@ export default function SignUpPage() {
                   {loading ? 'REGISTERING...' : 'REGISTER'}
                 </button>
 
-                <div className="relative flex items-center py-5">
+                <div className="relative flex items-center py-2">
                   <div className="flex-grow border-t border-[#280F0B]/20"></div>
                   <span className="flex-shrink mx-4 text-[#280F0B]/40 text-sm">OR</span>
                   <div className="flex-grow border-t border-[#280F0B]/20"></div>
