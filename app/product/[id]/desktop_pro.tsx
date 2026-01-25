@@ -407,33 +407,70 @@ const specificSections = [
               <p className="text-[14px] lg:text-[16px] leading-[1.6] opacity-90 mb-3">Harness Universal Energy with a Sphere Crystal Pendulum. The sphere represents wholeness, unity, and the infinite flow of universal energy.</p>
 
               <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
-
               <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${(activeVariant?.price || product.price).toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
-              <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
-                <div className="flex justify-between items-center mb-3">
-                  <p className="text-sm font-semibold uppercase tracking-widest">Jewellery Material</p>
-                  <div className="hidden lg:block">
-                    <Image src="/assets/images/book.svg" alt="Material Guide" width={22} height={22} className="cursor-pointer" />
+              {/* 1. BRACELET STYLE (e.g., for Ying Yang Bracelet) */}
+              {product.variants?.some((v: any) => v.selectedOptions?.["Bracelet Style"]) && (
+                <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
+                  <p className="text-sm font-semibold uppercase tracking-widest mb-3">Bracelet Style</p>
+                  <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
+                    {product.variants
+                      .filter((v: any, i: number, self: any[]) => 
+                        self.findIndex(t => t.selectedOptions?.["Bracelet Style"] === v.selectedOptions?.["Bracelet Style"]) === i
+                      )
+                      .map((variant: any) => {
+                        const styleName = variant.selectedOptions?.["Bracelet Style"];
+                        const isSelected = activeVariant?.id === variant.id;
+
+                        return (
+                          <button
+                            key={variant.id}
+                            onClick={() => setActiveVariant(variant)}
+                            className={`flex items-center gap-1 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
+                              isSelected ? 'bg-[#280F0B] text-white border-[#280F0B]' : 'bg-transparent text-[#280F0B] border-[#280F0B]'
+                            }`}
+                          >
+                            <span className="whitespace-nowrap font-normal">{styleName}</span>
+                          </button>
+                        );
+                      })}
                   </div>
                 </div>
-                <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
-                  {availableMaterials.map((option, index) => (
-                    <div key={option.name} className="contents">
-                      <button
-                        onClick={() => handleMaterialClick(option.name)}
-                        className={`flex items-center gap-1 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
-                          selectedMaterial === option.name ? 'bg-[#6C6AE4] text-white border-[#6C6AE4]' : 'bg-transparent text-[#280F0B] border-[#280F0B]'
-                        }`}
-                      >
-                        <Image src={option.img} alt={option.name} width={20} height={24} className={`object-contain ${selectedMaterial === option.name ? 'brightness-0 invert' : ''}`} />
-                        <span className="whitespace-nowrap font-normal">{option.name}</span>
-                      </button>
-                      {(index + 1) % 3 === 0 && <div className="hidden lg:block w-full h-0" />}
+              )}
+
+              {/* 2. JEWELLERY MATERIAL (Standard Pendants) */}
+              {availableMaterials.length > 0 && !product.variants?.some((v: any) => v.selectedOptions?.["Bracelet Style"]) && (
+                <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="text-sm font-semibold uppercase tracking-widest">Jewellery Material</p>
+                    <div className="hidden lg:block">
+                      <Image src="/assets/images/book.svg" alt="Material Guide" width={22} height={22} className="cursor-pointer" />
                     </div>
-                  ))}
+                  </div>
+                  <div className="flex flex-col lg:flex-row lg:flex-wrap gap-2">
+                    {availableMaterials.map((option, index) => (
+                      <div key={option.name} className="contents">
+                        <button
+                          onClick={() => handleMaterialClick(option.name)}
+                          className={`flex items-center gap-1 px-4 py-2 rounded-full border transition-all text-[13px] lg:text-[14px] justify-center lg:justify-start w-full lg:w-auto ${
+                            selectedMaterial === option.name ? 'bg-[#6C6AE4] text-white border-[#6C6AE4]' : 'bg-transparent text-[#280F0B] border-[#280F0B]'
+                          }`}
+                        >
+                          <Image 
+                            src={option.img} 
+                            alt={option.name} 
+                            width={20} 
+                            height={24} 
+                            className={`object-contain ${selectedMaterial === option.name ? 'brightness-0 invert' : ''}`} 
+                          />
+                          <span className="whitespace-nowrap font-normal">{option.name}</span>
+                        </button>
+                        {(index + 1) % 3 === 0 && <div className="hidden lg:block w-full h-0" />}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
             {hasChainOptions && (
               <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
