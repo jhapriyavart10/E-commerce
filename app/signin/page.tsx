@@ -65,6 +65,26 @@ export default function SignInPage() {
     }
   };
 
+  // --- NEW: Google Login Logic ---
+  const handleGoogleLogin = () => {
+    setLoading(true);
+    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+    const options = {
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+      redirect_uri: process.env.NEXT_PUBLIC_REDIRECT_URI || '',
+      response_type: 'code',
+      scope: [
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email',
+      ].join(' '),
+      prompt: 'select_account',
+      access_type: 'offline',
+    };
+
+    const queryString = new URLSearchParams(options).toString();
+    window.location.href = `${rootUrl}?${queryString}`;
+  };
+
   return (
     <>
       <Header />
@@ -166,6 +186,22 @@ export default function SignInPage() {
                 className="w-full py-3 mt-10 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
               >
                 {loading ? 'Logging in...' : 'LOGIN'}
+              </button>
+
+              {/* --- NEW: Google Login Section --- */}
+              <div className="relative flex items-center py-6">
+                <div className="flex-grow border-t border-[#280F0B]/20"></div>
+                <span className="flex-shrink mx-4 text-[#280F0B]/40 text-sm">OR</span>
+                <div className="flex-grow border-t border-[#280F0B]/20"></div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full py-3 flex items-center justify-center gap-3 border border-[#280F0B] text-[#280F0B] font-manrope font-semibold uppercase tracking-widest text-sm hover:bg-[#280F0B] hover:text-white transition-all duration-300 disabled:opacity-50"
+              >
+                <Image src="/assets/images/google-logo.svg" alt="Google" width={20} height={20} />
+                CONTINUE WITH GOOGLE
               </button>
             </form>
 

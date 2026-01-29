@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Manrope } from 'next/font/google'
 import localFont from 'next/font/local'
-import Script from 'next/script' // 1. Import Script component
+import Script from 'next/script' 
 import './globals.css'
 import { CartProvider } from './context/CartContext'
 import Footer from '@/components/Footer' 
@@ -50,17 +50,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const klaviyoKey = process.env.NEXT_PUBLIC_KLAVIYO_PUBLIC_API_KEY;
+
   return (
     <html lang="en">
       <body className={`${lora.variable} ${manrope.variable} ${muslone.variable} flex flex-col min-h-screen`}>
+        
+        {/* KLAVIYO SCRIPT - Uses the env variable */}
+        <Script
+          id="klaviyo-onsite"
+          strategy="afterInteractive"
+          src={`//static.klaviyo.com/onsite/js/klaviyo.js?company_id=${klaviyoKey}`} 
+        />
 
         <CartProvider>
-          {/* flex-grow ensures this area takes up all available space, pushing footer down */}
           <main className="flex-grow">
             {children}
           </main>
 
-          {/* Persistent components appearing on all pages */}
           <Footer />
           <NewsletterPopup />
           <FloatingChat />

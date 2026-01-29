@@ -64,6 +64,7 @@ export const getProductQuery = `
           node {
             id
             title
+            quantityAvailable
             image {
               url
               altText

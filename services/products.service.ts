@@ -1,12 +1,7 @@
 import { shopifyFetch } from '@/lib/shopify';
 import { getProductQuery, getProductsQuery } from '@/lib/shopify/queries';
 
-/**
- * Unified helper to extract display values from Metaobjects.
- * Handles both plural 'references' and singular 'reference'.
- */
 function resolveMetaobjectLabels(metafield: any, fallback: string): string[] {
-  // 1. Handle plural references (Collection Page / getProducts)
   if (metafield?.references?.edges) {
     const labels = metafield.references.edges.map(
       (edge: any) => edge.node.field?.value || fallback
@@ -14,7 +9,6 @@ function resolveMetaobjectLabels(metafield: any, fallback: string): string[] {
     return Array.from(new Set(labels));
   }
 
-  // 2. Handle singular reference (Product Page / getProduct)
   if (metafield?.reference?.fields) {
     const displayField = metafield.reference.fields.find(
       (f: any) => f.key === 'label' || f.key === 'name' || f.key === 'value'
@@ -63,7 +57,7 @@ export async function getProduct(handle: string) {
     const res = await shopifyFetch<any>({
       query: getProductQuery,
       variables: { handle },
-      cache: 'no-store' // Force fresh data during testing
+      cache: 'no-store'
     });
 
     const product = res?.body?.product;
@@ -80,7 +74,6 @@ export async function getProduct(handle: string) {
       image: product.images?.edges?.[0]?.node?.url || '/assets/images/necklace-img.png',
       description: product.descriptionHtml,
       
-      // MAPPING NEW SPECIFICATION FIELDS
       howToUse: product.howToUse?.value || null,
       productDetails: product.productDetails?.value || null,
       careInstructions: product.careInstructions?.value || null,
@@ -93,6 +86,9 @@ export async function getProduct(handle: string) {
         id: v.node.id,
         title: v.node.title,
         price: Number(v.node.price.amount),
+        // --- ADDED THIS LINE ---
+        quantityAvailable: v.node.quantityAvailable, 
+        // -----------------------
         image: v.node.image?.url || null, 
         selectedOptions: v.node.selectedOptions.reduce((acc: any, opt: any) => {
           acc[opt.name] = opt.value;

@@ -52,7 +52,7 @@ export default function GiftTrigger({ onOpen }: GiftTriggerProps) {
             src="/assets/images/gift.svg" 
             alt="gift icon" 
             fill 
-            className="object-contain brightness-0 invert" // Makes the icon white
+            className="object-contain" 
           />
         </div>
       </div>

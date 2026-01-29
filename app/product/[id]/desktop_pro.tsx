@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; // FIXED: Changed from lucide-react to next/link
+import Link from 'next/link'; 
 import Header from '@/components/Header';
 import { useCart } from '@/app/context/CartContext';
 import CartDrawer from '@/components/CartDrawer';
-import { title } from 'process';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Types for backend integration
 interface Product {
@@ -56,12 +56,12 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const numericProductId = useMemo(() => {
     const idToUse = product.productId || (product.id.includes('ProductVariant') ? null : product.id); 
     if (!idToUse){
-      console.error("Klaviyo Error: No parent Product ID found. Check your API response.");
+      // console.error("Klaviyo Error: No parent Product ID found. Check your API response.");
       return '';
     } 
     return idToUse.split('/').pop();
   }, [product.productId, product.id]);
-  // Logic for the main product gallery
+
   const jewelleryImages = product.images && product.images.length > 0 
     ? product.images 
     : ['/assets/images/necklace-img.png'];
@@ -76,6 +76,10 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   
+  // Notification Modal State
+  const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [notifyStatus, setNotifyStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   // Logic for Recommended Products Backend
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
@@ -85,27 +89,66 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   const [isReviewsLoading, setIsReviewsLoading] = useState(true);
   const [klaviyoData, setKlaviyoData] = useState<any>(null);
 
-  const reviewFilters = [
-    { label: 'Search reviews', isSearch: true },
-    { label: 'Most relevant', isSearch: false },
-    { label: 'All ratings', isSearch: false },
-    { label: 'With media', isSearch: false },
-  ];
   const productRating = parseFloat(product.rating || "0");
   const productReviewCount = parseInt(product.reviewCount || "0");
 
   const handleWriteReview = () => {
-    // Scroll to the review widget
-    const reviewSection = document.getElementById('klaviyo-reviews-all');
+    const reviewSection = document.getElementById('reviews-section');
     if (reviewSection) {
       reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // If the widget is loaded, we can try to trigger its internal form button
-      const writeButton = reviewSection.querySelector('button') as HTMLElement;
-      if (writeButton) writeButton.click();
+      
+      // Try to find the widget after scrolling
+      setTimeout(() => {
+        const widgetContainer = document.getElementById('klaviyo-reviews-all');
+        if (widgetContainer) {
+          const internalButton = widgetContainer.querySelector('button') as HTMLElement;
+          if (internalButton) {
+            internalButton.click();
+          } else {
+            // Fallback: Dispatch event that Klaviyo sometimes listens to
+            window.dispatchEvent(new CustomEvent('klaviyo-reviews-open-form'));
+          }
+        }
+      }, 500);
+    }
+  };
+
+  const handleNotifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNotifyStatus('loading');
+    
+    try {
+      // Reusing the newsletter subscription route for notification
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: notifyEmail,
+          tags: [`Restock: ${product.title} - ${activeVariant.title}`] // Tagging for context
+        })
+      });
+
+      if (response.ok) {
+        setNotifyStatus('success');
+        setTimeout(() => {
+          setIsNotifyModalOpen(false);
+          setNotifyStatus('idle');
+          setNotifyEmail('');
+        }, 2000);
+      } else {
+        setNotifyStatus('error');
+      }
+    } catch (error) {
+      console.error("Notification subscription failed", error);
+      setNotifyStatus('error');
     }
   };
 
   const handleAddToCart = () => {
+    if (activeVariant?.quantityAvailable < 1) {
+        // Prevent adding to cart if completely out of stock, though the button should handle UI
+        return;
+    }
     addToCart({ 
       id: activeVariant?.id || product.id, 
       title: product.title, 
@@ -126,15 +169,14 @@ export default function UnifiedProductPage({ product }: { product: any }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          variantId: activeVariant.id, // Corrected field name
+          variantId: activeVariant.id, 
           quantity: quantity
         })
       });
       
       const data = await response.json();
       
-      // Updated to match the key "url" returned by your API
-      if (response.ok &&data.url) {
+      if (response.ok && data.url) {
         window.location.href = data.url;
       } else {
         console.error("Checkout Redirect Error:", data.error || "Unknown Error");
@@ -153,24 +195,21 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
     if (variantMatch) {
       setActiveVariant(variantMatch);
-      // 3. Update the main image if the variant has a specific one assigned
       if (variantMatch.image) {
         setSelectedImage(variantMatch.image);
       }
     }
   };
 
-  // Extract unique images from variants, filter out nulls, and limit to 6
-const variantThumbnails = useMemo(() => {
-  const images = product.variants
-    ?.map((v: any) => v.image)
-    .filter((img: string | null): img is string => !!img) || [];
-  
-  // If no variant images exist, fallback to the general product images
-  const baseImages = images.length > 0 ? images : (product.images || []);
-  
-  return baseImages.slice(0, 6);
-}, [product.variants, product.images]);
+  const variantThumbnails = useMemo(() => {
+    const images = product.variants
+      ?.map((v: any) => v.image)
+      .filter((img: string | null): img is string => !!img) || [];
+    
+    const baseImages = images.length > 0 ? images : (product.images || []);
+    
+    return baseImages.slice(0, 6);
+  }, [product.variants, product.images]);
 
   const availableMaterials = useMemo(() => {
     return materialOptions.filter(option => 
@@ -179,42 +218,39 @@ const variantThumbnails = useMemo(() => {
       )
     );
   }, [product.variants]);
+
   const chainOptions = useMemo(() => {
     const options = new Set<string>();
-    
     product.variants?.forEach((variant: any) => {
-      // Check if "Chain Type" exists in the variant's options
       const chainValue = variant.selectedOptions?.["Chain Type"];
       if (chainValue) {
         options.add(chainValue);
       }
     });
-
     return Array.from(options);
   }, [product.variants]);
 
-// Determine if we should show the box at all
-const hasChainOptions = chainOptions.length > 0;
-const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
+  const hasChainOptions = chainOptions.length > 0;
+  const [selectedChain, setSelectedChain] = useState(chainOptions[0]);
 
-const specificSections = [
-  { 
-    title: 'Description', 
-    content: product.descriptionHtml || product.description 
-  },
-  { 
-    title: 'How to use', 
-    content: product.howToUse || "Follow your intuition or use during meditation to connect with the crystal's energy." 
-  },
-  { 
-    title: 'Product Details', 
-    content: product.productDetails || "Ethically sourced natural crystal jewelry." 
-  },
-  { 
-    title: 'Care Instructions', 
-    content: product.careInstructions || "Handle gently and cleanse regularly with sage, moonlight, or sound." 
-  }
-];
+  const specificSections = [
+    { 
+      title: 'Description', 
+      content: product.descriptionHtml || product.description 
+    },
+    { 
+      title: 'How to use', 
+      content: product.howToUse || "Follow your intuition or use during meditation to connect with the crystal's energy." 
+    },
+    { 
+      title: 'Product Details', 
+      content: product.productDetails || "Ethically sourced natural crystal jewelry." 
+    },
+    { 
+      title: 'Care Instructions', 
+      content: product.careInstructions || "Handle gently and cleanse regularly with sage, moonlight, or sound." 
+    }
+  ];
 
   useEffect(() => {
     async function fetchRecommended() {
@@ -236,15 +272,12 @@ const specificSections = [
     fetchRecommended();
   }, [product.id]);
 
-  // Fetch reviews from Klaviyo
   useEffect(() => {
     async function fetchReviews() {
       try {
         if (!numericProductId) return;
-        
         const response = await fetch(`/api/reviews/fetch?productId=${numericProductId}`);
         const data = await response.json();
-        
         if (data.reviews) {
           setReviews(data.reviews);
         }
@@ -269,11 +302,9 @@ const specificSections = [
     }
   }, [selectedMaterial, selectedChain, product.variants]);
 
-  // ADD: Manual render trigger for Klaviyo (Essential for Next.js)
   useEffect(() => {
     if (!numericProductId) return;
-  const checkForKlaviyoData = () => {
-      // Access the internal data Klaviyo has fetched
+    const checkForKlaviyoData = () => {
       const reviewsInstance = (window as any).KlaviyoReviews;
       if (reviewsInstance && reviewsInstance.getReviews) {
         const data = reviewsInstance.getReviews(numericProductId);
@@ -284,32 +315,11 @@ const specificSections = [
       }
       return false;
     };
-
-    // Poll for the data since it loads asynchronously
     const interval = setInterval(() => {
       if (checkForKlaviyoData()) clearInterval(interval);
     }, 500);
-
     return () => clearInterval(interval);
   }, [numericProductId]);
-
-  // Prepared variables for the widget
-  const absoluteProductUrl = useMemo(() => 
-    `${typeof window !== 'undefined' ? window.location.origin : ''}/product/${product.handle}`, 
-    [product.handle]
-  );
-
-  const absoluteImageUrl = useMemo(() => {
-    const img = selectedImage || product.image || '/assets/images/necklace-img.png';
-    return img.startsWith('http') ? img : `${typeof window !== 'undefined' ? window.location.origin : ''}${img}`;
-  }, [selectedImage, product.image]);
-
-  const safeDescription = useMemo(() => 
-    (product.description || product.title || "")
-      .replace(/<[^>]*>?/gm, '') // Strip HTML tags
-      .substring(0, 250),
-    [product.description, product.title]
-  );
 
   const reviewStats = useMemo(() => {
     if (!reviews || reviews.length === 0) {
@@ -320,11 +330,9 @@ const specificSections = [
         percentages: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
       };
     }
-
     const total = reviews.length;
     const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
     let sum = 0;
-
     reviews.forEach((r: any) => {
       const rating = Math.round(r.rating) as keyof typeof distribution;
       if (distribution[rating] !== undefined) {
@@ -332,7 +340,6 @@ const specificSections = [
         sum += r.rating;
       }
     });
-
     const average = sum / total;
     const percentages = {
       5: (distribution[5] / total) * 100,
@@ -341,9 +348,11 @@ const specificSections = [
       2: (distribution[2] / total) * 100,
       1: (distribution[1] / total) * 100,
     };
-
     return { average, total, distribution, percentages };
   }, [reviews]);
+
+  // Determine stock status based on user preference (< 5)
+  const isOutOfStock = (activeVariant?.quantityAvailable ?? 0) < 3;
 
   return (
     <>
@@ -359,10 +368,69 @@ const specificSections = [
           </p>
         </div>
       )}
+
+      {/* Notify Me Modal */}
+      <AnimatePresence>
+        {isNotifyModalOpen && (
+          <div className="fixed inset-0 z-[300] flex items-center justify-center px-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsNotifyModalOpen(false)}
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-[#F6D8AB] text-[#280F0B] p-8 rounded-lg shadow-2xl w-full max-w-md border border-[#280F0B]"
+            >
+              <button 
+                onClick={() => setIsNotifyModalOpen(false)}
+                className="absolute top-4 right-4 text-2xl leading-none hover:opacity-70"
+              >
+                &times;
+              </button>
+              
+              <h3 className="text-2xl font-lora font-bold mb-2">Back in Stock?</h3>
+              <p className="mb-6 opacity-80 text-sm">
+                Get notified via email when <strong>{activeVariant?.title}</strong> is back in stock.
+              </p>
+
+              {notifyStatus === 'success' ? (
+                <div className="bg-green-100 border border-green-500 text-green-800 p-4 rounded text-center">
+                  <p className="font-bold">You're on the list!</p>
+                  <p className="text-sm">We'll email you as soon as it arrives.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleNotifySubmit} className="flex flex-col gap-4">
+                  <input 
+                    type="email" 
+                    required 
+                    placeholder="Enter your email" 
+                    value={notifyEmail}
+                    onChange={(e) => setNotifyEmail(e.target.value)}
+                    className="p-3 bg-transparent border border-[#280F0B] rounded outline-none focus:ring-1 focus:ring-[#280F0B] placeholder-[#280F0B]/50"
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={notifyStatus === 'loading'}
+                    className="bg-[#280F0B] text-[#F6D8AB] py-3 rounded font-bold uppercase tracking-wider hover:opacity-90 disabled:opacity-50"
+                  >
+                    {notifyStatus === 'loading' ? 'Subscribing...' : 'Notify Me'}
+                  </button>
+                  {notifyStatus === 'error' && <p className="text-red-600 text-xs text-center">Something went wrong. Please try again.</p>}
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <Header />
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
         
-        {/* SECTION 1 – PRODUCT INFO */}
         <section className="px-6 pt-6 lg:pt-12 lg:px-12 xl:px-24 2xl:px-32 max-w-[1920px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
             
@@ -409,7 +477,7 @@ const specificSections = [
               <button onClick={() => { setOpenAccordion('Description'); setTimeout(() => descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); }} className="uppercase text-[12px] font-bold text-[#7F3E2F] mb-4 text-left bg-transparent border-none p-0">Learn more</button>
               <div className="text-xl lg:text-2xl font-semibold mb-4 lg:mb-6">${(activeVariant?.price || product.price).toFixed(2)} AUD <span className="text-sm font-normal opacity-70">incl. tax</span></div>
 
-              {/* 1. BRACELET STYLE (e.g., for Ying Yang Bracelet) */}
+              {/* 1. BRACELET STYLE */}
               {product.variants?.some((v: any) => v.selectedOptions?.["Bracelet Style"]) && (
                 <div className="border-[1.25px] border-[#280F0B] p-3 lg:p-2 lg:px-4 mb-4 lg:mb-6">
                   <p className="text-sm font-semibold uppercase tracking-widest mb-3">Bracelet Style</p>
@@ -435,6 +503,27 @@ const specificSections = [
                         );
                       })}
                   </div>
+                </div>
+              )}
+
+              {/* OUT OF STOCK BAR (Shows if quantity < 3) */}
+              {isOutOfStock && (
+                <div className="border border-[#280F0B] flex items-center justify-between px-4 py-3 mb-6 w-full bg-white/20">
+                  <span className="font-bold text-[#280F0B] uppercase tracking-wider text-sm">
+                    OUT OF STOCK
+                  </span>
+                  
+                  <button 
+                    onClick={() => setIsNotifyModalOpen(true)}
+                    className="flex items-center gap-2 bg-[#280F0B] text-[#F6D8AB] px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wide hover:bg-black transition-colors"
+                  >
+                    {/* Bell Icon */}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Notify
+                  </button>
                 </div>
               )}
 
@@ -494,31 +583,39 @@ const specificSections = [
             )} 
 
               <div className="w-full">
-                <div className="flex items-center w-fit border border-b-0 border-[#280F0B]">
-                  <button className="px-4 py-2" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                  <span className="w-12 text-center text-sm font-bold">{quantity}</span>
-                  <button className="px-4 py-2" onClick={() => setQuantity(q => q + 1)}>+</button>
-                </div>
+                {/* ONLY SHOW QUANTITY SELECTOR IF IN STOCK */}
+                {!isOutOfStock && (
+                  <div className="flex items-center w-fit border border-b-0 border-[#280F0B]">
+                    <button className="px-4 py-2" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                    <span className="w-12 text-center text-sm font-bold">{quantity}</span>
+                    <button className="px-4 py-2" onClick={() => setQuantity(q => q + 1)}>+</button>
+                  </div>
+                )}
+
                 <button 
                   onClick={handleAddToCart}
-                  className="w-full bg-[#280F0B] text-white py-4 uppercase font-semibold tracking-wide mb-3"
+                  disabled={isOutOfStock}
+                  className={`w-full text-white py-4 uppercase font-semibold tracking-wide mb-3 ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#280F0B]'}`}
                 >
-                  Add to cart
+                  {isOutOfStock ? 'Out of Stock' : 'Add to cart'}
                 </button>
-                <button 
-                  onClick={handleShopPay}
-                  className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3 flex items-center justify-center gap-1 transition-all hover:brightness-110 active:scale-[0.98]"
-                >
-                  Buy with 
-                  <div className="relative w-[54px] h-[18px]"> {/* Adjust width/height to match your SVG aspect ratio */}
-                    <Image 
-                      src="/assets/images/shop.svg" 
-                      alt="Shop" 
-                      fill 
-                      className="object-contain brightness-0 invert" // Ensures the logo is white to match the text
-                    />
-                  </div>
-                </button>
+                
+                {!isOutOfStock && (
+                  <button 
+                    onClick={handleShopPay}
+                    className="w-full bg-[#4A2CF0] text-white py-4 font-bold mb-3 flex items-center justify-center gap-1 transition-all hover:brightness-110 active:scale-[0.98]"
+                  >
+                    Buy with 
+                    <div className="relative w-[54px] h-[18px]"> 
+                      <Image 
+                        src="/assets/images/shop.svg" 
+                        alt="Shop" 
+                        fill 
+                        className="object-contain brightness-0 invert" 
+                      />
+                    </div>
+                  </button>
+                )}
               </div>
              <div className="flex items-center gap-1 mt-2 ">
               <Image 
@@ -537,8 +634,6 @@ const specificSections = [
               <div className="mt-8">
                 {specificSections.map((section) => {
                   const isOpen = openAccordion === section.title;
-                  
-                  // Check if content looks like HTML (has tags) or is plain text
                   const isHtml = typeof section.content === 'string' && section.content.includes('<');
 
                   return (
@@ -577,7 +672,7 @@ const specificSections = [
           </div>
         </section>
 
-        {/* SECTION 2 – SPIRITUALITY BANNER */}
+        {/* ... (Banner Section remains the same) ... */}
         <section className="mt-16 bg-gradient-to-b from-[#2A0F0A] to-[#1A0705]">
           <div className="w-full h-[35px] bg-[#C38154]" />
           <div className="px-6 lg:px-12 xl:px-24 2xl:px-32 max-w-[1920px] mx-auto">
@@ -597,7 +692,6 @@ const specificSections = [
               <h2 className="text-[28px] lg:text-[40px] font-bold mb-6">Customer Reviews</h2>
               <div className="flex items-center gap-6 mb-8">
                 <span className="text-[48px] lg:text-[64px] font-bold">
-                  {/* Use the calculated average */}
                   {reviewStats.average > 0 ? reviewStats.average.toFixed(1) : "0.0"}
                 </span>
                 <div>
@@ -609,7 +703,6 @@ const specificSections = [
                 </div>
               </div>
               
-              {/* Visual Rating Breakdown - NOW FUNCTIONAL */}
               <div className="space-y-2 max-w-[820px]">
                 {[5, 4, 3, 2, 1].map((star) => (
                   <div key={star} className="flex items-center gap-3">
@@ -620,7 +713,6 @@ const specificSections = [
                       <div 
                         className="h-full bg-[#F5B301] transition-all duration-500" 
                         style={{ 
-                          // Use the calculated percentage for this specific star level
                           width: `${reviewStats.percentages[star as keyof typeof reviewStats.percentages]}%` 
                         }} 
                       />
@@ -640,20 +732,7 @@ const specificSections = [
               
               {/* Functional Write Review Button */}
               <button 
-                onClick={() => {
-                  const widgetContainer = document.getElementById('klaviyo-reviews-all');
-                  
-                  if (widgetContainer) {
-                    const internalButton = widgetContainer.querySelector('button') as HTMLElement;
-                    
-                    if (internalButton) {
-                      internalButton.click();
-                    } else {
-                      window.dispatchEvent(new CustomEvent('klaviyo-reviews-open-form'));
-                      widgetContainer.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }
-                }}
+                onClick={handleWriteReview}
                 className="w-full max-w-[820px] h-[51px] bg-[#7A3E2E] text-white uppercase font-semibold flex items-center justify-center gap-3 hover:bg-[#280F0B] transition-all"
               >
                 <Image src="/assets/images/write.svg" alt="write" width={20} height={20} />
@@ -669,7 +748,6 @@ const specificSections = [
               
               <div className="space-y-6">
                 {reviews.slice(0, 6).map((review: any, index: number) => (
-                  /* Container with Muddy Yellow Background */
                   <div key={index} className="bg-[#FFC26F] p-6 lg:p-8 rounded-sm shadow-sm border border-[#280F0B05]">
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -693,7 +771,6 @@ const specificSections = [
                       {review.content || review.body}
                     </p>
 
-                    {/* Review Media */}
                     {review.images && review.images.length > 0 && (
                       <div className="flex gap-3 mt-4">
                         {review.images.map((img: any, i: number) => (
@@ -709,11 +786,11 @@ const specificSections = [
             </div>
           )}
 
-          {/* Hidden Klaviyo standard widget (Keep this for the script to hook into) */}
+          {/* Hidden Klaviyo standard widget */}
           <div id="klaviyo-reviews-all" className="hidden" data-id={numericProductId} />
         </section>
 
-        {/* SECTION 4 – RECOMMENDED FOR YOU (Dynamic Backend Data) */}
+        {/* SECTION 4 – RECOMMENDED FOR YOU */}
         <section className="pb-24 pt-4 px-6 lg:px-12 xl:px-24 max-w-[2500px] mx-auto">
           <h2 className="text-2xl lg:text-[32px] font-bold mb-10 text-[#280F0B]">
             Recommended for you
@@ -743,12 +820,10 @@ const specificSections = [
                   </Link>
 
                   <div className="relative h-8 overflow-hidden group/btn flex items-center justify-between">
-                    {/* Price - Standard on mobile, moves UP and fades on desktop hover */}
                     <p className="text-[#280F0B] text-[13px] opacity-70 font-medium transition-all duration-300 transform translate-y-0 lg:group-hover:translate-y-[-100%] lg:group-hover:opacity-0 flex items-center h-full">
                       ${p.price.toFixed(2)} AUD
                     </p>
 
-                    {/* MOBILE BUTTON: Visible only on small/medium screens, hidden on desktop */}
                     <button 
                       onClick={() => {
                         addToCart({ 
@@ -765,7 +840,6 @@ const specificSections = [
                       + Add to Cart
                     </button>
 
-                    {/* DESKTOP BUTTON: Hover animation, hidden on mobile */}
                     <button 
                       onClick={() => {
                         addToCart({ 
@@ -788,7 +862,6 @@ const specificSections = [
           )}
         </section>
 
-      {/* 4. The Cart Drawer Component */}
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       </main>
     </>

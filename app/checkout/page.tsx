@@ -5,6 +5,8 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
+import { ChevronDown, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Sample Data for Country-State logic
 const COUNTRY_DATA: Record<string, string[]> = {
@@ -27,7 +29,22 @@ type FormErrors = {
 };
 
 export default function CheckoutPage() {
-  const { cartItems, cartId, getTotalItems, applyCoupon, removeCoupon, appliedCoupon, discountAmount } = useCart();
+  const { 
+    cartItems, 
+    cartId, 
+    getTotalItems, 
+    applyCoupon, 
+    removeCoupon, 
+    appliedCoupon, 
+    discountAmount,
+    // New Context Values
+    shippingMethod,
+    setShippingMethod,
+    shippingCost,
+    subtotal,
+    finalTotal,
+    freeShippingThreshold
+  } = useCart();
   
   // States
   const [isHydrated, setIsHydrated] = useState(false);
@@ -35,15 +52,10 @@ export default function CheckoutPage() {
   const [countrySearch, setCountrySearch] = useState('');
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [shippingDropdownOpen, setShippingDropdownOpen] = useState(false);
   
   // Error state for validation
   const [errors, setErrors] = useState<FormErrors>({});
-  
-  const [checkoutData, setCheckoutData] = useState<{
-    totalPrice: {
-      amount: string;
-    };
-  } | null>(null);
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -58,6 +70,10 @@ export default function CheckoutPage() {
     state: '',
     orderNotes: ''
   });
+
+  // Progress Bar Calculation
+  const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const progressPercent = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -127,10 +143,11 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
+      // NOTE: Ensure your API handles shippingMethod if needed
       const response = await fetch('/api/shopify/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cartId, customerDetails: formData }),
+        body: JSON.stringify({ cartId, customerDetails: formData, shippingMethod }), 
       });
 
       const data = await response.json();
@@ -152,12 +169,6 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [couponMessage, setCouponMessage] = useState({ text: '', type: '' });
-  const subtotal = useMemo(() => 
-    cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
-  , [cartItems]);
-  
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax - discountAmount;
 
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
@@ -338,7 +349,6 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div className="relative">
-                    {/* The select box now mimics the exact padding and border of your input fields */}
                     <select 
                       value={formData.state} 
                       onChange={(e) => { 
@@ -350,7 +360,7 @@ export default function CheckoutPage() {
                           ? 'border-red-600 text-red-600' 
                           : 'border-[#280F0B66] text-[#280F0B80] focus:border-[#280F0B]'
                         } 
-                        ${!formData.state ? 'text-[#280F0B80]' : 'text-[#280F0B]'} `} // Mimics placeholder color when empty
+                        ${!formData.state ? 'text-[#280F0B80]' : 'text-[#280F0B]'} `} 
                     >
                       <option value="" disabled>Select State/Province</option>
                       {COUNTRY_DATA[formData.country]?.map(state => (
@@ -360,7 +370,6 @@ export default function CheckoutPage() {
                       ))}
                     </select>
 
-                    {/* Custom dropdown icon positioned at the right corner */}
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                       <svg 
                         className={`w-4 h-4 transition-transform ${errors.state ? 'text-red-600' : 'text-[#280F0B]'}`} 
@@ -390,14 +399,13 @@ export default function CheckoutPage() {
           <div className="relative w-full max-w-[526px] mx-auto lg:mx-0 order-2">
             <div className="bg-[#FFC26F] rounded-[20px] overflow-hidden relative flex flex-col shadow-sm">
               
-              {/* Price Breakdown Section */}
+              {/* 1. Cost Breakdown Section */}
               <div className="p-6 lg:p-10 flex flex-col gap-4">
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Subtotal</span>
                   <span className="font-semibold text-base lg:text-lg">${subtotal.toFixed(2)}</span>
                 </div>
 
-                {/* Persistent Discount Row from Context */}
                 {discountAmount > 0 && (
                   <div className="flex justify-between items-center text-[#280F0B] ">
                     <span className="text-base lg:text-lg tracking-tight">Discount Applied</span>
@@ -405,93 +413,140 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between items-center text-[#280f0b]">
-                  <span className="text-base lg:text-lg">Tax</span>
-                  <span className="font-semibold text-base lg:text-lg">${tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center text-[#280f0b]">
-                  <span className="text-base lg:text-lg">Shipping</span>
-                  <span className="font-semibold text-base lg:text-lg text-[#280f0b]">FREE</span>
+                {/* Interactive Shipping Selector */}
+                <div className="flex justify-between items-center relative z-20">
+                  <span className="text-base lg:text-lg text-[#280f0b]">Shipping</span>
+
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShippingDropdownOpen(!shippingDropdownOpen)}
+                      className="flex items-center gap-3 bg-[#f6d8ab] border border-[#280f0b]/10 rounded-lg px-4 py-3 text-sm font-bold text-[#280f0b] hover:bg-[#ffe3b9] transition-colors shadow-sm min-w-[200px] justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="relative w-5 h-5 shrink-0">
+                          <Image src="/assets/images/truck.svg" alt="Shipping" fill className="object-contain" />
+                        </div>
+                        <span>{shippingMethod === 'standard' ? 'Standard' : 'Express'} - ${shippingCost.toFixed(2)}</span>
+                      </div>
+                      <ChevronDown size={16} className={`transition-transform ${shippingDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {shippingDropdownOpen && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -5 }}
+                          className="absolute right-0 top-full mt-2 w-64 bg-[#f6d8ab] text-[#280f0b] rounded-lg shadow-xl overflow-hidden z-50 border border-[#280f0b]/10"
+                        >
+                          <div 
+                            onClick={() => { setShippingMethod('standard'); setShippingDropdownOpen(false); }}
+                            className={`p-4 cursor-pointer hover:bg-black/5 flex items-center justify-between ${shippingMethod === 'standard' ? 'bg-black/5' : ''}`}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-bold">Standard</span>
+                              <span className="text-xs opacity-70">7-14 Business Days</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {subtotal >= freeShippingThreshold ? <span className="font-bold text-green-700">FREE</span> : <span className="font-bold">$9.00</span>}
+                              {shippingMethod === 'standard' && <Check size={16} />}
+                            </div>
+                          </div>
+                          <div 
+                            onClick={() => { setShippingMethod('express'); setShippingDropdownOpen(false); }}
+                            className={`p-4 cursor-pointer hover:bg-black/5 flex items-center justify-between ${shippingMethod === 'express' ? 'bg-black/5' : ''}`}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-bold">Express</span>
+                              <span className="text-xs opacity-70 text-red-700 font-semibold">1-2 Days</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">$15.00</span>
+                              {shippingMethod === 'express' && <Check size={16} />}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
 
-              {/* Coupon Section with rounded cutouts */}
-              <div className="relative">
-                <div className="w-full border-t border-dashed border-black/40" />
+              {/* 2. Free Shipping Progress - Left Aligned */}
+              <div className="px-6 lg:px-10 pb-6">
+                <p className="text-xs text-[#280f0b] text-left mb-2 font-bold tracking-wide">
+                  {amountToFreeShipping > 0 
+                    ? `$${amountToFreeShipping.toFixed(2)} away from free shipping!` 
+                    : "You've unlocked FREE shipping!"}
+                </p>
+                <div className="w-full h-2 bg-[#280f0b]/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    className="h-full bg-[#7F3E2F]"
+                  />
+                </div>
+              </div>
+
+              {/* 3. Divider with Cutouts - Positioned correctly above coupon section */}
+              <div className="relative w-full">
+                <div className="border-t border-dashed border-[#280f0b]/30 w-full" />
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
-
-                <div className="px-6 lg:px-10 py-6">
-                  {/* Conditional Rendering: Input vs Applied State */}
-                  {!appliedCoupon ? (
-                    <>
-                      <button 
-                        onClick={() => setCouponExpanded(!couponExpanded)} 
-                        className="flex items-center gap-4 w-full group outline-none"
-                      >
-                        <div className="size-6 relative shrink-0">
-                          <Image src="/assets/images/coupon.svg" alt="Coupon" fill className="object-contain" />
-                        </div>
-                        <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">
-                          Have a coupon code?
-                        </span>
-                        <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="#280f0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </button>
-                      
-                      <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-32 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <div className="flex gap-2">
-                          <input 
-                            type="text" 
-                            value={couponCode}
-                            onChange={(e) => setCouponCode(e.target.value)}
-                            placeholder="Enter code" 
-                            className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/50 outline-none focus:border-[#280f0b]" 
-                          />
-                          <button 
-                            onClick={handleApplyCoupon}
-                            disabled={isApplying}
-                            className="bg-[#280F0B] text-[#F6D8AB] px-6 rounded text-xs font-bold uppercase hover:bg-black transition-colors disabled:opacity-50"
-                          >
-                            {isApplying ? '...' : 'Apply'}
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    /* Applied Coupon View matching Cart Page */
-                    <div className="flex justify-between items-center py-2">
-                      <div className="flex items-center gap-3">
-                        <Image src="/assets/images/coupon.svg" alt="Coupon" width={20} height={20} className="object-contain" />
-                        <p className="text-[12px] font-bold text-[#280F0B] tracking-wider">
-                          CODE: {appliedCoupon} APPLIED
-                        </p>
-                      </div>
-                      <button 
-                        onClick={removeCoupon} 
-                        className="text-[11px] underline font-bold uppercase text-[#280f0b] hover:text-red-700 transition-colors"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Status Message styling from Cart Page */}
-                  {couponMessage.text && (
-                    <p className={`mt-3 text-[11px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-green-800'}`}>
-                      {couponMessage.text}
-                    </p>
-                  )}
-                </div>
-                <div className="w-full border-b border-dashed border-black/40" />
               </div>
+
+              {/* 4. Coupon Code Section */}
+              <div className="px-6 lg:px-10 py-6">
+                {!appliedCoupon ? (
+                  <>
+                    <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group outline-none">
+                      <div className="size-6 relative shrink-0">
+                        <Image src="/assets/images/coupon.svg" alt="Coupon" fill className="object-contain" />
+                      </div>
+                      <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">Have a coupon code?</span>
+                      <ChevronDown className={`ml-auto transition-transform ${couponExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+                    <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-32 mt-4' : 'max-h-0'}`}>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          placeholder="Enter code" 
+                          className="flex-1 bg-white/40 border border-[#280f0b]/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/50 outline-none focus:border-[#280f0b]" 
+                        />
+                        <button 
+                          onClick={handleApplyCoupon}
+                          disabled={isApplying}
+                          className="bg-[#280F0B] text-[#F6D8AB] px-4 rounded text-xs font-bold uppercase hover:bg-black disabled:opacity-50"
+                        >
+                          {isApplying ? '...' : 'Apply'}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between items-center py-2 bg-[#280F0B]/5 p-3 rounded border border-[#280F0B]/10">
+                    <div className="flex items-center gap-3">
+                      <Image src="/assets/images/coupon.svg" alt="Coupon" width={20} height={20} className="object-contain" />
+                      <p className="text-[12px] font-bold text-[#280F0B] tracking-wider">CODE: {appliedCoupon} APPLIED</p>
+                    </div>
+                    <button onClick={removeCoupon} className="text-[11px] underline font-bold uppercase hover:text-red-700">Remove</button>
+                  </div>
+                )}
+                {couponMessage.text && (
+                  <p className={`mt-3 text-[11px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-green-800'}`}>
+                    {couponMessage.text}
+                  </p>
+                )}
+              </div>
+              <div className="w-full border-b border-dashed border-[#280f0b]/30" />
 
               {/* Final Total Section */}
               <div className="p-6 lg:p-10 flex flex-col">
                 <div className="flex justify-between items-center mb-10 text-[#280f0b]">
                   <span className="text-2xl font-bold">Total</span>
-                  <span className="text-2xl font-bold">${total.toFixed(2)} AUD</span>
+                  <span className="text-2xl font-bold">${finalTotal.toFixed(2)} AUD</span>
                 </div>
 
                 <button 

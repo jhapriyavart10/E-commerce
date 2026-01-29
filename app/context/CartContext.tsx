@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
 
 /* ---------------- TYPES ---------------- */
 export interface CartItem {
@@ -11,6 +11,9 @@ export interface CartItem {
   quantity: number;
   image: string;
 }
+
+// 1. Add Shipping Types
+export type ShippingMethod = 'standard' | 'express';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -25,11 +28,19 @@ interface CartContextType {
   clearCart: () => void;
   getTotalItems: () => number;
   
-  // New Coupon States & Methods
+  // Coupon States
   appliedCoupon: string | null;
   discountAmount: number;
   applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
+
+  // 2. New Shipping & Total States
+  shippingMethod: ShippingMethod;
+  setShippingMethod: (method: ShippingMethod) => void;
+  shippingCost: number;
+  finalTotal: number;
+  subtotal: number;
+  freeShippingThreshold: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -45,7 +56,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
 
-  // 1. HYDRATION (Pulling from LocalStorage)
+  // 3. Shipping State
+  const [shippingMethod, setShippingMethod] = useState<ShippingMethod>('standard');
+  const FREE_SHIPPING_THRESHOLD = 99;
+
+  // HYDRATION
   useEffect(() => {
     const savedCartId = localStorage.getItem('shopify_cart_id');
     const savedItems = localStorage.getItem('local_cart_items');
@@ -66,7 +81,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsPageLoading(false);
   }, []);
 
-  // 2. PERSISTENCE (Auto-save items)
+  // PERSISTENCE
   useEffect(() => {
     localStorage.setItem('local_cart_items', JSON.stringify(cartItems));
   }, [cartItems]);
@@ -96,7 +111,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 3. COUPON METHODS
   const applyCoupon = async (code: string) => {
     if (!cartId) return { success: false, message: 'Cart not initialized' };
     
@@ -108,10 +122,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const result = await res.json();
 
       if (result.success) {
-        // Calculate savings based on current subtotal + 10% tax
+        // Calculate savings based on current subtotal (tax is already included in prices)
         const subtotal = cartItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
-        const tax = subtotal * 0.1;
-        const savings = (subtotal + tax) - Number(result.newTotal);
+        // Tax calculation removed here
+        const savings = subtotal - Number(result.newTotal);
 
         setAppliedCoupon(code);
         setDiscountAmount(savings);
@@ -152,6 +166,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getTotalItems = () => cartItems.reduce((total, item) => total + item.quantity, 0);
 
+  // 4. Calculate Financials
+  const subtotal = useMemo(() => cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0), [cartItems]);
+  
+  const shippingCost = useMemo(() => {
+    if (shippingMethod === 'standard') {
+      return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 9;
+    }
+    return 15; // Express
+  }, [shippingMethod, subtotal]);
+
+  // Tax calculation removed. Final total is Subtotal + Shipping - Discount
+  const finalTotal = (subtotal + shippingCost) - discountAmount;
+
   return (
     <CartContext.Provider
       value={{
@@ -169,7 +196,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         appliedCoupon,
         discountAmount,
         applyCoupon,
-        removeCoupon
+        removeCoupon,
+        // New Values
+        shippingMethod,
+        setShippingMethod,
+        shippingCost,
+        subtotal,
+        finalTotal,
+        freeShippingThreshold: FREE_SHIPPING_THRESHOLD
       }}
     >
       {children}

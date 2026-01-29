@@ -1,14 +1,57 @@
 import { shopifyFetch } from '@/lib/shopify';
 
+const CartFragment = `
+  id
+  checkoutUrl
+  cost {
+    subtotalAmount { amount currencyCode }
+    totalTaxAmount { amount currencyCode }
+    totalAmount { amount currencyCode }
+  }
+  lines(first: 100) {
+    edges {
+      node {
+        id
+        quantity
+        merchandise {
+          ... on ProductVariant {
+            id
+            title
+            image { url altText }
+            price { amount currencyCode }
+            product { title }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const CartService = {
-  // Updated to accept arguments
+  async getCart(cartId: string) {
+    const query = `
+      query getCart($cartId: ID!) {
+        cart(id: $cartId) {
+          ${CartFragment}
+        }
+      }
+    `;
+    
+    const res = await shopifyFetch<any>({
+      query,
+      variables: { cartId },
+      cache: 'no-store'
+    });
+
+    return res.body?.cart;
+  },
+
   async createCart(variantId: string, quantity: number) {
     const mutation = `
       mutation cartCreate($input: CartInput) {
         cartCreate(input: $input) {
           cart {
-            id
-            checkoutUrl
+            ${CartFragment}
           }
         }
       }
@@ -38,8 +81,7 @@ export const CartService = {
       mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
         cartLinesAdd(cartId: $cartId, lines: $lines) {
           cart {
-            id
-            checkoutUrl
+            ${CartFragment}
           }
         }
       }

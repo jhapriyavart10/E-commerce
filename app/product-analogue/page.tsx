@@ -26,14 +26,44 @@ type Filters = {
   material: string[];
 };
 
+// 1. Define the Quick Link Data
+const QUICK_LINKS = [
+  { 
+    title: 'For Her', 
+    image: '/assets/images/For Her.png', 
+    filterType: 'gender', 
+    filterValue: 'For Her' 
+  },
+  { 
+    title: 'For Him', 
+    image: '/assets/images/For Him.png', 
+    filterType: 'gender', 
+    filterValue: 'For Him' 
+  },
+  { 
+    title: 'Charms', 
+    image: '/assets/images/Charms.png', 
+    filterType: 'category', 
+    filterValue: 'Charms & Pendants' 
+  },
+  { 
+    title: 'Bracelets', 
+    image: '/assets/images/Bracelets.png', 
+    filterType: 'category', 
+    filterValue: 'Bracelets' 
+  }
+];
+
 export default function ShopPage() {
   const { addToCart } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
   const [sortBy, setBy] = useState<string>('Default Sorting');
   
+  // 2. Add State for Dynamic Header
+  const [pageTitle, setPageTitle] = useState('All Products');
+
   const [filters, setFilters] = useState<Filters>({
     price: { min: 0, max: 150 },
     category: [],
@@ -43,7 +73,6 @@ export default function ShopPage() {
 
   const [openSections, setOpenSections] = useState({ category: true, gender: true, material: true });
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
@@ -53,7 +82,6 @@ export default function ShopPage() {
         const data = await res.json();
         if (data && Array.isArray(data)) {
           setAllProducts(data);
-          setQuantities(Object.fromEntries(data.map((p: Product) => [p.id, 1])));
         } else {
           setApiError(data.error || "Failed to load products.");
           setAllProducts([]); 
@@ -83,7 +111,23 @@ export default function ShopPage() {
   const toggleFilter = (key: keyof Filters, value: string) => {
     setFilters((prev) => {
       const list = prev[key] as string[];
+      // If manually toggling, we might want to reset the "Page Title" to generic if it gets complex, 
+      // but strictly adhering to the prompt, we just toggle the filter.
       return { ...prev, [key]: list.includes(value) ? list.filter((v) => v !== value) : [...list, value] };
+    });
+  };
+
+  // 3. Handle Quick Link Click
+  const handleQuickLink = (item: typeof QUICK_LINKS[0]) => {
+    setPageTitle(item.title); // Update Header
+    
+    // Reset other filters and apply the selected one
+    setFilters({
+      price: { min: 0, max: 150 },
+      category: [],
+      gender: [],
+      material: [],
+      [item.filterType]: [item.filterValue]
     });
   };
 
@@ -145,9 +189,6 @@ export default function ShopPage() {
         <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [1, 0, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute w-32 h-32">
           <img src="/assets/images/Logo.svg" alt="Loading" className="w-full h-full object-contain" />
         </motion.div>
-        <motion.div animate={{ scale: [1.2, 0.8, 1.2], opacity: [0, 1, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute w-24 h-24">
-          <img src="/assets/images/Logo.svg" alt="Loading" className="w-full h-full object-contain opacity-50" />
-        </motion.div>
       </div>
     </div>
   );
@@ -158,10 +199,36 @@ export default function ShopPage() {
       <div className="h-[80px] md:h-[150px] w-full bg-[#F6D8AB]" />
       
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
-        <div className="px-5 md:px-12 xl:px-24 2xl:px-32 py-10">
+        <div className="px-5 md:px-12 xl:px-24 2xl:px-32 pb-10 pt-4">
+          
+          {/* 4. New Image Quick Filters Section */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 w-full">
+            {QUICK_LINKS.map((link) => (
+              <motion.div
+                key={link.title}
+                onClick={() => handleQuickLink(link)}
+                className="relative cursor-pointer group"
+                whileHover={{ scale: 1.05 }} // Pop up animation
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              >
+                <div className="aspect-[17/15] relative overflow-hidden rounded-md border border-[#280F0B]/10 shadow-sm">
+                   <Image 
+                     src={link.image} 
+                     alt={link.title}
+                     fill
+                     className="object-contain"
+                   />
+                </div>
+                <p className="text-center mt-3 font-lora font-bold text-xl tracking-wide">{link.title}</p>
+              </motion.div>
+            ))}
+          </div>
+
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-1">
             <div />
-            <h1 className="font-lora text-[40px] leading-tight">All Products</h1>
+            {/* 5. Dynamic Header */}
+            <h1 className="font-lora text-[40px] leading-tight">{pageTitle}</h1>
           </div>
         
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-6">
@@ -181,10 +248,11 @@ export default function ShopPage() {
           <div className="flex flex-col lg:flex-row gap-10 items-start">
             <aside className="w-full lg:w-[260px]">
               <div className="lg:hidden flex flex-col mb-6">
-                <h1 className="font-lora text-[40px] leading-tight mb-1">All Products</h1>
+                <h1 className="font-lora text-[40px] leading-tight mb-1">{pageTitle}</h1>
                 <p className="text-xs opacity-70">Showing {filteredProducts.length} products</p>
               </div>
 
+              {/* ... (Rest of the Sidebar / Mobile Filters remains the same) ... */}
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button onClick={() => setShowMobileFilters(true)} className="flex items-center gap-2 text-[#280F0B] font-semibold">
                   <Image src="/assets/images/filter.svg" alt="" width={14} height={14} />
@@ -199,7 +267,6 @@ export default function ShopPage() {
                 </select>
               </div>
 
-              {/* MOBILE FILTER DRAWER WITH ANiMATE PRESENCE */}
               <AnimatePresence>
                 {(showMobileFilters) && (
                   <div className="fixed inset-0 z-[100] lg:hidden">
@@ -227,7 +294,6 @@ export default function ShopPage() {
                 )}
               </AnimatePresence>
 
-              {/* DESKTOP FILTERS (Always visible) */}
               <div className="hidden lg:block">
                 <FilterContent filters={filters} setFilters={setFilters} openSections={openSections} toggleSection={toggleSection} dynamicMaterials={dynamicMaterials} toggleFilter={toggleFilter} safeProducts={safeProducts} getCount={getCount} />
               </div>

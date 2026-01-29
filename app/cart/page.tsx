@@ -5,38 +5,59 @@ import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
 import Header from '@/components/Header';
 import Link from 'next/link';
+import { ChevronDown, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const svgPathsDesktop = {
-  p21b9db80: "M10.1569 12.7116L5.20694 17.6616C4.81647 18.0521 4.1834 18.0521 3.79294 17.6616C3.40247 17.2712 3.40247 16.6381 3.79294 16.2476L8.03594 12.0046L3.79294 7.76163C3.40247 7.37116 3.40247 6.73809 3.79294 6.34763C4.1834 5.95716 4.81647 5.95716 5.20694 6.34763L10.1569 11.2976C10.3444 11.4852 10.4497 11.7395 10.4497 12.0046C10.4497 12.2698 10.3444 12.5241 10.1569 12.7116Z",
-  pdaf5300: "M0.75 4.77297C0.335786 4.77297 0 5.10876 0 5.52297C0 5.93718 0.335786 6.27297 0.75 6.27297V5.52297V4.77297ZM17.2803 6.0533C17.5732 5.76041 17.5732 5.28553 17.2803 4.99264L12.5074 0.21967C12.2145 -0.0732234 11.7396 -0.0732234 11.4467 0.21967C11.1538 0.512563 11.1538 0.987437 11.4467 1.28033L15.6893 5.52297L11.4467 9.76561C11.1538 10.0585 11.1538 10.5334 11.4467 10.8263C11.7396 11.1192 12.2145 11.1192 12.5074 10.8263L17.2803 6.0533ZM0.75 5.52297V6.27297H16.75V5.52297V4.77297H0.75V5.52297Z",
   p1553ba00: "M8 7.25C7.58579 7.25 7.25 7.58579 7.25 8C7.25 8.41421 7.58579 8.75 8 8.75V8V7.25ZM25.5303 8.53033C25.8232 8.23744 25.8232 7.76256 25.5303 7.46967L20.7574 2.6967C20.4645 2.40381 19.9896 2.40381 19.6967 2.6967C19.4038 2.98959 19.4038 3.46447 19.6967 3.75736L23.9393 8L19.6967 12.2426C19.4038 12.5355 19.4038 13.0104 19.6967 13.3033C19.9896 13.5962 20.4645 13.5962 20.7574 13.3033L25.5303 8.53033ZM8 8V8.75H25V8V7.25H8V8Z",
+  pdaf5300: "M0.75 4.77297C0.335786 4.77297 0 5.10876 0 5.52297C0 5.93718 0.335786 6.27297 0.75 6.27297V5.52297V4.77297ZM17.2803 6.0533C17.5732 5.76041 17.5732 5.28553 17.2803 4.99264L12.5074 0.21967C12.2145 -0.0732234 11.7396 -0.0732234 11.4467 0.21967C11.1538 0.512563 11.1538 0.987437 11.4467 1.28033L15.6893 5.52297L11.4467 9.76561C11.1538 10.0585 11.1538 10.5334 11.4467 10.8263C11.7396 11.1192 12.2145 11.1192 12.5074 10.8263L17.2803 6.0533ZM0.75 5.52297V6.27297H16.75V5.52297V4.77297H0.75V5.52297Z",
 };
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, removeFromCart, cartId, getTotalItems,applyCoupon, 
-    removeCoupon, appliedCoupon, discountAmount } = useCart();
+  const { 
+    cartItems, 
+    updateQuantity, 
+    removeFromCart, 
+    getTotalItems,
+    applyCoupon, 
+    removeCoupon, 
+    appliedCoupon, 
+    discountAmount,
+    // New Context Values
+    shippingMethod,
+    setShippingMethod,
+    shippingCost,
+    subtotal,
+    finalTotal,
+    freeShippingThreshold
+  } = useCart();
+
   const [couponExpanded, setCouponExpanded] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [couponMessage, setCouponMessage] = useState({ text: '', type: '' });
   
-  // Dynamic calculations based on real Cart state
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.1; // Example 10% tax calculation
-  const total = subtotal + tax - discountAmount;
+  // Shipping Dropdown State
+  const [shippingDropdownOpen, setShippingDropdownOpen] = useState(false);
 
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
     setIsApplying(true);
     setCouponMessage({ text: '', type: '' });
 
-    const result = await applyCoupon(couponCode); // Call global method
+    const result = await applyCoupon(couponCode);
     setCouponMessage({ 
       text: result.message, 
       type: result.success ? 'success' : 'error' 
     });
+    
+    if (result.success) setCouponCode('');
     setIsApplying(false);
   };
+
+  // Progress Bar Logic
+  const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const progressPercent = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
   if (cartItems.length === 0) {
     return (
@@ -67,10 +88,8 @@ export default function CartPage() {
               <path d={svgPathsDesktop.p1553ba00} fill="black" />
             </svg>
           </div>
-          <Link href="/checkout" className="flex gap-3 items-center opacity-40">
-            <div className="bg-[#280f0b] flex items-center justify-center rounded-full size-[30px] text-[#f6d8ab] font-bold group-hover:bg-[#ce953f] transition-colors">
-              2
-            </div>
+          <Link href="/checkout" className="flex gap-3 items-center opacity-40 hover:opacity-100 transition-opacity">
+            <div className="bg-[#280f0b] flex items-center justify-center rounded-full size-[30px] text-[#f6d8ab] font-bold">2</div>
             <p className="text-[#280f0b] text-base font-medium">Checkout</p>
           </Link>
           <div className="w-[33px] h-[16px] opacity-40">
@@ -144,36 +163,111 @@ export default function CartPage() {
           
           {/* Right: Summary Card */}
           <div className="relative w-full max-w-[526px] mx-auto lg:mx-0">
-            <div className="bg-[#FFC26F] rounded-[20px] overflow-hidden relative min-h-[430px] flex flex-col shadow-sm">
+            <div className="bg-[#FFC26F] rounded-[20px] overflow-hidden relative flex flex-col shadow-sm">
               
+              {/* 1. Cost Breakdown Section */}
               <div className="p-6 lg:p-10 flex flex-col gap-4">
                 <div className="flex justify-between items-center text-[#280f0b]">
                   <span className="text-base lg:text-lg">Subtotal</span>
                   <span className="font-semibold text-base lg:text-lg">${subtotal.toFixed(2)}</span>
                 </div>
+
                 {discountAmount > 0 && (
-                  <div className="flex justify-between items-center text-[#280f0b]">
-                    <span className="text-base lg:text-lg">Discount</span>
-                    <span className="font-semibold text-base lg:text-lg">-${discountAmount.toFixed(2)}</span>
+                  <div className="flex justify-between items-center text-[#280F0B] ">
+                    <span className="text-base lg:text-lg tracking-tight">Discount</span>
+                    <span className="font-semibold text-base lg:text-lg text-[#280F0B]">-${discountAmount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center text-[#280f0b]">
-                  <span className="text-base lg:text-lg">Tax</span>
-                  <span className="font-semibold text-base lg:text-lg">${tax.toFixed(2)}</span>
+
+                {/* Interactive Shipping Selector with Attached Truck Icon */}
+                <div className="flex justify-between items-center relative z-20">
+                  <span className="text-base lg:text-lg text-[#280f0b]">Shipping</span>
+
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShippingDropdownOpen(!shippingDropdownOpen)}
+                      className="flex items-center gap-3 bg-[#f6d8ab] border border-[#280f0b]/10 rounded-lg px-4 py-3 text-sm font-bold text-[#280f0b] hover:bg-[#ffe3b9] transition-colors shadow-sm min-w-[200px] justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="relative w-5 h-5 shrink-0">
+                          <Image src="/assets/images/truck.svg" alt="Shipping" fill className="object-contain" />
+                        </div>
+                        <span>{shippingMethod === 'standard' ? 'Standard' : 'Express'} - ${shippingCost.toFixed(2)}</span>
+                      </div>
+                      <ChevronDown size={16} className={`transition-transform ${shippingDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {shippingDropdownOpen && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -5 }}
+                          className="absolute right-0 top-full mt-2 w-64 bg-[#f6d8ab] text-[#280f0b] rounded-lg shadow-xl overflow-hidden z-50 border border-[#280f0b]/10"
+                        >
+                          <div 
+                            onClick={() => { setShippingMethod('standard'); setShippingDropdownOpen(false); }}
+                            className={`p-4 cursor-pointer hover:bg-black/5 flex items-center justify-between ${shippingMethod === 'standard' ? 'bg-black/5' : ''}`}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-bold">Standard</span>
+                              <span className="text-xs opacity-70">7-14 Business Days</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {subtotal >= freeShippingThreshold ? <span className="font-bold text-[#280F0B]">FREE</span> : <span className="font-bold">$9.00</span>}
+                              {shippingMethod === 'standard' && <Check size={16} />}
+                            </div>
+                          </div>
+                          <div 
+                            onClick={() => { setShippingMethod('express'); setShippingDropdownOpen(false); }}
+                            className={`p-4 cursor-pointer hover:bg-black/5 flex items-center justify-between ${shippingMethod === 'express' ? 'bg-black/5' : ''}`}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-bold">Express</span>
+                              <span className="text-xs opacity-70 text-red-700 font-semibold">1-2 Days</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold">$15.00</span>
+                              {shippingMethod === 'express' && <Check size={16} />}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-[#280f0b]">
-                  <span className="text-base lg:text-lg">Shipping</span>
-                  <span className="font-semibold text-base lg:text-lg">FREE</span>
+                
+              </div>
+
+              {/* 2. Free Shipping Progress */}
+              <div className="px-6 lg:px-10 pb-6">
+                <p className="text-xs text-left text-[#280f0b] mb-2 font-medium tracking-wide">
+                  {amountToFreeShipping > 0 ? (
+                    <>
+                      <span className="font-extrabold">${amountToFreeShipping.toFixed(2)}</span> away from free shipping!
+                    </>
+                  ) : (
+                    <span className="font-extrabold">You've unlocked FREE shipping!</span>
+                  )}
+                </p>
+                <div className="w-full h-2 bg-[#280f0b]/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    className="h-full bg-[#7F3E2F]"
+                  />
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="w-full border-t border-dashed border-black/40" />
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10 shadow-inner" />
+              {/* 3. Divider with Cutouts */}
+              <div className="relative w-full">
+                <div className="border-t border-dashed border-[#280f0b]/30 w-full" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-8 rounded-full bg-[#f6d8ab] z-10" />
+              </div>
 
-                <div className="px-6 lg:px-10 py-6">
-                {/* Coupon Input Area */}
+              {/* 4. Coupon Code Section */}
+              <div className="px-6 lg:px-10 py-6">
                 {!appliedCoupon ? (
                   <>
                     <button onClick={() => setCouponExpanded(!couponExpanded)} className="flex items-center gap-4 w-full group outline-none">
@@ -181,7 +275,7 @@ export default function CartPage() {
                         <Image src="/assets/images/coupon.svg" alt="Coupon" fill className="object-contain" />
                       </div>
                       <span className="text-[#280f0b] font-medium text-base lg:text-lg group-hover:underline">Have a coupon code?</span>
-                      <svg className={`ml-auto w-4 h-4 transition-transform ${couponExpanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="#280f0b" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                      <ChevronDown className={`ml-auto transition-transform ${couponExpanded ? 'rotate-180' : ''}`} />
                     </button>
                     <div className={`overflow-hidden transition-all duration-300 ${couponExpanded ? 'max-h-32 mt-4' : 'max-h-0'}`}>
                       <div className="flex gap-2">
@@ -190,7 +284,7 @@ export default function CartPage() {
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
                           placeholder="Enter code" 
-                          className="flex-1 bg-white/20 border border-black/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/50 outline-none" 
+                          className="flex-1 bg-white/40 border border-[#280f0b]/20 p-3 rounded text-sm text-[#280f0b] placeholder-[#280f0b]/50 outline-none focus:border-[#280f0b]" 
                         />
                         <button 
                           onClick={handleApplyCoupon}
@@ -203,8 +297,7 @@ export default function CartPage() {
                     </div>
                   </>
                 ) : (
-                  /* Applied Coupon Message with Remove button */
-                  <div className="flex justify-between items-center py-2">
+                  <div className="flex justify-between items-center py-2 bg-[#280F0B]/5 p-3 rounded border border-[#280F0B]/10">
                     <div className="flex items-center gap-3">
                       <Image src="/assets/images/coupon.svg" alt="Coupon" width={20} height={20} className="object-contain" />
                       <p className="text-[12px] font-bold text-[#280F0B] tracking-wider">CODE: {appliedCoupon} APPLIED</p>
@@ -218,25 +311,23 @@ export default function CartPage() {
                   </p>
                 )}
               </div>
-              <div className="w-full border-b border-dashed border-black/40" />
-            </div>
+              <div className="w-full border-b border-dashed border-[#280f0b]/30" />
 
+              {/* Final Total Section */}
               <div className="p-6 lg:p-10 flex flex-col flex-1">
-                <div className="flex justify-between items-center mb-10">
+                <div className="flex justify-between items-center mb-10 text-[#280f0b]">
                   <span className="text-2xl font-bold">Total</span>
-                  <span className="text-2xl font-bold">${total.toFixed(2)} AUD</span>
+                  <span className="text-2xl font-bold">${finalTotal.toFixed(2)} AUD</span>
                 </div>
 
-              <Link href="/checkout" className="w-full block">
-                <button  
-                  className="w-full mt-auto bg-[#7f3e2f] text-[#fcf3e5] py-4 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 disabled:opacity-50 transition-all uppercase tracking-[1.12px] font-semibold text-sm"
-                >
-                  Proceed to checkout
-                  <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
-                    <path d={svgPathsDesktop.pdaf5300} fill="#fcf3e5" />
-                  </svg>
-                </button>
-              </Link>
+                <Link href="/checkout" className="w-full block mt-auto">
+                  <button className="w-full bg-[#7f3e2f] text-[#fcf3e5] py-5 rounded-lg flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-[1.12px] font-bold text-sm">
+                    Proceed to checkout
+                    <svg className="w-5 h-3" viewBox="0 0 18 12" fill="none">
+                      <path d={svgPathsDesktop.p1553ba00} fill="#fcf3e5" />
+                    </svg>
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

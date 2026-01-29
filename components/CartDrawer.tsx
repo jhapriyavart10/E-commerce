@@ -235,7 +235,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         <div className="bg-[#280f0b] p-8 text-[#f6d8ab]">
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center text-sm">
-              <p className="opacity-70">Subtotal</p>
+              <p className="opacity-70">Subtotal (incl. tax)</p>
               <p className="font-bold">${subtotal.toFixed(2)} AUD</p>
             </div>
             
@@ -245,11 +245,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <p className="font-semibold">-${discountAmount.toFixed(2)} AUD</p>
               </div>
             )}
-
-            <div className="flex justify-between items-center text-sm">
-              <p className="opacity-70">Estimated Tax (10%)</p>
-              <p className="font-bold">${tax.toFixed(2)} AUD</p>
-            </div>
           </div>
 
           <div className="flex items-end justify-between mb-8 border-t border-[#f6d8ab]/10 pt-4">
