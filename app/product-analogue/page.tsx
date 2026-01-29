@@ -196,10 +196,10 @@ export default function ShopPage() {
   return (
     <>
       <Header />
-      <div className="h-[80px] md:h-[150px] w-full bg-[#F6D8AB]" />
+      <div className="h-[40px] md:h-[40px] w-full bg-[#F6D8AB]" />
       
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
-        <div className="px-5 md:px-12 xl:px-24 2xl:px-32 pb-10 pt-4">
+        <div className="px-5 md:px-12 xl:px-24 2xl:px-32 pb-5">
           
           {/* 4. New Image Quick Filters Section */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 w-full">
