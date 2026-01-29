@@ -201,14 +201,13 @@ export default function ShopPage() {
       <main className="bg-[#F6D8AB] text-[#280F0B] font-manrope min-h-screen">
         <div className="px-5 md:px-12 xl:px-24 2xl:px-32 pb-5">
           
-          {/* 4. New Image Quick Filters Section */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 w-full">
             {QUICK_LINKS.map((link) => (
               <motion.div
                 key={link.title}
                 onClick={() => handleQuickLink(link)}
                 className="relative cursor-pointer group"
-                whileHover={{ scale: 1.05 }} // Pop up animation
+                // Removed whileHover={{ scale: 1.05 }} so the box doesn't grow
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
@@ -217,10 +216,9 @@ export default function ShopPage() {
                      src={link.image} 
                      alt={link.title}
                      fill
-                     className="object-contain"
+                     className="object-fill transition-transform duration-500 group-hover:scale-110"
                    />
                 </div>
-                <p className="text-center mt-3 font-lora font-bold text-xl tracking-wide">{link.title}</p>
               </motion.div>
             ))}
           </div>

@@ -117,18 +117,28 @@ export default function UnifiedProductPage({ product }: { product: any }) {
     e.preventDefault();
     setNotifyStatus('loading');
     
+    // 1. Get your public key from env (ensure it's loaded in next.config.js or via env)
+    const KLAVIYO_PUBLIC_KEY = process.env.NEXT_PUBLIC_KLAVIYO_PUBLIC_API_KEY; 
+
     try {
-      // Reusing the newsletter subscription route for notification
-      const response = await fetch('/api/newsletter/subscribe', {
+      // 2. Use Klaviyo's Client-Side Back-in-Stock API
+      const response = await fetch('https://a.klaviyo.com/api/v1/catalog/subscribe', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          a: KLAVIYO_PUBLIC_KEY || '', 
           email: notifyEmail,
-          tags: [`Restock: ${product.title} - ${activeVariant.title}`] // Tagging for context
+          variant: activeVariant?.id?.split('/').pop() || '', 
+          product: product.id?.split('/').pop() || '',       
+          platform: 'shopify'
         })
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (data.success) {
         setNotifyStatus('success');
         setTimeout(() => {
           setIsNotifyModalOpen(false);
@@ -136,6 +146,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
           setNotifyEmail('');
         }, 2000);
       } else {
+        console.error("Klaviyo Error:", data);
         setNotifyStatus('error');
       }
     } catch (error) {
@@ -146,7 +157,6 @@ export default function UnifiedProductPage({ product }: { product: any }) {
 
   const handleAddToCart = () => {
     if (activeVariant?.quantityAvailable < 1) {
-        // Prevent adding to cart if completely out of stock, though the button should handle UI
         return;
     }
     addToCart({ 
@@ -352,7 +362,7 @@ export default function UnifiedProductPage({ product }: { product: any }) {
   }, [reviews]);
 
   // Determine stock status based on user preference (< 5)
-  const isOutOfStock = (activeVariant?.quantityAvailable ?? 0) < 3;
+  const isOutOfStock = (activeVariant?.quantityAvailable ?? 0) == 0;
 
   return (
     <>

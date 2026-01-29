@@ -424,7 +424,7 @@ export default function CheckoutPage() {
                     >
                       <div className="flex items-center gap-2">
                         <div className="relative w-5 h-5 shrink-0">
-                          <Image src="/assets/images/truck.svg" alt="Shipping" fill className="object-contain" />
+                          <Image src={shippingMethod === 'express' ? "/assets/images/express.svg" : "/assets/images/truck.svg"} alt="Shipping" fill className="object-contain" />
                         </div>
                         <span>{shippingMethod === 'standard' ? 'Standard' : 'Express'} - ${shippingCost.toFixed(2)}</span>
                       </div>
@@ -448,7 +448,7 @@ export default function CheckoutPage() {
                               <span className="text-xs opacity-70">7-14 Business Days</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {subtotal >= freeShippingThreshold ? <span className="font-bold text-green-700">FREE</span> : <span className="font-bold">$9.00</span>}
+                              {subtotal >= freeShippingThreshold ? <span className="font-bold text-[#280F0B]">FREE</span> : <span className="font-bold">$9.00</span>}
                               {shippingMethod === 'standard' && <Check size={16} />}
                             </div>
                           </div>
@@ -458,10 +458,10 @@ export default function CheckoutPage() {
                           >
                             <div className="flex flex-col">
                               <span className="font-bold">Express</span>
-                              <span className="text-xs opacity-70 text-red-700 font-semibold">1-2 Days</span>
+                              <span className="text-xs opacity-70">1-2 Days</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold">$15.00</span>
+                              <span className="font-bold text-[#280F0B]">$15.00</span>
                               {shippingMethod === 'express' && <Check size={16} />}
                             </div>
                           </div>
@@ -474,10 +474,14 @@ export default function CheckoutPage() {
 
               {/* 2. Free Shipping Progress - Left Aligned */}
               <div className="px-6 lg:px-10 pb-6">
-                <p className="text-xs text-[#280f0b] text-left mb-2 font-bold tracking-wide">
-                  {amountToFreeShipping > 0 
-                    ? `$${amountToFreeShipping.toFixed(2)} away from free shipping!` 
-                    : "You've unlocked FREE shipping!"}
+                <p className="text-medium text-left text-[#280f0b] mb-2 font-medium tracking-wide">
+                  {amountToFreeShipping > 0 ? (
+                    <>
+                      <span className="font-extrabold">${amountToFreeShipping.toFixed(2)}</span> away from free shipping!
+                    </>
+                  ) : (
+                    <span className="font-extrabold">You've unlocked FREE shipping!</span>
+                  )}
                 </p>
                 <div className="w-full h-2 bg-[#280f0b]/10 rounded-full overflow-hidden">
                   <motion.div 
@@ -535,7 +539,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 {couponMessage.text && (
-                  <p className={`mt-3 text-[11px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-green-800'}`}>
+                  <p className={`mt-3 text-[11px] font-bold uppercase tracking-widest ${couponMessage.type === 'error' ? 'text-red-700' : 'text-[#280F0B]'}`}>
                     {couponMessage.text}
                   </p>
                 )}

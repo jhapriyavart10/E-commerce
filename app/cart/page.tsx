@@ -190,7 +190,7 @@ export default function CartPage() {
                     >
                       <div className="flex items-center gap-2">
                         <div className="relative w-5 h-5 shrink-0">
-                          <Image src="/assets/images/truck.svg" alt="Shipping" fill className="object-contain" />
+                          <Image src={shippingMethod === 'express' ? "/assets/images/express.svg" : "/assets/images/truck.svg"} alt="Shipping" fill className="object-contain" />
                         </div>
                         <span>{shippingMethod === 'standard' ? 'Standard' : 'Express'} - ${shippingCost.toFixed(2)}</span>
                       </div>
@@ -224,10 +224,10 @@ export default function CartPage() {
                           >
                             <div className="flex flex-col">
                               <span className="font-bold">Express</span>
-                              <span className="text-xs opacity-70 text-red-700 font-semibold">1-2 Days</span>
+                              <span className="text-xs opacity-70">1-2 Days</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold">$15.00</span>
+                              <span className="font-bold text-[#280F0B]">$15.00</span>
                               {shippingMethod === 'express' && <Check size={16} />}
                             </div>
                           </div>
@@ -241,7 +241,7 @@ export default function CartPage() {
 
               {/* 2. Free Shipping Progress */}
               <div className="px-6 lg:px-10 pb-6">
-                <p className="text-xs text-left text-[#280f0b] mb-2 font-medium tracking-wide">
+                <p className="text-medium text-left text-[#280f0b] mb-2 font-medium tracking-wide">
                   {amountToFreeShipping > 0 ? (
                     <>
                       <span className="font-extrabold">${amountToFreeShipping.toFixed(2)}</span> away from free shipping!
