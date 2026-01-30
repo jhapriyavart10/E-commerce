@@ -207,17 +207,16 @@ export default function ShopPage() {
                 key={link.title}
                 onClick={() => handleQuickLink(link)}
                 className="relative cursor-pointer group"
-                // Removed whileHover={{ scale: 1.05 }} so the box doesn't grow
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
-                <div className="aspect-[17/15] relative overflow-hidden rounded-md border border-[#280F0B]/10 shadow-sm">
-                   <Image 
-                     src={link.image} 
-                     alt={link.title}
-                     fill
-                     className="object-fill transition-transform duration-500 group-hover:scale-110"
-                   />
+                <div className="aspect-[17/15] relative overflow-hidden rounded-md border border-[#280F0B]/10 shadow-sm bg-[#280F0B]">
+                    <Image 
+                      src={link.image} 
+                      alt={link.title}
+                      fill
+                      className="object-fill transition-all will-change-transform transform-gpu duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] opacity-70 group-hover:scale-110 group-hover:opacity-100"
+                    />
                 </div>
               </motion.div>
             ))}
