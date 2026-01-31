@@ -4,6 +4,7 @@ export async function GET(request: NextRequest) {
   try {
     const listId = process.env.KLAVIYO_NEWSLETTER_LIST_ID; // Add your List ID to .env
     const privateKey = process.env.KLAVIYO_PRIVATE_KEY;
+    const couponCode = process.env.KLAVIYO_WELCOME_COUPON;
 
     if (!listId || !privateKey) {
       return NextResponse.json({ error: 'Configuration missing' }, { status: 500 });
@@ -30,8 +31,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       name: data.data.attributes.name,
-      // Note: Full profile count often requires a separate 'relationships' call
-      // but list name and basic metadata are returned here.
+      couponCode: couponCode
     });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

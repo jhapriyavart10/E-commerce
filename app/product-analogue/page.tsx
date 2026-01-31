@@ -41,7 +41,7 @@ const QUICK_LINKS = [
     filterValue: 'For Him' 
   },
   { 
-    title: 'Charms', 
+    title: 'Charms & Pendants', 
     image: '/assets/images/Charms.png', 
     filterType: 'category', 
     filterValue: 'Charms & Pendants' 
@@ -217,6 +217,11 @@ export default function ShopPage() {
                       fill
                       className="object-fill transition-all will-change-transform transform-gpu duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] opacity-70 group-hover:scale-110 group-hover:opacity-100"
                     />
+                    <div className="absolute bottom-5 left-5 z-10 pointer-events-none">
+                      <span className="text-white font-manrope font-bold text-[24px] leading-none tracking-[-0.5px]">
+                        {link.title === 'Charms' ? 'Charms & Pendants' : link.title}
+                      </span>
+                    </div>
                 </div>
               </motion.div>
             ))}

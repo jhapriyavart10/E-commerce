@@ -13,9 +13,13 @@ export default function ImmersiveNewsletter() {
   const [warning, setWarning] = useState('');
   const [copied, setCopied] = useState(false);
   
+  // New state to track if the gift has been claimed
+  const [isClaimed, setIsClaimed] = useState(false);
+
   const [newsletterData, setNewsletterData] = useState({
     title: "Grab a 20% off.",
     subheading: "To claim it tell us your primary spiritual focus.",
+    couponCode: "", // Initialize empty
     options: [
       "Inner Peace & Emotional Balance",
       "Energy Cleansing & Protection",
@@ -31,18 +35,25 @@ export default function ImmersiveNewsletter() {
     setIsVisible(true);
   };
 
-  // NEW: Fetch details from your /api/newsletter/details route
+  // Check if already claimed on mount
+  useEffect(() => {
+    const claimed = localStorage.getItem('newsletter_claimed');
+    if (claimed) {
+      setIsClaimed(true);
+    }
+  }, []);
+
+  // Fetch details (List Name & Coupon Code)
   useEffect(() => {
     async function fetchDetails() {
       try {
         const res = await fetch('/api/newsletter/details');
         const data = await res.json();
-        if (data.name) {
-          setNewsletterData(prev => ({
-            ...prev,
-            title: `Join ${data.name}`, 
-          }));
-        }
+        setNewsletterData(prev => ({
+          ...prev,
+          title: data.name ? `Join ${data.name}` : prev.title,
+          couponCode: data.couponCode || 'WELCOME20' // Use fetched code
+        }));
       } catch (err) {
         console.error("Failed to fetch newsletter details:", err);
       }
@@ -50,9 +61,12 @@ export default function ImmersiveNewsletter() {
     fetchDetails();
   }, []);
 
+  // Auto-show logic (only if not claimed and not seen this session)
   useEffect(() => {
     const hasSeenPopup = sessionStorage.getItem('hasSeenNewsletter');
-    if (!hasSeenPopup) {
+    const claimed = localStorage.getItem('newsletter_claimed');
+    
+    if (!hasSeenPopup && !claimed) {
       const timer = setTimeout(() => setIsVisible(true), 3500);
       return () => clearTimeout(timer);
     }
@@ -75,7 +89,6 @@ export default function ImmersiveNewsletter() {
     }
 
     try {
-      // NEW: Actually subscribe the user to Klaviyo via your API
       const response = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,6 +98,9 @@ export default function ImmersiveNewsletter() {
       if (response.ok) {
         setWarning('');
         setStep(3);
+        // Mark as claimed so GiftTrigger hides immediately and permanently
+        setIsClaimed(true);
+        localStorage.setItem('newsletter_claimed', 'true');
       } else {
         setWarning('Something went wrong. Please try again.');
       }
@@ -94,7 +110,8 @@ export default function ImmersiveNewsletter() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText('WELCOME20');
+    // Use the dynamic code
+    navigator.clipboard.writeText(newsletterData.couponCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -115,7 +132,9 @@ export default function ImmersiveNewsletter() {
 
   return (
     <>
-    <GiftTrigger onOpen={openPopup} />
+    {/* Only show GiftTrigger if NOT claimed */}
+    {!isClaimed && <GiftTrigger onOpen={openPopup} />}
+    
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -213,7 +232,9 @@ export default function ImmersiveNewsletter() {
                     }}
                     className="flex items-center justify-center gap-[8px] px-[20px] cursor-pointer hover:bg-white/5 transition-colors"
                   >
-                    <span className="font-manrope font-medium text-white text-[16px] tracking-widest uppercase">WELCOME20</span>
+                    <span className="font-manrope font-medium text-white text-[16px] tracking-widest uppercase">
+                      {newsletterData.couponCode || 'WELCOME20'}
+                    </span>
                     {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-white/60" />}
                   </div>
                 </motion.div>
