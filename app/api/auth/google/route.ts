@@ -1,14 +1,11 @@
 import { createCustomer, loginCustomer } from '@/lib/shopify';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import crypto from 'crypto'; // 1. Import crypto for secure password generation
 
-/**
- * Helper function to exchange the Google Auth Code for real user profile data.
- */
 async function getGoogleUser(code: string) {
   const rootUrl = 'https://oauth2.googleapis.com/token';
   
-  // These must be defined in your .env file
   const options = {
     code,
     client_id: process.env.GOOGLE_CLIENT_ID || '',
@@ -31,7 +28,6 @@ async function getGoogleUser(code: string) {
 
   const { id_token, access_token } = await res.json();
 
-  // Fetch the user's profile using the access_token
   const userRes = await fetch(
     `https://www.googleapis.com/oauth2/v3/userinfo?alt=json&access_token=${access_token}`,
     {
@@ -62,21 +58,22 @@ export async function GET(req: Request) {
 
   try {
     const googleUser = await getGoogleUser(code); 
+    const securePassword = crypto.randomBytes(16).toString('hex');
+
     try {
       await createCustomer({
         email: googleUser.email,
         firstName: googleUser.firstName,
         lastName: googleUser.lastName,
-        password: "GoogleAuthUser123!", // Consistent placeholder for OAuth
+        password: securePassword, // Use the random password
         acceptsMarketing: true
       });
     } catch (e) {
-      // Ignore "Email has already been taken" errors to allow returning users to log in
       console.log('User may already exist, attempting login...');
     }
 
-    // 3. Log into Shopify to get a Customer Access Token
-    const loginResponse = await loginCustomer(googleUser.email, "GoogleAuthUser123!");
+    let loginResponse = await loginCustomer(googleUser.email, securePassword);
+    
     const accessToken = (loginResponse.body as any)?.customerAccessTokenCreate?.customerAccessToken?.accessToken;
 
     if (accessToken) {
@@ -90,7 +87,9 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL('/product-analogue', req.url));
     }
 
-    return NextResponse.redirect(new URL('/signin?error=auth_failed', req.url));
+    // If we couldn't log them in (e.g. existing user with different password)
+    return NextResponse.redirect(new URL('/signin?error=google_account_exists_please_login_manually', req.url));
+
   } catch (error) {
     console.error('Google Auth Error:', error);
     return NextResponse.redirect(new URL('/signup?error=server_error', req.url));

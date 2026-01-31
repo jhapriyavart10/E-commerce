@@ -1,106 +1,47 @@
+// services/products.service.ts
 import { shopifyFetch } from '@/lib/shopify';
-import { getProductQuery, getProductsQuery } from '@/lib/shopify/queries';
+import { getProductsQuery, getProductQuery } from '@/lib/shopify/queries';
+import { Product } from '@/lib/shopify/types'; // Ensure you have this type or use 'any' if strictly needed
 
-function resolveMetaobjectLabels(metafield: any, fallback: string): string[] {
-  if (metafield?.references?.edges) {
-    const labels = metafield.references.edges.map(
-      (edge: any) => edge.node.field?.value || fallback
-    );
-    return Array.from(new Set(labels));
-  }
+// Helper to reshape Shopify data
+const reshapeProduct = (product: any) => {
+  if (!product) return undefined;
+  const { images, variants, ...rest } = product;
+  return {
+    ...rest,
+    image: images?.edges?.[0]?.node?.url || '',
+    price: variants?.edges?.[0]?.node?.price?.amount ? parseFloat(variants.edges[0].node.price.amount) : 0,
+    // Extract metadata values for filters
+    gender: product.gender?.references?.edges?.map((e: any) => e.node?.field?.value) || [],
+    material: product.material?.references?.edges?.map((e: any) => e.node?.field?.value) || [],
+    category: product.productType
+  };
+};
 
-  if (metafield?.reference?.fields) {
-    const displayField = metafield.reference.fields.find(
-      (f: any) => f.key === 'label' || f.key === 'name' || f.key === 'value'
-    );
-    return [displayField?.value || fallback];
-  }
+export async function getProducts(cursor?: string) {
+  const res = await shopifyFetch<any>({
+    query: getProductsQuery,
+    variables: { 
+      first: 12, // Load 12 items per batch
+      after: cursor || null 
+    }, 
+    cache: 'no-store'
+  });
 
-  return [fallback];
-}
+  const shopifyProducts = res.body?.products?.edges || [];
+  const pageInfo = res.body?.products?.pageInfo;
 
-export async function getProducts() {
-  try {
-    const res = await shopifyFetch<any>({
-      query: getProductsQuery,
-      variables: { first: 28 },
-    });
-
-    const edges = res?.body?.products?.edges;
-    if (!edges) return [];
-
-    return edges.map((edge: any) => {
-      const product = edge.node;
-      const variantNode = product.variants?.edges?.[0]?.node;
-      const imageNode = product.images?.edges?.[0]?.node;
-
-      return {
-        id: variantNode?.id || product.id,
-        productId: product.id,
-        title: product.title,
-        handle: product.handle,
-        price: Number(variantNode?.price?.amount || 0),
-        image: imageNode?.url || '/assets/images/necklace-img.png',
-        category: product.productType || 'Jewellery',
-        gender: resolveMetaobjectLabels(product.gender, 'Unisex'),
-        material: resolveMetaobjectLabels(product.material, 'Uncategorized'),
-      };
-    });
-  } catch (err) {
-    console.error('Service Layer Failure (getProducts):', err);
-    return [];
-  }
+  return {
+    products: shopifyProducts.map((item: any) => reshapeProduct(item.node)),
+    pageInfo
+  };
 }
 
 export async function getProduct(handle: string) {
-  try {
-    const res = await shopifyFetch<any>({
-      query: getProductQuery,
-      variables: { handle },
-      cache: 'no-store'
-    });
-
-    const product = res?.body?.product;
-    if (!product) return null;
-
-    const variantNode = product.variants?.edges?.[0]?.node;
-
-    return {
-      id: variantNode?.id || product.id,
-      productId: product.id,
-      title: product.title,
-      handle: product.handle,
-      price: Number(variantNode?.price?.amount || 0),
-      image: product.images?.edges?.[0]?.node?.url || '/assets/images/necklace-img.png',
-      description: product.descriptionHtml,
-      
-      howToUse: product.howToUse?.value || null,
-      productDetails: product.productDetails?.value || null,
-      careInstructions: product.careInstructions?.value || null,
-
-      category: product.productType || 'Jewellery',
-      gender: resolveMetaobjectLabels(product.gender, 'Unisex'),
-      material: resolveMetaobjectLabels(product.material, 'Uncategorized'),
-      
-      variants: product.variants?.edges?.map((v: any) => ({
-        id: v.node.id,
-        title: v.node.title,
-        price: Number(v.node.price.amount),
-        // --- ADDED THIS LINE ---
-        quantityAvailable: v.node.quantityAvailable, 
-        // -----------------------
-        image: v.node.image?.url || null, 
-        selectedOptions: v.node.selectedOptions.reduce((acc: any, opt: any) => {
-          acc[opt.name] = opt.value;
-          return acc;
-        }, {})
-      })) || [],
-      rating: product.rating?.value ? parseFloat(product.rating.value) : 0,
-      reviewCount: product.reviewCount?.value ? parseInt(product.reviewCount.value) : 0,
-      reviews: product.reviewList?.value ? JSON.parse(product.reviewList.value) : []
-    };
-  } catch (err) {
-    console.error('Fetch Product Error (getProduct):', err);
-    return null;
-  }
+  const res = await shopifyFetch<any>({
+    query: getProductQuery,
+    variables: { handle },
+    cache: 'no-store'
+  });
+  return reshapeProduct(res.body?.product);
 }

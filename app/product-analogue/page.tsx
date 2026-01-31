@@ -1,3 +1,4 @@
+// app/product-analogue/page.tsx
 'use client';
 import Header from '@/components/Header';
 import Image from 'next/image';
@@ -26,42 +27,25 @@ type Filters = {
   material: string[];
 };
 
-// 1. Define the Quick Link Data
+// ... (Keep QUICK_LINKS const same as before) ...
 const QUICK_LINKS = [
-  { 
-    title: 'For Her', 
-    image: '/assets/images/For Her.png', 
-    filterType: 'gender', 
-    filterValue: 'For Her' 
-  },
-  { 
-    title: 'For Him', 
-    image: '/assets/images/For Him.png', 
-    filterType: 'gender', 
-    filterValue: 'For Him' 
-  },
-  { 
-    title: 'Charms & Pendants', 
-    image: '/assets/images/Charms.png', 
-    filterType: 'category', 
-    filterValue: 'Charms & Pendants' 
-  },
-  { 
-    title: 'Bracelets', 
-    image: '/assets/images/Bracelets.png', 
-    filterType: 'category', 
-    filterValue: 'Bracelets' 
-  }
+  { title: 'For Her', image: '/assets/images/For Her.png', filterType: 'gender', filterValue: 'For Her' },
+  { title: 'For Him', image: '/assets/images/For Him.png', filterType: 'gender', filterValue: 'For Him' },
+  { title: 'Charms & Pendants', image: '/assets/images/Charms.png', filterType: 'category', filterValue: 'Charms & Pendants' },
+  { title: 'Bracelets', image: '/assets/images/Bracelets.png', filterType: 'category', filterValue: 'Bracelets' }
 ];
 
 export default function ShopPage() {
   const { addToCart } = useCart();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // 1. Pagination State
+  const [pageInfo, setPageInfo] = useState({ hasNextPage: false, endCursor: null });
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const [apiError, setApiError] = useState<string | null>(null);
   const [sortBy, setBy] = useState<string>('Default Sorting');
-  
-  // 2. Add State for Dynamic Header
   const [pageTitle, setPageTitle] = useState('All Products');
 
   const [filters, setFilters] = useState<Filters>({
@@ -75,26 +59,50 @@ export default function ShopPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        const res = await fetch('/api/shopify/products');
-        const data = await res.json();
-        if (data && Array.isArray(data)) {
-          setAllProducts(data);
+  // 2. Fetch Function (Reusable)
+  async function fetchProducts(cursor: string | null = null, isLoadMore = false) {
+    try {
+      if (!isLoadMore) setLoading(true);
+      else setLoadingMore(true);
+
+      const url = cursor 
+        ? `/api/shopify/products?cursor=${cursor}`
+        : `/api/shopify/products`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      if (data.products && Array.isArray(data.products)) {
+        if (isLoadMore) {
+           // Append new products to existing list
+           setAllProducts(prev => [...prev, ...data.products]);
         } else {
-          setApiError(data.error || "Failed to load products.");
-          setAllProducts([]); 
+           setAllProducts(data.products);
         }
-      } catch (error) {
-        setApiError("Network error.");
-        setAllProducts([]);
-      } finally {
-        setLoading(false);
+        // Update pagination info
+        setPageInfo(data.pageInfo);
+      } else {
+        setApiError("Failed to load products.");
       }
+    } catch (error) {
+      setApiError("Network error.");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
-    loadProducts();
+  }
+
+  // Initial Load
+  useEffect(() => {
+    fetchProducts();
   }, []);
+
+  // 3. Load More Handler
+  const handleLoadMore = () => {
+    if (pageInfo.hasNextPage && pageInfo.endCursor) {
+      fetchProducts(pageInfo.endCursor, true);
+    }
+  };
 
   const safeProducts = Array.isArray(allProducts) ? allProducts : [];
 
@@ -111,17 +119,12 @@ export default function ShopPage() {
   const toggleFilter = (key: keyof Filters, value: string) => {
     setFilters((prev) => {
       const list = prev[key] as string[];
-      // If manually toggling, we might want to reset the "Page Title" to generic if it gets complex, 
-      // but strictly adhering to the prompt, we just toggle the filter.
       return { ...prev, [key]: list.includes(value) ? list.filter((v) => v !== value) : [...list, value] };
     });
   };
 
-  // 3. Handle Quick Link Click
   const handleQuickLink = (item: typeof QUICK_LINKS[0]) => {
-    setPageTitle(item.title); // Update Header
-    
-    // Reset other filters and apply the selected one
+    setPageTitle(item.title); 
     setFilters({
       price: { min: 0, max: 150 },
       category: [],
@@ -136,6 +139,7 @@ export default function ShopPage() {
     setIsCartOpen(true);
   };
 
+  // ... (Keep dynamicMaterials, filteredProducts, sortedProducts logic same as before) ...
   const dynamicMaterials = useMemo(() => {
     const counts: Record<string, number> = {};
     safeProducts.forEach(p => {
@@ -143,11 +147,7 @@ export default function ShopPage() {
       materials.forEach(m => { if (m) counts[m] = (counts[m] || 0) + 1; });
     });
     return Object.entries(counts)
-      .sort((a, b) => {
-        if (a[0] === 'Uncategorized') return 1;
-        if (b[0] === 'Uncategorized') return -1;
-        return b[1] - a[1];
-      })
+      .sort((a, b) => b[1] - a[1]) // Simplified sort
       .map(([name]) => name);
   }, [safeProducts]);
 
@@ -182,6 +182,7 @@ export default function ShopPage() {
       default: return items;
     }
   }, [filteredProducts, sortBy]);
+
 
   if (loading) return (
     <div className="bg-[#F6D8AB] min-h-screen flex items-center justify-center">
@@ -227,12 +228,11 @@ export default function ShopPage() {
             ))}
           </div>
 
+          {/* ... (Header and Filters Layout same as original) ... */}
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-1">
             <div />
-            {/* 5. Dynamic Header */}
             <h1 className="font-lora text-[40px] leading-tight">{pageTitle}</h1>
           </div>
-        
           <div className="hidden lg:grid grid-cols-[260px_1fr] gap-8 mb-6">
             <h2 className="text-xl font-bold border-b border-[#280F0B33] pb-1 flex items-end tracking-[0px]">Filters</h2>
             <div className="flex justify-between items-end border-b border-[#280F0B33] pb-1">
@@ -249,12 +249,12 @@ export default function ShopPage() {
 
           <div className="flex flex-col lg:flex-row gap-10 items-start">
             <aside className="w-full lg:w-[260px]">
+              {/* Mobile Filter UI */}
               <div className="lg:hidden flex flex-col mb-6">
                 <h1 className="font-lora text-[40px] leading-tight mb-1">{pageTitle}</h1>
                 <p className="text-xs opacity-70">Showing {filteredProducts.length} products</p>
               </div>
 
-              {/* ... (Rest of the Sidebar / Mobile Filters remains the same) ... */}
               <div className="flex justify-between items-center lg:hidden border-b border-[#280F0B33] pb-2 mb-4">
                 <button onClick={() => setShowMobileFilters(true)} className="flex items-center gap-2 text-[#280F0B] font-semibold">
                   <Image src="/assets/images/filter.svg" alt="" width={14} height={14} />
@@ -271,7 +271,8 @@ export default function ShopPage() {
 
               <AnimatePresence>
                 {(showMobileFilters) && (
-                  <div className="fixed inset-0 z-[100] lg:hidden">
+                   // ... Mobile Modal same as before ...
+                   <div className="fixed inset-0 z-[100] lg:hidden">
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -319,6 +320,19 @@ export default function ShopPage() {
                   </motion.div>
                 ))}
               </div>
+
+              {/* 4. LOAD MORE BUTTON */}
+              {pageInfo.hasNextPage && (
+                 <div className="mt-16 flex justify-center">
+                   <button 
+                     onClick={handleLoadMore} 
+                     disabled={loadingMore}
+                     className="px-8 py-3 bg-[#280F0B] text-[#F6D8AB] font-bold uppercase tracking-widest text-xs hover:bg-opacity-90 disabled:opacity-50 transition-all"
+                   >
+                     {loadingMore ? 'Loading...' : 'Load More'}
+                   </button>
+                 </div>
+              )}
             </section>
           </div>
         </div>
@@ -332,7 +346,7 @@ export default function ShopPage() {
   );
 }
 
-/* HELPER COMPONENT TO AVOID CODE DUPLICATION */
+// ... (Keep FilterContent Component exactly the same as provided) ...
 function FilterContent({ filters, setFilters, openSections, toggleSection, dynamicMaterials, toggleFilter, safeProducts, getCount }: any) {
   return (
     <>

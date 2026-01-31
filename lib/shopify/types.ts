@@ -2,6 +2,7 @@ export type ShopifyProduct = {
   id: string;
   title: string;
   handle: string;
+  productType: string;
   descriptionHtml: string;
   images: {
     edges: Array<{ node: { url: string } }>;
@@ -12,9 +13,15 @@ export type ShopifyProduct = {
         id: string;
         title: string;
         price: { amount: string; currencyCode: string };
+        quantityAvailable?: number;
+        image?: { url: string };
+        selectedOptions?: Array<{ name: string; value: string }>;
       };
     }>;
   };
+  // Metafields often come in nested in raw Shopify responses
+  gender?: any; 
+  material?: any;
 };
 
 export type ShopifyCart = {
@@ -40,4 +47,33 @@ export type ShopifyCart = {
       };
     }>;
   };
+};
+
+// --- ADDED THIS EXPORT ---
+export type Product = {
+  id: string;
+  handle: string;
+  title: string;
+  descriptionHtml?: string;
+  price: number;
+  image: string;
+  images?: string[]; // Optional: if you want array of strings
+  category: string;
+  gender: string[];
+  material: string[];
+  // Optional extra fields based on your app usage
+  careInstructions?: string;
+  productDetails?: string;
+  howToUse?: string;
+  variants?: any[];
+};
+
+export type PageInfo = {
+  hasNextPage: boolean;
+  endCursor: string | null;
+};
+
+export type Connection<T> = {
+  edges: Array<{ node: T }>;
+  pageInfo?: PageInfo;
 };

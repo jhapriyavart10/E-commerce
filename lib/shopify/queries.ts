@@ -84,9 +84,14 @@ export const getProductQuery = `
 `;
 
 export const getProductsQuery = `
-  query getProducts($first: Int!) {
-    products(first: $first) {
+  query getProducts($first: Int!, $after: String) {
+    products(first: $first, after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       edges {
+        cursor
         node {
           id
           handle
@@ -94,7 +99,6 @@ export const getProductsQuery = `
           productType
           descriptionHtml
           
-          # Added Specifications to Bulk Query
           careInstructions: metafield(namespace: "custom", key: "care_instructions") {
             value
           }

@@ -17,14 +17,16 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     cartItems, 
     updateQuantity, 
     removeFromCart, 
-    cartId, 
     getTotalItems,
     setIsCartDrawerOpen,
     appliedCoupon,
     discountAmount,
     applyCoupon,
-    removeCoupon
-  } = useCart(); // Centralized state
+    removeCoupon,
+    // Import calculated values directly from Context
+    subtotal,
+    finalTotal
+  } = useCart(); 
 
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [couponExpanded, setCouponExpanded] = useState(false);
@@ -39,17 +41,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
   }, [isOpen, setIsCartDrawerOpen]);
 
-  // Drawer Price Calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const tax = subtotal * 0.1;
-  const finalTotal = (subtotal + tax) - discountAmount;
+  // REMOVED: Local tax/total calculation. 
+  // We now use 'subtotal' and 'finalTotal' directly from useCart() to ensure consistency.
 
   const handleApply = async () => {
     if (!couponCode) return;
     setIsApplying(true);
     setCouponMessage({ text: '', type: '' });
 
-    const result = await applyCoupon(couponCode); //
+    const result = await applyCoupon(couponCode); 
     setCouponMessage({ 
       text: result.message, 
       type: result.success ? 'success' : 'error' 
@@ -68,7 +68,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     <div className={`fixed inset-0 z-[100] flex justify-end transition-opacity duration-800 ${
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       }`}>
-      {/* Overlay */}
       <div 
         className={`fixed inset-0 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0"
@@ -76,13 +75,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         onClick={onClose}
       />
 
-      {/* Cart Sidebar */}
       <section 
         className={`relative flex h-full w-full flex-col bg-[#f6d8ab] shadow-2xl transition-transform duration-300 ease-in-out md:w-[486px] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-[#280f0b]/10 px-6 py-8">
           <div className="flex items-baseline gap-2">
             <h2 className="font-lora text-4xl text-[#280f0b]">Cart</h2>
@@ -93,7 +90,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           </button>
         </div>
 
-        {/* Scrollable Cart Items */}
         <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
           {cartItems.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
@@ -171,7 +167,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           )}
         </div>
 
-        {/* Coupon Section (Dashed Border Style) */}
         <div className="border-t border-dashed border-[#280f0b]/30">
           {!appliedCoupon ? (
             <>
@@ -231,7 +226,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           )}
         </div>
 
-        {/* Summary Footer */}
         <div className="bg-[#280f0b] p-8 text-[#f6d8ab]">
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center text-sm">
